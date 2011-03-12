@@ -8,6 +8,8 @@
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
 
+#include "utils.c"
+
 #define MAX_EVENTS 10
 #define MAX_HEADER 200
 #define MAX_STR 32
@@ -185,6 +187,15 @@ void central()
 
   int done = 0;
 
+  struct stockClient {
+	  int nbClients;
+	  struct requete * requetes;
+	  };
+
+  struct stockClient tabClient;
+  tabClient.requetes = (struct requete *)malloc(10*sizeof(struct requete));
+  tabClient.nbClients = 0;
+
   while(!done) //Boucle principale
   {
   
@@ -199,10 +210,15 @@ void central()
         if (events[n].data.fd == sock) 
 		{
 			csock = createSockClientEvent(epollfd, sock);	    
-        } else if (events[n].data.fd == socktest)
+        }
+	   	else if (events[n].data.fd == socktest)
 	   	{
+
 			csocktest = createSockClientEvent(epollfd, socktest);
-        } else if(events[n].data.fd == STDIN_FILENO)
+			tabClient.nbClients++;
+			tabClient.requetes[tabClient.nbClients-1].sock = csocktest;
+        }
+	   	else if(events[n].data.fd == STDIN_FILENO)
 	   	{
             char chaine[512];
             scanf("\n%s", chaine); //récupère l'entrée standart
@@ -224,7 +240,15 @@ void central()
             if (events[n].data.fd == csocktest)
 			{
 				if (events[n].events == 5)
-                printf("%s\n","Plop 8087 ok");
+				{					
+					printf("%s\n", "buffer");
+					char buffer[512];
+					printf("%s\n", "recv");
+					recv(csocktest, buffer, 512*sizeof(char),0);
+					printf("%s\n", "traite");
+					traiteChaine(buffer, &tabClient.requetes[1]);
+					printf("%s\n", "over");
+				}
 			}
         }
     }

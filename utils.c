@@ -29,7 +29,9 @@
 #define DEFAULT_REQ {NON_DEFINI, 0, -2, -1, -1, 0, 0, 0, 0, 0, 0}
 
 struct requete {
-    int type;
+    int sock;
+	
+	int type;
     
     int isOver;
     
@@ -107,7 +109,8 @@ void traiteChaine(char* chaine, struct requete* req) {
     for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
         
         char c = chaine[i];
-    
+		printf("%s\n",chaine);
+
         //est-ce que le caractère est un espace ?
         req->space = (c == ' ' || c == '\n' || c == '\r');
         
@@ -115,6 +118,8 @@ void traiteChaine(char* chaine, struct requete* req) {
             req->mot[req->motPosition] = '\0';
             req->inWord = 0;
             
+			printf("%s\n",req->mot);
+
             //Traitement du mot lu
             //puts(req->mot);
             if(req->reqPosition == 0) {
@@ -212,15 +217,15 @@ void traiteChaine(char* chaine, struct requete* req) {
     }
 }
 
-int main() {
+/*int main() {
     struct requete req = DEFAULT_REQ;
     
-    /* tests
-    assert(parseInt("1") == 1);
-    assert(parseInt("-1") == -1);
-    assert(parseInt("e") == PARSE_ERROR);
-    assert(parseInt("523654") == 523654);
-    */
+    // tests
+    //assert(parseInt("1") == 1);
+    //assert(parseInt("-1") == -1);
+    //assert(parseInt("e") == PARSE_ERROR);
+    //assert(parseInt("523654") == 523654);
+    
     
     req.mot = malloc(MAX_TOCKEN*sizeof(char));
     
@@ -258,4 +263,4 @@ int main() {
     //printf("### %d ###\n", req.type);
     
     return 0;
-}
+}*/
