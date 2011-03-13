@@ -239,6 +239,7 @@ void central()
 				}
 				tabClients.clients[tabClients.nbClients].sock =
 					createSockClientEvent(epollfd, socktest);
+				initReq(&tabClients.clients[tabClients.nbClients].requete);
 				tabClients.nbClients++;
 
 			}
