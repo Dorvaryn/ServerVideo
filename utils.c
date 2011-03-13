@@ -29,7 +29,7 @@
 #define DEFAULT_REQ {NON_DEFINI, 0, -2, -1, -1, 0, 0, 0, 0, 0, 0}
 
 struct requete {
-    int sock;
+    //int sock;
 	
 	int type;
     
@@ -105,11 +105,16 @@ void traiteRequete(struct requete* req) {
 }
 
 void traiteChaine(char* chaine, struct requete* req) {
+
+    if(req->mot == 0) {
+        req->mot = malloc(MAX_TOCKEN*sizeof(char));
+    }
+
     int i;
     for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
         
         char c = chaine[i];
-		printf("%s\n",chaine);
+		//printf("%s\n",chaine);
 
         //est-ce que le caractère est un espace ?
         req->space = (c == ' ' || c == '\n' || c == '\r');
@@ -118,7 +123,7 @@ void traiteChaine(char* chaine, struct requete* req) {
             req->mot[req->motPosition] = '\0';
             req->inWord = 0;
             
-			printf("%s\n",req->mot);
+			//printf("%s\n",req->mot);
 
             //Traitement du mot lu
             //puts(req->mot);
@@ -194,6 +199,7 @@ void traiteChaine(char* chaine, struct requete* req) {
             }
             if(req->crlfCounter == 4) {
                 req->isOver = 1;
+                //puts(req->mot);
             }
         }
         
@@ -227,7 +233,7 @@ void traiteChaine(char* chaine, struct requete* req) {
     //assert(parseInt("523654") == 523654);
     
     
-    req.mot = malloc(MAX_TOCKEN*sizeof(char));
+    //req.mot = malloc(MAX_TOCKEN*sizeof(char));
     
     traiteChaine("ALIV", &req);
     traiteChaine("E 0 LISTEN_PORT \n  5\r\n \r\n", &req);
