@@ -25,9 +25,6 @@
 //Erreur de converion char->int
 #define PARSE_ERROR -2
 
-//Valeur par défaut de la structure
-#define DEFAULT_REQ {NON_DEFINI, 0, -2, -1, -1, 0, 0, 0, 0, 0, 0}
-
 struct requete {
 	int type;
     
@@ -69,6 +66,25 @@ int parseInt(char* entier) {
     }
 
     return res;
+}
+
+void initReq(struct requete* req) {
+    req->type = NON_DEFINI;
+    
+    req->isOver = 0;
+    
+    req->imgId = -2;
+    req->listenPort = -1;
+    req->fragmentSize = -1;
+    
+    req->inWord = 0;
+    req->space = 0;
+    req->crlfCounter = 0;
+    
+    req->mot = 0;
+    req->motPosition = 0;
+    
+    req->reqPosition = 0;
 }
 
 void traiteRequete(struct requete* req) {
@@ -217,12 +233,13 @@ void traiteChaine(char* chaine, struct requete* req) {
             puts("mauvaise requete");
         } else*/
         traiteRequete(req);
+        initReq(req);
     }
 }
 
-int main() {
-    struct requete req = DEFAULT_REQ;
-    
+/*int main() {
+    struct requete req;
+    initReq(&req);
     // tests
     //assert(parseInt("1") == 1);
     //assert(parseInt("-1") == -1);
@@ -235,35 +252,21 @@ int main() {
     traiteChaine("ALIV", &req);
     traiteChaine("E 0 LISTEN_PORT \n  5\r\n \r\n", &req);
     
-    struct requete req2 = DEFAULT_REQ;
-    req2.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("START\r\n\r\n", &req2);
+    traiteChaine("START\r\n\r\n", &req);
     
-    struct requete req3 = DEFAULT_REQ;
-    req3.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("PAUSE\r\n\r\n", &req3);
+    traiteChaine("PAUSE\r\n\r\n", &req);
     
-    struct requete req4 = DEFAULT_REQ;
-    req4.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("END\r\n\r\n", &req4);
+    traiteChaine("END\r\n\r\n", &req);
     
-    struct requete req5 = DEFAULT_REQ;
-    req5.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("GET\r\n\r\n", &req5);
+    traiteChaine("GET\r\n\r\n", &req);
     
-    struct requete req6 = DEFAULT_REQ;
-    req6.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("GET -1\r\n\r\n", &req6);
+    traiteChaine("GET -1\r\n\r\n", &req);
     
-    struct requete req7 = DEFAULT_REQ;
-    req7.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("GET 5\r\n LISTEN_PORT 404\r\n\r\n", &req7);
+    traiteChaine("GET 5\r\n LISTEN_PORT 404\r\n\r\n", &req);
     
-    struct requete req8 = DEFAULT_REQ;
-    req8.mot = malloc(MAX_TOCKEN*sizeof(char));
-    traiteChaine("GET 1024\r\n LISTEN_PORT 4096\r\n FRAGMENT_SIZE 32 \r\n\r\n", &req8);
+    traiteChaine("GET 1024\r\n LISTEN_PORT 4096\r\n FRAGMENT_SIZE 32 \r\n\r\n", &req);
     
     //printf("### %d ###\n", req.type);
     
     return 0;
-}
+}*/
