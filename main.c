@@ -9,6 +9,7 @@
 #include <unistd.h> //Pour STDIN_FILENO
 
 #include "utils.c"
+#include "cata.c"
 
 #define MAX_EVENTS 10
 #define MAX_HEADER 200
@@ -86,15 +87,17 @@ void send_get_answer(int fd)
 	int size;
 	char * buf = NULL;
 	/*On recuper le fichier sous forme de chaine de cara*/
-	file_to_buffer(&buf, &size);
+	buf = buildCatalogue("catalogue.txt");
 	/*On construit l'entete HTML aproprié*/
 	char * header = build_http_header("text/plain", size);
+
+	printf("%s\n",buf);
 
 	/*Et on envoie les données*/
 	puts("Going to send");
 	send(fd, header, strlen(header), MSG_MORE);
 	printf("send : %s\n", strerror(errno));
-	send(fd, buf, size, 0);
+	send(fd, buf, strlen(buf), 0);
 	printf("send : %s\n", strerror(errno));
 
 	/*On libere les ressources alloué*/
@@ -289,6 +292,6 @@ void central()
 
 int main(int argc, char ** argv)
 {
-	central(8081);
+	central();
 	return 0;
 }
