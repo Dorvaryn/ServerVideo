@@ -89,7 +89,7 @@ void send_get_answer(int fd)
 	/*On recuper le fichier sous forme de chaine de cara*/
 	buf = buildCatalogue("catalogue.txt");
 	/*On construit l'entete HTML aproprié*/
-	header = build_http_header("text/plain", size);
+	header = build_http_header("text/plain", strlen(buf));
 
 	printf("%s\n",buf);
 

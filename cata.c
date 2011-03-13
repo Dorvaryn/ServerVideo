@@ -33,6 +33,9 @@ char * buildCatalogue (char * file)
 	{
 		temp[i] = '\0';
 	}
+	
+	strcat(buff,"ServerAddress: 127.0.0.1\r\n");
+	strcat(buff,"ServerPort: 8081\r\n");
 
 	fgets(temp,512,f);
 	printf("fgets : %s\n", strerror(errno));
