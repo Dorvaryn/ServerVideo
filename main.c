@@ -13,7 +13,7 @@
 #define MAX_EVENTS 10
 #define MAX_HEADER 200
 #define MAX_STR 32
-
+#define BASE_CLIENT 32
 
 char * build_date()
 {
@@ -196,9 +196,12 @@ void central()
 		struct sockClient * clients;
 	};
 
-	struct tabClients tabClient;
-	tabClient.clients = (struct sockClient *)malloc(10*sizeof(struct sockClient));
-	tabClient.nbClients = 0;
+	struct tabClients tabClients;
+	tabClients.clients =
+		(struct sockClient *)malloc(BASE_CLIENT*sizeof(struct sockClient));
+	tabClients.nbClients = 0;
+
+	int baseCourante = BASE_CLIENT;
 
 	while(!done) //Boucle principale
 	{
@@ -217,10 +220,27 @@ void central()
 			}
 			else if (events[n].data.fd == socktest)
 			{
+				if (tabClients.nbClients >= baseCourante)
+				{
+					baseCourante *=2;
+					struct sockClient * temp;
+					temp = (struct sockClient *) realloc(tabClients.clients,
+							baseCourante*sizeof(struct sockClient));
+					if (temp!=NULL) 
+					{
+						tabClients.clients = temp;
+					}
+					else 
+					{
+						free (tabClients.clients);
+						puts ("Error (re)allocating memory");
+						exit (1);
+					}
+				}
+				tabClients.clients[tabClients.nbClients].sock =
+					createSockClientEvent(epollfd, socktest);
+				tabClients.nbClients++;
 
-				csocktest = createSockClientEvent(epollfd, socktest);
-				tabClient.nbClients++;
-				tabClient.clients[tabClient.nbClients-1].sock = csocktest;
 			}
 			else if(events[n].data.fd == STDIN_FILENO)
 			{
@@ -241,17 +261,21 @@ void central()
 					if (events[n].events == 5)
 						send_get_answer(events[n].data.fd);
 				}
-				if (events[n].data.fd == csocktest)
+				int i;
+				for(i =0 ; i < tabClients.nbClients; i++)
 				{
-					if (events[n].events == 5)
-					{					
-						printf("%s\n", "buffer");
-						char buffer[512];
-						printf("%s\n", "recv");
-						recv(csocktest, buffer, 512*sizeof(char),0);
-						printf("%s\n", "traite");
-						traiteChaine(buffer, &tabClient.clients[1].requete);
-						printf("%s\n", "over");
+					if (events[n].data.fd == tabClients.clients[i].sock)
+					{
+						if (events[n].events == 5)
+						{					
+							printf("%s\n", "buffer");
+							char buffer[512];
+							printf("%s\n", "recv");
+							recv(tabClients.clients[i].sock, buffer, 512*sizeof(char),0);
+							printf("%s\n", "traiteChaine");
+							traiteChaine(buffer, &tabClients.clients[i].requete);
+							printf("%s\n", "done");
+						}
 					}
 				}
 			}

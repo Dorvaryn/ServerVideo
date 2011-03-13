@@ -220,7 +220,7 @@ void traiteChaine(char* chaine, struct requete* req) {
     }
 }
 
-int main() {
+/*int main() {
     struct requete req = DEFAULT_REQ;
     
     // tests
@@ -266,4 +266,4 @@ int main() {
     //printf("### %d ###\n", req.type);
     
     return 0;
-}
+}*/
