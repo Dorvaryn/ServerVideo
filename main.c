@@ -25,12 +25,12 @@ char * build_http_header(char * type, int size)
 {
 	char * header = malloc(MAX_HEADER * sizeof(char));
 	memset(header, '\0', MAX_HEADER);
-	strcat(header, "HTTP/1.1 200 OK\nDate: ");
+	strcat(header, "HTTP/1.1 200 OK\r\nDate: ");
 
 	/*Insertion de la date actuelle*/
 	strcat(header, build_date());
 
-	strcat(header, "\nServer: ServLib (Unix) (Arch/Linux)\nAccept-Ranges: bytes\n\
+	strcat(header, "\r\nServer: ServLib (Unix) (Arch/Linux)\r\nAccept-Ranges: bytes\r\n\
 			Content-Length: ");
 
 	/*Insertion de la taille*/
@@ -38,12 +38,12 @@ char * build_http_header(char * type, int size)
 	sprintf(tmp, "%d", size);
 	strcat(header, tmp);
 
-	strcat(header, "\nConnection: close\nContent-Type: ");
+	strcat(header, "\r\nConnection: close\r\nContent-Type: ");
 
 	/*Insertion du type*/
 	strcat(header, type);
 
-	strcat(header, "; charset=UTF-8\n\n");
+	strcat(header, "; charset=UTF-8\r\n\r\n");
 
 	return header;
 }
@@ -101,14 +101,19 @@ void send_get_answer(int fd)
 	printf("send : %s\n", strerror(errno));
 
 	/*On libere les ressources alloué*/
-	free(header);
-	free(buf);
 	int l = strlen(buf);
 	int i;
 	for(i=0;i<l;i++)
 	{
 	   buf[i] = '\0';
 	}
+	int l2 = strlen(header);
+	for(i=0;i<l2;i++)
+	{
+	   header[i] = '\0';
+	}
+	free(header);
+	free(buf);
 }
 
 int createSockEvent(int epollfd, int port)

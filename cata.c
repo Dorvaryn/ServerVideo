@@ -84,6 +84,8 @@ char * buildCatalogue (char * file)
 		printf("fgets : %s\n", strerror(errno));
 
 	}while(!feof(f));
+	strcat(buff,"\r\n");
+	strcat(buff,"\r\n");
 	strcat(buff,"\0");
 	printf("%s\n", "done");
 	fclose(f);
