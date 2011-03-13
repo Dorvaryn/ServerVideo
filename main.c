@@ -103,6 +103,12 @@ void send_get_answer(int fd)
 	/*On libere les ressources alloué*/
 	free(header);
 	free(buf);
+	int l = strlen(buf);
+	int i;
+	for(i=0;i<l;i++)
+	{
+	   buf[i] = '\0';
+	}
 }
 
 int createSockEvent(int epollfd, int port)
