@@ -30,8 +30,7 @@ char * build_http_header(char * type, int size)
 	/*Insertion de la date actuelle*/
 	strcat(header, build_date());
 
-	strcat(header, "\r\nServer: ServLib (Unix) (Arch/Linux)\r\nAccept-Ranges: bytes\r\n\
-			Content-Length: ");
+	strcat(header, "\r\nServer: ServLib (Unix) (Arch/Linux)\r\nAccept-Ranges: bytes\r\nContent-Length: ");
 
 	/*Insertion de la taille*/
 	char tmp[MAX_STR] = {'\0'};
@@ -85,11 +84,12 @@ void file_to_buffer(char ** buff, int * size)
 void send_get_answer(int fd)
 {
 	int size;
-	char * buf = NULL;
+	char * buf;
+	char * header;
 	/*On recuper le fichier sous forme de chaine de cara*/
 	buf = buildCatalogue("catalogue.txt");
 	/*On construit l'entete HTML aproprié*/
-	char * header = build_http_header("text/plain", size);
+	header = build_http_header("text/plain", size);
 
 	printf("%s\n",buf);
 

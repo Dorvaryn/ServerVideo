@@ -22,11 +22,16 @@ char * buildCatalogue (char * file)
 
 	fgets(temp,512,f);
 	fgets(temp,512,f);
-	
+
+	int l3 = strlen(buff);
+	for(i=0;i<l3;i++)
+	{
+		buff[i] = '\0';
+	}
 	int l = strlen(temp);
 	for(i=0;i<l;i++)
 	{
-		   temp[i] = '\0';
+		temp[i] = '\0';
 	}
 
 	fgets(temp,512,f);
@@ -37,7 +42,7 @@ char * buildCatalogue (char * file)
 		strncpy(temp2,temp,strlen(temp)-2);
 
 		printf("%s\n", temp2);
-		
+
 		FILE * g = fopen(temp2,"r");
 		printf("fopen : %s\n", strerror(errno));
 		strcat(buff,"Object ");
@@ -45,12 +50,12 @@ char * buildCatalogue (char * file)
 		int l = strlen(temp2);
 		for(i=0;i<l;i++)
 		{
-			   temp2[i] = '\0';
+			temp2[i] = '\0';
 		}
 		int l2 = strlen(temp);
 		for(i=0;i<l2;i++)
 		{
-			   temp[i] = '\0';
+			temp[i] = '\0';
 		}
 
 		int j;
@@ -68,12 +73,12 @@ char * buildCatalogue (char * file)
 			int l2 = strlen(tmp2);
 			for(i=0;i<l2;i++)
 			{
-				   tmp2[i] = '\0';
+				tmp2[i] = '\0';
 			}
 			int l = strlen(tmp);
 			for(i=0;i<l;i++)
 			{
-				   tmp[i] = '\0';
+				tmp[i] = '\0';
 			}
 		}
 		printf("%s\n", "fin");
@@ -85,8 +90,6 @@ char * buildCatalogue (char * file)
 
 	}while(!feof(f));
 	strcat(buff,"\r\n");
-	strcat(buff,"\r\n");
-	strcat(buff,"\0");
 	printf("%s\n", "done");
 	fclose(f);
 	return buff;
