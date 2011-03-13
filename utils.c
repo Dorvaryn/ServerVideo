@@ -29,8 +29,6 @@
 #define DEFAULT_REQ {NON_DEFINI, 0, -2, -1, -1, 0, 0, 0, 0, 0, 0}
 
 struct requete {
-    //int sock;
-	
 	int type;
     
     int isOver;
@@ -179,9 +177,9 @@ void traiteChaine(char* chaine, struct requete* req) {
             
             req->reqPosition++;
             
-            if(c=='\r') {
+            /*if(c=='\r') {
                 req->crlfCounter = 1;
-            }
+            }*/
             
         } else if(req->inWord && !req->space) { //Le mot continue
             req->mot[req->motPosition] = c;
@@ -193,11 +191,10 @@ void traiteChaine(char* chaine, struct requete* req) {
             req->mot[req->motPosition] = c;
             req->motPosition++;
         } else { //Sinon les espaces continuent
-            if( (c == '\r' && (req->crlfCounter == 0 || req->crlfCounter == 2))
-                    || (c == '\n' && (req->crlfCounter == 1 || req->crlfCounter == 3)) ) {
+            if(c == '\n') {
                 req->crlfCounter++;
             }
-            if(req->crlfCounter == 4) {
+            if(req->crlfCounter == 2) {
                 req->isOver = 1;
                 //puts(req->mot);
             }
@@ -223,7 +220,7 @@ void traiteChaine(char* chaine, struct requete* req) {
     }
 }
 
-/*int main() {
+int main() {
     struct requete req = DEFAULT_REQ;
     
     // tests
@@ -269,4 +266,4 @@ void traiteChaine(char* chaine, struct requete* req) {
     //printf("### %d ###\n", req.type);
     
     return 0;
-}*/
+}
