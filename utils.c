@@ -240,6 +240,7 @@ void traiteChaine(char* chaine, struct requete* req) {
 /*int main() {
     struct requete req;
     initReq(&req);
+
     // tests
     //assert(parseInt("1") == 1);
     //assert(parseInt("-1") == -1);
