@@ -105,12 +105,12 @@ void send_get_answer(int fd)
 	int i;
 	for(i=0;i<l;i++)
 	{
-	   buf[i] = '\0';
+		buf[i] = '\0';
 	}
 	int l2 = strlen(header);
 	for(i=0;i<l2;i++)
 	{
-	   header[i] = '\0';
+		header[i] = '\0';
 	}
 	free(header);
 	free(buf);
@@ -203,6 +203,7 @@ void central()
 
 	struct sockClient {
 		int sock;
+		int isGET;
 		struct requete requete;
 	};
 	struct tabClients {
@@ -230,7 +231,28 @@ void central()
 		for (n = 0; n < nfds; ++n) {
 			if (events[n].data.fd == sock) 
 			{
-				csock = createSockClientEvent(epollfd, sock);	    
+				if (tabClients.nbClients >= baseCourante)
+				{
+					baseCourante *=2;
+					struct sockClient * temp;
+					temp = (struct sockClient *) realloc(tabClients.clients,
+							baseCourante*sizeof(struct sockClient));
+					if (temp!=NULL) 
+					{
+						tabClients.clients = temp;
+					}
+					else 
+					{
+						free (tabClients.clients);
+						puts ("Error (re)allocating memory");
+						exit (1);
+					}
+				}
+				tabClients.clients[tabClients.nbClients].sock =
+					createSockClientEvent(epollfd, sock);
+				initReq(&tabClients.clients[tabClients.nbClients].requete);
+				tabClients.clients[tabClients.nbClients].isGET = 1;
+				tabClients.nbClients++;
 			}
 			else if (events[n].data.fd == socktest)
 			{
@@ -254,6 +276,7 @@ void central()
 				tabClients.clients[tabClients.nbClients].sock =
 					createSockClientEvent(epollfd, socktest);
 				initReq(&tabClients.clients[tabClients.nbClients].requete);
+				tabClients.clients[tabClients.nbClients].isGET = 0;
 				tabClients.nbClients++;
 
 			}
@@ -270,26 +293,31 @@ void central()
 			}
 			else 
 			{
-				printf("%d\n", events[n].events);
-				if (events[n].data.fd == csock)
-				{
-					if (events[n].events == 5)
-						send_get_answer(events[n].data.fd);
-				}
 				int i;
 				for(i =0 ; i < tabClients.nbClients; i++)
 				{
 					if (events[n].data.fd == tabClients.clients[i].sock)
 					{
-						if (events[n].events == 5)
+						if (events[n].events == (EPOLLIN | EPOLLOUT))
 						{					
-							printf("%s\n", "buffer");
-							char buffer[512];
-							printf("%s\n", "recv");
-							recv(tabClients.clients[i].sock, buffer, 512*sizeof(char),0);
-							printf("%s\n", "traiteChaine");
-							traiteChaine(buffer, &tabClients.clients[i].requete);
-							printf("%s\n", "done");
+							if (tabClients.clients[i].isGET != 1)
+							{
+								printf("%s\n", "buffer");
+								char buffer[512];
+								printf("%s\n", "recv");
+								recv(tabClients.clients[i].sock, buffer, 512*sizeof(char),0);
+								printf("%s\n", "traiteChaine");
+								traiteChaine(buffer, &tabClients.clients[i].requete);
+								printf("%s\n", "done");
+							}
+							else
+							{
+								send_get_answer(events[n].data.fd);
+							}
+						}
+						else if(events[n].events == EPOLLOUT)
+						{
+							printf("%s\n","TODO: ENVOIE");
 						}
 					}
 				}
