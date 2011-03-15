@@ -8,7 +8,7 @@
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
 
-#include "utils.c"
+#include "requete.c"
 #include "cata.c"
 
 #define MAX_EVENTS 10
