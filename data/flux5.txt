@@ -2,7 +2,7 @@ ID: 5
 Name: video5
 Type: BMP
 Address: 127.0.0.1
-Port: 11113
+Port: 8084
 Protocol: TCP_PULL
 IPS: 0.25
 .\Images\img1.bmp

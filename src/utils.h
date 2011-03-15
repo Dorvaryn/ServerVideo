@@ -38,6 +38,8 @@ int createSockEvent(int epollfd, int port);
 
 int createSockClientEvent(int epollfd, int sock);
 
-void connectClient(int epollfd, struct tabClients * tabClients, int sock, int baseCourante, int isGet);
+void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante);
+
+void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet);
 
 #endif // UTILS_H_

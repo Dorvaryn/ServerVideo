@@ -31,7 +31,7 @@ char * build_http_header(char * type, int size)
 	return header;
 }
 
-char * buildCatalogue ()
+char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 {
 
 	char * buff = (char *)malloc(MAX_CATA*sizeof(char));
@@ -42,6 +42,7 @@ char * buildCatalogue ()
 	printf("fopen : %s\n", strerror(errno));
 
 	int i;
+	int baseFichierCourante = BASE_FICHIERS;
 	char * temp = (char *)malloc(512*sizeof(char));
 	char * temp2 = (char *)malloc(512*sizeof(char));
 
@@ -58,7 +59,7 @@ char * buildCatalogue ()
 	{
 		temp[i] = '\0';
 	}
-	
+
 	strcat(buff,"ServerAddress: 127.0.0.1\r\n");
 	strcat(buff,"ServerPort: 8081\r\n");
 
@@ -91,10 +92,24 @@ char * buildCatalogue ()
 		{
 			char * tmp = (char *)malloc(512*sizeof(char));
 			char  * tmp2 = (char *)malloc(512*sizeof(char));
-
 			fgets(tmp,512,g);
 			printf("fgets : %s\n", strerror(errno));
 			strncpy(tmp2,tmp,strlen(tmp)-2);
+			printf("%s : %d\n",tmp2,j);
+			if (j == 4)
+			{
+				int k;
+				int created = 0;
+				for (k = 0; k < strlen(tmp2); k++)
+				{
+					if ((isdigit(tmp2[k]) != 0) & (created != 1) )
+					{
+						printf("%s : %d\n",tmp2+k,atoi(tmp+k));
+						createFichier(epollfd, tabFichiers, atoi(tmp2+k), &baseFichierCourante);
+						created = 1;
+					}
+				}
+			}	
 			strcat(buff,tmp2);
 			strcat(buff," ");
 
@@ -120,11 +135,11 @@ char * buildCatalogue ()
 	strcat(buff,"\r\n");
 	printf("%s\n", "done");
 	fclose(f);
-	
+
 	char * header;
 	/*On construit l'entete HTML aproprié*/
 	header = build_http_header("text/plain", strlen(buff));
-	
+
 	char * buff2 = (char *)malloc((MAX_HEADER + MAX_CATA)*sizeof(char));
 	memset(buff2, '\0', (MAX_HEADER + MAX_CATA));
 	strcpy(buff2, header);

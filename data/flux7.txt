@@ -2,7 +2,7 @@ ID: 7
 Name: VideoJpegMCAST
 Type: JPEG
 Address: 225.6.7.8
-Port: 12234
+Port: 8087
 Protocol: MCAST_PUSH
 IPS: 0.5
 .\Images\Video1\img1.jpg
