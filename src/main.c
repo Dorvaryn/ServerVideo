@@ -13,11 +13,10 @@
 #include "utils.h"
 
 #define MAX_EVENTS 10
-#define MAX_HEADER 200
-#define MAX_STR 32
 #define BASE_CLIENTS 32
 #define BASE_FICHIERS 32 
 
+char * catalogue;
 
 void central()
 {
@@ -107,7 +106,7 @@ void central()
 							}
 							else
 							{
-								send_get_answer(events[n].data.fd);
+								send_get_answer(events[n].data.fd, catalogue);
 							}
 						}
 						else if(events[n].events == EPOLLOUT)
@@ -126,6 +125,8 @@ void central()
 
 int main(int argc, char ** argv)
 {
+	catalogue = buildCatalogue ();
 	central();
+	free(catalogue);
 	return 0;
 }

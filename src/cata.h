@@ -12,7 +12,14 @@
 #include <unistd.h> //Pour STDIN_FILENO
 
 #define DATA_DIRECTORY "data/"
+#define MAX_HEADER 256
+#define MAX_STR 32
+#define MAX_CATA 1024
 
-char * buildCatalogue (char * file);
+char * build_date();
+
+char * build_http_header(char * type, int size);
+
+char * buildCatalogue ();
 
 #endif // CATA_H_

@@ -15,8 +15,6 @@
 #include "cata.h"
 
 #define MAX_EVENTS 10
-#define MAX_HEADER 200
-#define MAX_STR 32
 #define BASE_CLIENTS 32
 #define BASE_FICHIERS 32 
 
@@ -34,14 +32,7 @@ struct tabFichiers {
 	int * socks;
 };
 
-
-char * build_date();
-
-char * build_http_header(char * type, int size);
-
-void file_to_buffer(char ** buff, int * size);
-
-void send_get_answer(int fd);
+void send_get_answer(int fd, char * catalogue);
 
 int createSockEvent(int epollfd, int port);
 
