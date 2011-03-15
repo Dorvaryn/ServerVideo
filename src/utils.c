@@ -35,7 +35,7 @@ char * build_http_header(char * type, int size)
 void file_to_buffer(char ** buff, int * size)
 {
 	/*Ouverture du fichier*/
-	FILE * f = fopen("catalogue.txt", "r");
+	FILE * f = fopen("data/catalogue.txt", "r");
 	printf("fopen : %s\n", strerror(errno));
 
 	/*Deplacement du curseur à la fin du fichier*/
@@ -72,7 +72,7 @@ void send_get_answer(int fd)
 	char * buf;
 	char * header;
 	/*On recuper le fichier sous forme de chaine de cara*/
-	buf = buildCatalogue("catalogue.txt");
+	buf = buildCatalogue("data/catalogue.txt");
 	/*On construit l'entete HTML aproprié*/
 	header = build_http_header("text/plain", strlen(buf));
 

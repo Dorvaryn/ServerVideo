@@ -1,0 +1,7 @@
+ID: 2
+Name: VideoMCAST
+Type: JPEG
+Address: 225.6.7.8
+Port: 9999
+Protocol: MCAST_PUSH
+IPS: 2.5

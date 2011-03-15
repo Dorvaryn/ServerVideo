@@ -32,8 +32,8 @@ char * buildCatalogue (char * file)
 	printf("fgets : %s\n", strerror(errno));
 	do
 	{
-
-		strncpy(temp2,temp,strlen(temp)-2);
+		strcpy(temp2,DATA_DIRECTORY);
+		strncat(temp2,temp,strlen(temp)-2);
 
 		printf("%s\n", temp2);
 

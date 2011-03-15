@@ -11,6 +11,7 @@
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
 
+#define DATA_DIRECTORY "data/"
 
 char * buildCatalogue (char * file);
 
