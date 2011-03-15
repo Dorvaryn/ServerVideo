@@ -17,6 +17,20 @@
 #define BASE_CLIENTS 32
 #define BASE_FICHIERS 32 
 
+struct sockClient {
+	int sock;
+	int isGET;
+	struct requete requete;
+};
+struct tabClients {
+	int nbClients;
+	struct sockClient * clients;
+};
+struct tabFichiers {
+	int nbFichiers;
+	int * socks;
+};
+
 char * build_date()
 {
 	return "00 / 00 / 00";
@@ -177,6 +191,32 @@ int createSockClientEvent(int epollfd, int sock)
 	return csock;
 }
 
+void connectClient(int epollfd, struct tabClients * tabClients, int sock, int baseCourante, int isGet)
+{
+	if (tabClients->nbClients >= baseCourante)
+	{
+		baseCourante *=2;
+		struct sockClient * temp;
+		temp = (struct sockClient *) realloc(tabClients->clients,
+				baseCourante*sizeof(struct sockClient));
+		if (temp!=NULL) 
+		{
+			tabClients->clients = temp;
+		}
+		else 
+		{
+			free (tabClients->clients);
+			puts ("Error (re)allocating memory");
+			exit (1);
+		}
+	}
+	tabClients->clients[tabClients->nbClients].sock =
+		createSockClientEvent(epollfd, sock);
+	initReq(&tabClients->clients[tabClients->nbClients].requete);
+	tabClients->clients[tabClients->nbClients].isGET = isGet;
+	tabClients->nbClients++;
+}
+
 void central()
 {
 	struct epoll_event ev, events[MAX_EVENTS];
@@ -202,22 +242,9 @@ void central()
 
 	int done = 0;
 
-	struct sockClient {
-		int sock;
-		int isGET;
-		struct requete requete;
-	};
-	struct tabClients {
-		int nbClients;
-		struct sockClient * clients;
-	};
-	struct tabFichiers {
-		int nbFichiers;
-		int * socks;
-	};
 
 	struct tabFichiers tabFichiers;
-	tabFichiers.nbFichiers = ;
+	tabFichiers.nbFichiers = 0;
 	tabFichiers.socks = (int *)malloc(BASE_FICHIERS*sizeof(int));
 
 	struct tabClients tabClients;
@@ -240,54 +267,11 @@ void central()
 		for (n = 0; n < nfds; ++n) {
 			if (events[n].data.fd == sock) 
 			{
-				if (tabClients.nbClients >= baseCourante)
-				{
-					baseCourante *=2;
-					struct sockClient * temp;
-					temp = (struct sockClient *) realloc(tabClients.clients,
-							baseCourante*sizeof(struct sockClient));
-					if (temp!=NULL) 
-					{
-						tabClients.clients = temp;
-					}
-					else 
-					{
-						free (tabClients.clients);
-						puts ("Error (re)allocating memory");
-						exit (1);
-					}
-				}
-				tabClients.clients[tabClients.nbClients].sock =
-					createSockClientEvent(epollfd, sock);
-				initReq(&tabClients.clients[tabClients.nbClients].requete);
-				tabClients.clients[tabClients.nbClients].isGET = 1;
-				tabClients.nbClients++;
+				connectClient(epollfd, &tabClients, sock, baseCourante, 1);
 			}
 			else if (events[n].data.fd == socktest)
 			{
-				if (tabClients.nbClients >= baseCourante)
-				{
-					baseCourante *=2;
-					struct sockClient * temp;
-					temp = (struct sockClient *) realloc(tabClients.clients,
-							baseCourante*sizeof(struct sockClient));
-					if (temp!=NULL) 
-					{
-						tabClients.clients = temp;
-					}
-					else 
-					{
-						free (tabClients.clients);
-						puts ("Error (re)allocating memory");
-						exit (1);
-					}
-				}
-				tabClients.clients[tabClients.nbClients].sock =
-					createSockClientEvent(epollfd, socktest);
-				initReq(&tabClients.clients[tabClients.nbClients].requete);
-				tabClients.clients[tabClients.nbClients].isGET = 0;
-				tabClients.nbClients++;
-
+				connectClient(epollfd, &tabClients, socktest, baseCourante, 0);
 			}
 			else if(events[n].data.fd == STDIN_FILENO)
 			{
