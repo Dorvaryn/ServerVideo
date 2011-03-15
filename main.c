@@ -14,7 +14,8 @@
 #define MAX_EVENTS 10
 #define MAX_HEADER 200
 #define MAX_STR 32
-#define BASE_CLIENT 32
+#define BASE_CLIENTS 32
+#define BASE_FICHIERS 32 
 
 char * build_date()
 {
@@ -210,13 +211,21 @@ void central()
 		int nbClients;
 		struct sockClient * clients;
 	};
+	struct tabFichiers {
+		int nbFichiers;
+		int * socks;
+	};
+
+	struct tabFichiers tabFichiers;
+	tabFichiers.nbFichiers = ;
+	tabFichiers.socks = (int *)malloc(BASE_FICHIERS*sizeof(int));
 
 	struct tabClients tabClients;
 	tabClients.clients =
-		(struct sockClient *)malloc(BASE_CLIENT*sizeof(struct sockClient));
+		(struct sockClient *)malloc(BASE_CLIENTS*sizeof(struct sockClient));
 	tabClients.nbClients = 0;
 
-	int baseCourante = BASE_CLIENT;
+	int baseCourante = BASE_CLIENTS;
 
 	while(!done) //Boucle principale
 	{
