@@ -1,5 +1,13 @@
 #include "cata.h"
 #include "utils.h"
+#include <stdlib.h>
+#include <string.h>
+
+#define FAIL(x) if(x) {\
+	perror(#x);}
+
+#define FAIL_FATAL(x) if(x) {\
+	perror(#x);exit(EXIT_FAILURE);}
 
 void send_get_answer(int fd, char * catalogue)
 {
@@ -10,7 +18,11 @@ void send_get_answer(int fd, char * catalogue)
 
 int createSockEvent(int epollfd, int port)
 {
-	int sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
+	int sock = socket(AF_INET, SOCK_STREAM, 0); //Version portable des sockets non bloquants
+	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
+	FAIL(flags);
+	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
+
 	printf("socket : %s\n", strerror(errno));
 
 	struct sockaddr_in saddr;
@@ -45,7 +57,17 @@ int createSockClientEvent(int epollfd, int sock)
 	struct sockaddr_in saddr_client;
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
+	#if defined ( NEW )
+	csock = accept4(sock, (struct sockaddr *)&saddr_client, &size_addr,SOCK_NONBLOCK); //accept4 plus performant
+	#endif // NEW
+
+	#if defined ( OLD )
 	csock = accept(sock, (struct sockaddr *)&saddr_client, &size_addr);
+	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
+	FAIL(flags);
+	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
+	#endif // OLD
+
 	printf("accept : %s\n", strerror(errno));
 
 	printf("Connection de %s :: %d\n", inet_ntoa(saddr_client.sin_addr), 

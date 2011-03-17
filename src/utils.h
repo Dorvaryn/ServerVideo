@@ -10,6 +10,8 @@
 #include <errno.h>
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
+#include <fcntl.h> // Pour déclarer non bloquant
+#include <sys/utsname.h> //Pour connaitre version noyau
 
 #include "requete.h"
 #include "cata.h"

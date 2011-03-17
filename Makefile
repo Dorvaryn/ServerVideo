@@ -3,7 +3,12 @@ EDL=gcc
 RM=rm
 BUILDDIR=build/
 SRCDIR=src/
-CCFLAGS=
+KERNEL=$(shell uname -r | cut -d '-' -f1 | cut -d '.' -f3)
+ifeq ($(shell expr $(KERNEL) \< 28),1)
+CCFLAGS=-DOLD
+else
+CCFLAGS=-DNEW
+endif
 LDFLAGS=
 RMFLAGS=-f
 EXE=ServerVideo
