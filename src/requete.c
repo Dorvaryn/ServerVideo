@@ -1,4 +1,5 @@
 #include "requete.h"
+#include "envoi.h"
 
 /**
  * Converti un char* en un entier.
@@ -43,7 +44,7 @@ void initReq(struct requete* req) {
     req->reqPosition = 0;
 }
 
-void traiteRequete(struct requete* req) {
+void traiteRequete(struct requete* req, int clientSocket) {
     switch(req->type) {
         case BAD_REQUEST:
             puts("E: Mauvaise requete");
@@ -53,8 +54,21 @@ void traiteRequete(struct requete* req) {
                 printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
             } else if(req->listenPort != -1) {
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
+                
+                //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans un structure...
+                
             } else {
                 printf("GET id:%d\n", req->imgId);
+                
+                struct envoiTcp* envoi = malloc(sizeof(struct envoiTcp));
+                
+                envoi->state = NOTHING_SENT;
+                envoi->clientSocket = clientSocket;
+                
+                //TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
+                envoi->curFile = fopen("./Images/img1.bmp", "r");
+                
+                send(envoi);
             }
             break;
         case START:
@@ -74,7 +88,7 @@ void traiteRequete(struct requete* req) {
     }
 }
 
-void traiteChaine(char* chaine, struct requete* req) {
+void traiteChaine(char* chaine, struct requete* req, int clientSocket) {
 
     if(req->mot == 0) {
         req->mot = malloc(MAX_TOCKEN*sizeof(char));
@@ -188,7 +202,7 @@ void traiteChaine(char* chaine, struct requete* req) {
         if(req->type == BAD_REQUEST) {
             puts("mauvaise requete");
         } else*/
-        traiteRequete(req);
+        traiteRequete(req, clientSocket);
         initReq(req);
     }
 }

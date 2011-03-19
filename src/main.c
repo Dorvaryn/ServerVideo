@@ -11,6 +11,7 @@
 #include "requete.h"
 #include "cata.h"
 #include "utils.h"
+#include "envoi.h"
 
 #define MAX_EVENTS 10
 #define BASE_CLIENTS 32
@@ -95,7 +96,7 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 
 								printf("%s\n", "recv");
 								recv(tabClients.clients[i].sock, buffer, 512*sizeof(char),0);
-								traiteChaine(buffer, &tabClients.clients[i].requete);
+								traiteChaine(buffer, &tabClients.clients[i].requete, tabClients.clients[i].sock);
 								printf("%s\n", "done");
 							}
 							else

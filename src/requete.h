@@ -51,8 +51,8 @@ int parseInt(char* entier);
 
 void initReq(struct requete* req);
 
-void traiteRequete(struct requete* req);
+void traiteRequete(struct requete* req, int clientSocket);
 
-void traiteChaine(char* chaine, struct requete* req);
+void traiteChaine(char* chaine, struct requete* req, int clientSocket);
 
 #endif // REQUETE_H_
