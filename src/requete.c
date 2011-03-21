@@ -93,6 +93,8 @@ void traiteChaine(char* chaine, struct requete* req, int clientSocket) {
     if(req->mot == 0) {
         req->mot = malloc(MAX_TOCKEN*sizeof(char));
     }
+    
+    if(res->type != NON_DEFINI) return;
 
     int i;
     for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
@@ -127,15 +129,11 @@ void traiteChaine(char* chaine, struct requete* req, int clientSocket) {
                     req->type = BAD_REQUEST;
                 }
             } else if(req->reqPosition == 1) {
-                if(req->type != GET && req->type != ALIVE) {
-                    req->type = BAD_REQUEST;
+                int numero = parseInt(req->mot);
+                if(numero == PARSE_ERROR) {
+                    req->imgId = 0;
                 } else {
-                    int numero = parseInt(req->mot);
-                    if(numero == PARSE_ERROR) {
-                        req->type = BAD_REQUEST;
-                    } else {
-                        req->imgId = numero;
-                    }
+                    req->imgId = numero;
                 }
             } else if(req->reqPosition == 2 && strcmp(req->mot, "LISTEN_PORT") != 0) {
                 req->type = BAD_REQUEST;
