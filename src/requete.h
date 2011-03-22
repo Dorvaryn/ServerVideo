@@ -6,7 +6,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
-#include <time.h>
+#include <sys/time.h>
 
 //Maximum d'un mot dans les requetes du client
 #define MAX_TOCKEN 256
@@ -60,9 +60,12 @@ struct videoClient {
     
     char etat; //RUNNING, PAUSED ou OVER
     
-    int idImageCourante;
-    int dernierEnvoi;
+    int id; //Image courante
+    time_t dernierEnvoi; //pour gérer les ips
     time_t lastAlive;
+    
+    struct envoi* envoi;
+    struct infosVideo* infosVideo;
 };
 
 int parseInt(char* entier);

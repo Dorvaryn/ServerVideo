@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "requete.h"
+
 #define NOTHING_SENT -3
 #define SENDING_HEADER -2
 #define HEADER_SENT -1
@@ -17,7 +19,7 @@ struct envoi {
     int state;
     int clientSocket;
     
-    int type; //ENVOI_TCP ou ENVOI_UDP
+    char type; //ENVOI_TCP ou ENVOI_UDP
 
     int currentPos; //Position dans l'envoi
     int bufLen; //Longueur du buffer
@@ -27,7 +29,7 @@ struct envoi {
     int fileSize;
 };
 
-void sendImage(struct envoi* env);
+void sendImage(struct videoClient* videoClient);
 
 void createHeaderTCP(struct envoi* env);
 void sendHeaderTCP(struct envoi* env) ;

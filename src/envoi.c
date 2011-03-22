@@ -1,9 +1,11 @@
 #include "envoi.h"
 
-void sendImage(struct envoi* env) {
+void sendImage(struct videoClient* videoClient) {
 
-    if(env->type == ENVOI_TCP) {
-        if(env->state == NOTHING_SENT) {
+    struct envoi* env = videoClient->envoie;
+
+    if(env->type == ENVOI_TCP && videoClient->etat == RUNNING) {
+        if(env->state == NOTHING_SENT && timevideoClient->dernierEnvoi ) {
             createHeaderTCP(env);
         } else if(env->state == SENDING_HEADER) {
             sendHeaderTCP(env);
@@ -54,7 +56,7 @@ void sendHeaderTCP(struct envoi* env) {
         env->state = HEADER_SENT;
         free(env->buffer);
     }
-    send(env); //TODO: supprimer après les tests
+    //send(env); //TODO: supprimer après les tests
 }
 
 void createImageTCP(struct envoi* env) {
@@ -67,7 +69,7 @@ void createImageTCP(struct envoi* env) {
         perror("fread raté");
     }
     env->state = SENDING_IMAGE;
-    send(env); //TODO: supprimer après les tests
+    //send(env); //TODO: supprimer après les tests
 }
 
 void sendImageTCP(struct envoi* env) {
@@ -81,6 +83,6 @@ void sendImageTCP(struct envoi* env) {
         free(env->buffer);
         close(curFile);
     } else {
-        send(env); //TODO: supprimer après les tests
+        //send(env); //TODO: supprimer après les tests
     }
 }
