@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #include "requete.h"
 
@@ -28,6 +29,8 @@ struct envoi {
     FILE* curFile;
     int fileSize;
 };
+
+double getTime();
 
 void sendImage(struct videoClient* videoClient);
 

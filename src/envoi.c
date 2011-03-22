@@ -1,5 +1,15 @@
 #include "envoi.h"
 
+double getTime() {
+    struct timeval timev;
+    
+    gettimeofday(&timev, NULL);
+    double micro = (double)timev.tv_usec;
+    double sec = (double)timev.tv_sec;
+    
+    return sec + micro/1000000;
+}
+
 void sendImage(struct videoClient* videoClient) {
 
     struct envoi* env = videoClient->envoie;
