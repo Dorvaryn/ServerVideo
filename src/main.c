@@ -96,7 +96,7 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 
 								printf("%s\n", "recv");
 								recv(tabClients.clients[i].sock, buffer, 512*sizeof(char),0);
-								traiteChaine(buffer, &tabClients.clients[i].requete, tabClients.clients[i].sock);
+								traiteChaine(buffer, &tabClients.clients[i].requete, &tabClients.clients[i].videoClient);
 								printf("%s\n", "done");
 							}
 							else

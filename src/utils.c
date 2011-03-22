@@ -98,19 +98,32 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 		int * temp;
 		temp = (int *) realloc(tabFichiers->socks,
 				*baseFichierCourante*sizeof(int));
-		if (temp!=NULL) 
+		struct infosVideo * temp2;
+		temp2 = (struct infosVideo *) realloc(tabFichiers->infosVideos,
+				*baseFichierCourante*sizeof(struct infosVideo));
+		if (temp!=NULL && temp2!=NULL) 
 		{
 			tabFichiers->socks = temp;
+			tabFichiers->infosVideos = temp2;
 		}
 		else 
 		{
 			free (tabFichiers->socks);
+			free (tabFichiers->infosVideos);
 			puts ("Error (re)allocating memory");
 			exit (1);
 		}
 	}
 	tabFichiers->socks[tabFichiers->nbFichiers] = createSockEvent(epollfd,port);
+	tabFichiers->infosVideos[tabFichiers->nbFichiers].nbImages = 0;
+	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(512*sizeof(char)*254);
 	tabFichiers->nbFichiers++;
+}
+
+void addImage(char * image, struct infosVideo * infos)
+{
+	strcpy(infos->images[infos->nbImages],image);
+	infos->nbImages++;
 }
 
 void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet)
