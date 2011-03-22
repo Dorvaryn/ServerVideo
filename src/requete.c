@@ -44,7 +44,7 @@ void initReq(struct requete* req) {
     req->reqPosition = 0;
 }
 
-void traiteRequete(struct requete* req, int clientSocket) {
+void traiteRequete(struct requete* req, struct videoClient* videoClient) {
     switch(req->type) {
         case BAD_REQUEST:
             puts("E: Mauvaise requete");
@@ -63,11 +63,11 @@ void traiteRequete(struct requete* req, int clientSocket) {
             } else {
                 printf("GET id:%d\n", req->imgId);
                 
-                struct envoi* envoi = malloc(sizeof(struct envoi));
+                struct envoi* envoi = malloc(sizeof(struct envoi)); //TODO: à mettre lors du la connection du client
                 
                 envoi->type = ENVOI_TCP; //TODO: recuperer le type d'envoi
                 envoi->state = NOTHING_SENT;
-                envoi->clientSocket = clientSocket;
+                envoi->clientSocket = videoClient->clientSocket;
                 
                 //TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
                 envoi->curFile = fopen("./Images/img1.bmp", "r");
@@ -77,22 +77,30 @@ void traiteRequete(struct requete* req, int clientSocket) {
             break;
         case START:
             printf("START\n");
+            if(videoClient->etat == PAUSED) {
+                videoClient->etat = RUNNING;
+            }
             break;
         case PAUSE:
             printf("PAUSE\n");
+            if(videoClient->etat == RUNNING) {
+                videoClient->etat = PAUSED;
+            }
             break;
         case END:
             printf("END\n");
+            videoClient->etat = OVER;
             break;
         case ALIVE:
             printf("ALIVE id:%d port:%d\n", req->imgId, req->listenPort);
+            videoClient->lastAlive = time(NULL);
             break;
         default:
             break;
     }
 }
 
-void traiteChaine(char* chaine, struct requete* req, int clientSocket) {
+void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient) {
 
     if(req->mot == 0) {
         req->mot = malloc(MAX_TOCKEN*sizeof(char));
@@ -204,7 +212,7 @@ void traiteChaine(char* chaine, struct requete* req, int clientSocket) {
         if(req->type == BAD_REQUEST) {
             puts("mauvaise requete");
         } else*/
-        traiteRequete(req, clientSocket);
+        traiteRequete(req, videoClient);
         initReq(req);
     }
 }

@@ -6,6 +6,7 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+#include <time.h>
 
 //Maximum d'un mot dans les requetes du client
 #define MAX_TOCKEN 256
@@ -28,6 +29,11 @@
 //Erreur de converion char->int
 #define PARSE_ERROR -2
 
+//Etats
+#define RUNNING 0
+#define PAUSED 1
+#define OVER 2
+
 struct requete {
 	int type;
     
@@ -47,12 +53,24 @@ struct requete {
     int reqPosition; //position du mot dans la requete
 };
 
+struct videoClient {
+    int clientSocket;
+    
+    int protocole;
+    
+    char etat; //RUNNING, PAUSED ou OVER
+    
+    int idImageCourante;
+    int dernierEnvoi;
+    time_t lastAlive;
+};
+
 int parseInt(char* entier);
 
 void initReq(struct requete* req);
 
-void traiteRequete(struct requete* req, int clientSocket);
+void traiteRequete(struct requete* req, struct videoClient* videoClient);
 
-void traiteChaine(char* chaine, struct requete* req, int clientSocket);
+void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient);
 
 #endif // REQUETE_H_
