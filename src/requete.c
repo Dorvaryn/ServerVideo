@@ -95,7 +95,7 @@ void traiteChaine(char* chaine, struct requete* req, int clientSocket) {
         req->mot = malloc(MAX_TOCKEN*sizeof(char));
     }
     
-    if(res->type != NON_DEFINI) return;
+    if(req->type != NON_DEFINI) return;
 
     int i;
     for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
