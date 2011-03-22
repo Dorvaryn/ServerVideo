@@ -44,4 +44,5 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 
 void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet);
 
+int connectDataTCP(int epollfd, int sock, int port);
 #endif // UTILS_H_

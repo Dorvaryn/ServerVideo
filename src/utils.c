@@ -63,7 +63,7 @@ int createSockClientEvent(int epollfd, int sock)
 
 	#if defined ( OLD )
 	csock = accept(sock, (struct sockaddr *)&saddr_client, &size_addr);
-	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
+	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 	#endif // OLD
@@ -137,4 +137,40 @@ void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * 
 	initReq(&(tabClients->clients[tabClients->nbClients].requete));
 	tabClients->clients[tabClients->nbClients].isGET = isGet;
 	tabClients->nbClients++;
+}
+
+int connectDataTCP(int epollfd, int sock, int port)
+{
+	struct sockaddr_in addr, saddr;	
+	int csock, len;
+	struct epoll_event ev;
+	getsockname(sock, (struct sockaddr*)&addr, &len);
+	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
+	saddr.sin_family = AF_INET;
+	saddr.sin_port = htons(port);
+	
+
+	socklen_t size_addr = sizeof(struct sockaddr_in);
+#if defined ( NEW )
+	csock = socket(AF_INET, SOCK_STREAM, SOCK_NONBLOCK); //socket NONBLOCK plus performant 
+#endif // NEW
+	
+#if defined ( OLD )
+	csock = socket(AF_INET, SOCK_STREAM, 0);
+	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
+	FAIL(flags);
+	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
+#endif // OLD
+	connect(csock, (struct sockaddr *)&saddr, size_addr);
+	
+	ev.events = EPOLLOUT | EPOLLET;
+	ev.data.fd = csock;
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
+			    &ev) == -1)
+	{
+	    perror("epoll_ctl: csock");
+		exit(EXIT_FAILURE);
+	}
+
+    return csock;	
 }

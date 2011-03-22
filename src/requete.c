@@ -50,7 +50,8 @@ void traiteRequete(struct requete* req, int clientSocket) {
             puts("E: Mauvaise requete");
             break;
         case GET:
-            if(req->fragmentSize != -1) {
+            if(req->fragmentSize != -1) 
+			{
                 printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
                 
                 //TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
@@ -59,7 +60,7 @@ void traiteRequete(struct requete* req, int clientSocket) {
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
                 
                 //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans une structure...
-                
+               
             } else {
                 printf("GET id:%d\n", req->imgId);
                 
