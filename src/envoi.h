@@ -10,9 +10,14 @@
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
 
-struct envoiTcp {
+#define ENVOI_TCP 0
+#define ENVOI_UDP 1
+
+struct envoi {
     int state;
     int clientSocket;
+    
+    int type; //ENVOI_TCP ou ENVOI_UDP
 
     int currentPos; //Position dans l'envoi
     int bufLen; //Longueur du buffer
@@ -22,12 +27,13 @@ struct envoiTcp {
     int fileSize;
 };
 
+void sendImage(struct envoi* env);
 
-void createHeaderTCP(struct envoiTcp* env);
-void sendHeaderTCP(struct envoiTcp* env) ;
+void createHeaderTCP(struct envoi* env);
+void sendHeaderTCP(struct envoi* env) ;
 
-void createImageTCP(struct envoiTcp* env);
-void sendImageTCP(struct envoiTcp* env);
+void createImageTCP(struct envoi* env);
+void sendImageTCP(struct envoi* env);
 
 
 #endif // ENVOI_H_

@@ -52,23 +52,27 @@ void traiteRequete(struct requete* req, int clientSocket) {
         case GET:
             if(req->fragmentSize != -1) {
                 printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
+                
+                //TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
+                
             } else if(req->listenPort != -1) {
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
                 
-                //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans un structure...
+                //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans une structure...
                 
             } else {
                 printf("GET id:%d\n", req->imgId);
                 
-                struct envoiTcp* envoi = malloc(sizeof(struct envoiTcp));
+                struct envoi* envoi = malloc(sizeof(struct envoi));
                 
+                envoi->type = ENVOI_TCP; //TODO: recuperer le type d'envoi
                 envoi->state = NOTHING_SENT;
                 envoi->clientSocket = clientSocket;
                 
                 //TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
                 envoi->curFile = fopen("./Images/img1.bmp", "r");
                 
-                send(envoi);
+                send(envoi); //TODO: enlever après le debuggage
             }
             break;
         case START:

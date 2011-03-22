@@ -1,18 +1,25 @@
 #include "envoi.h"
 
-void send(struct envoiTcp* env) {
-    if(env->state == NOTHING_SENT) {
-        createHeaderTCP(env);
-    } else if(env->state == SENDING_HEADER) {
-        sendHeaderTCP(env);
-    } else if(env->state == HEADER_SENT) {
-        createImageTCP(env);
-    } else {
-        sendImageTCP(env);
+void sendImage(struct envoi* env) {
+
+    if(env->type == ENVOI_TCP) {
+        if(env->state == NOTHING_SENT) {
+            createHeaderTCP(env);
+        } else if(env->state == SENDING_HEADER) {
+            sendHeaderTCP(env);
+        } else if(env->state == HEADER_SENT) {
+            createImageTCP(env);
+        } else {
+            sendImageTCP(env);
+        }
+    } else { //ENVOI_UDP
+        //TODO: Faire l'envoi udp
     }
+    
+    
 }
 
-void createHeaderTCP(struct envoiTcp* env) {
+void createHeaderTCP(struct envoi* env) {
     env->buffer = malloc(128*sizeof(char));
     env->buffer[0] = '\0';
     
@@ -25,7 +32,7 @@ void createHeaderTCP(struct envoiTcp* env) {
     fseek(fichier, 0, SEEK_END);
     env->fileSize = ftell(fichier);
     fseek(fichier, 0, SEEK_SET);
-    char sBufferTaille[20] = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+    char sBufferTaille[16];
     sprintf(sBufferTaille, "%d", env->fileSize);
     
     strcat(env->buffer, "\r\n");
@@ -37,7 +44,7 @@ void createHeaderTCP(struct envoiTcp* env) {
     sendHeaderTCP(env);
 }
 
-void sendHeaderTCP(struct envoiTcp* env) {
+void sendHeaderTCP(struct envoi* env) {
     
     int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
     
@@ -50,7 +57,7 @@ void sendHeaderTCP(struct envoiTcp* env) {
     send(env); //TODO: supprimer après les tests
 }
 
-void createImageTCP(struct envoiTcp* env) {
+void createImageTCP(struct envoi* env) {
     env->buffer = malloc(tailleFichier*sizeof(char));
     env->currentPos = 0;
     env->bufLen = env->fileSize;
@@ -63,7 +70,7 @@ void createImageTCP(struct envoiTcp* env) {
     send(env); //TODO: supprimer après les tests
 }
 
-void sendImageTCP(struct envoiTcp* env) {
+void sendImageTCP(struct envoi* env) {
 
     int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
     
