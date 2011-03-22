@@ -152,7 +152,7 @@ int connectDataTCP(int epollfd, int sock, int port)
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
 #if defined ( NEW )
-	csock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK); //socket NONBLOCK plus performant 
+	csock = socket(AF_INET, SOCK_STREAM, SOCK_NONBLOCK); //socket NONBLOCK plus performant 
 #endif // NEW
 	
 #if defined ( OLD )
@@ -161,7 +161,7 @@ int connectDataTCP(int epollfd, int sock, int port)
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 #endif // OLD
-	connect(csock, (struct sockaddr *)&saddr, &size_addr);
+	connect(csock, (struct sockaddr *)&saddr, size_addr);
 	
 	ev.events = EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
