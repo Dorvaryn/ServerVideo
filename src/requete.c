@@ -58,7 +58,6 @@ void traiteRequete(struct requete* req, int clientSocket) {
                 
             } else if(req->listenPort != -1) {
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
-                
                 //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans une structure...
                
             } else {

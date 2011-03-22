@@ -87,42 +87,85 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 			temp[i] = '\0';
 		}
 
-		int j;
-		for(j = 0; j < 7; j++)
+		int j = 0;
+		while (!feof(g))
 		{
-			char * tmp = (char *)malloc(512*sizeof(char));
-			char  * tmp2 = (char *)malloc(512*sizeof(char));
-			fgets(tmp,512,g);
-			printf("fgets : %s\n", strerror(errno));
-			strncpy(tmp2,tmp,strlen(tmp)-2);
-			printf("%s : %d\n",tmp2,j);
-			if (j == 4)
+			if (j < 7)
 			{
-				int k;
-				int created = 0;
-				for (k = 0; k < strlen(tmp2); k++)
+				char * tmp = (char *)malloc(512*sizeof(char));
+				char  * tmp2 = (char *)malloc(512*sizeof(char));
+				fgets(tmp,512,g);
+				printf("fgets : %s\n", strerror(errno));
+				strncpy(tmp2,tmp,strlen(tmp)-2);
+				printf("%s : %d\n",tmp2,j);
+				if (j == 4)
 				{
-					if ((isdigit(tmp2[k]) != 0) & (created != 1) )
+					int k;
+					int created = 0;
+					for (k = 0; k < strlen(tmp2); k++)
 					{
-						printf("%s : %d\n",tmp2+k,atoi(tmp+k));
-						createFichier(epollfd, tabFichiers, atoi(tmp2+k), &baseFichierCourante);
-						created = 1;
+						if ((isdigit(tmp2[k]) != 0) & (created != 1) )
+						{
+							printf("%s : %d\n",tmp2+k,atoi(tmp+k));
+							createFichier(epollfd, tabFichiers, atoi(tmp2+k), &baseFichierCourante);
+							created = 1;
+						}
 					}
 				}
-			}	
-			strcat(buff,tmp2);
-			strcat(buff," ");
+				else if (j == 5)
+				{	
+					char * dummy;
+					char * protocole;
+					sscanf(tmp2,"%s %s",dummy, protocole);
+					if(strcomp(protocole,"TCP_PULL"))
+					{
+						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PULL;
+					}
+					else if(strcomp(protocole,"TCP_PUSH"))
+					{
+						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PUSH;
+					}
+					else if(strcomp(protocole,"UDP_PULL"))
+					{
+						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PULL;
+					}
+					else if(strcomp(protocole,"UDP_PUSH"))
+					{
+						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PUSH;
+					}
+				}	
+				else if (j == 6)
+				{
+					char * dummy;
+					char * fps;
+					sscanf(tmp2,"%s %s",dummy, fps);
+					tabFichiers->infosVideos[tabFichiers->nbFichiers-1].fps = atof(fps);
+				}
+				strcat(buff,tmp2);
+				strcat(buff," ");
 
-			int l2 = strlen(tmp2);
-			for(i=0;i<l2;i++)
-			{
-				tmp2[i] = '\0';
+				int l2 = strlen(tmp2);
+				for(i=0;i<l2;i++)
+				{
+					tmp2[i] = '\0';
+				}
+				int l = strlen(tmp);
+				for(i=0;i<l;i++)
+				{
+					tmp[i] = '\0';
+				}
 			}
-			int l = strlen(tmp);
-			for(i=0;i<l;i++)
+			else
 			{
-				tmp[i] = '\0';
+				char * tmp = (char *)malloc(512*sizeof(char));
+				char  * tmp2 = (char *)malloc(512*sizeof(char));
+				fgets(tmp,512,g);
+				printf("fgets : %s\n", strerror(errno));
+				strncpy(tmp2,tmp,strlen(tmp)-2);
+				printf("%s : %d\n",tmp2,j);
+				addImage(tmp2, &tabFichiers->infosVideos[tabFichiers->nbFichiers-1]);
 			}
+			j++;
 		}
 		printf("%s\n", "fin");
 		strcat(buff,"\r\n");

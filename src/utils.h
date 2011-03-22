@@ -24,14 +24,22 @@ struct sockClient {
 	int sock;
 	int isGET;
 	struct requete requete;
+	struct videoClient videoClient;
 };
 struct tabClients {
 	int nbClients;
 	struct sockClient * clients;
 };
+struct infosVideo {
+	char type;
+	double fps;
+	int nbImages;
+	char ** images;
+};
 struct tabFichiers {
 	int nbFichiers;
 	int * socks;
+	struct infosVideo * infosVideos;
 };
 
 void send_get_answer(int fd, char * catalogue);
@@ -41,6 +49,8 @@ int createSockEvent(int epollfd, int port);
 int createSockClientEvent(int epollfd, int sock);
 
 void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante);
+
+void addImage(char * image, struct infosVideo * infos);
 
 void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet);
 

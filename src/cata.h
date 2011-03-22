@@ -18,6 +18,7 @@
 #define MAX_CATA 1024
 #define BASE_FICHIERS 32 
 
+
 char * build_date();
 
 char * build_http_header(char * type, int size);
