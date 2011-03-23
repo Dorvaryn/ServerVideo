@@ -1,10 +1,10 @@
-ID: 3
-Name: video3
-Type: BMP
-Address: 225.100.110.12
-Port: 8082 
-Protocol: MCAST_PUSH
-IPS: 0.5
+ID=3
+Name=video3
+Type=BMP
+Address=225.100.110.12
+Port=8082 
+Protocol=MCAST_PUSH
+IPS=0.5
 .\Images\img1.bmp
 .\Images\img2.bmp
 .\Images\img3.bmp

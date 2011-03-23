@@ -1,10 +1,10 @@
-ID: 1
-Name: video1
-Type: BMP
-Address: 127.0.0.1
-Port: 8088
-Protocol: TCP_PUSH
-IPS: 1.5
+ID=1
+Name=video1
+Type=BMP
+Address=10.0.2.2
+Port=8088
+Protocol=TCP_PUSH
+IPS=1.5
 .\Images\img1.bmp
 .\Images\img2.bmp
 .\Images\img3.bmp
