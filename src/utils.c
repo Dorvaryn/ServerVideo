@@ -126,7 +126,7 @@ void addImage(char * image, struct infosVideo * infos)
 	infos->nbImages++;
 }
 
-void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet)
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock, int * baseCourante, int isGet)
 {
 	if (tabClients->nbClients >= *baseCourante)
 	{
@@ -149,6 +149,18 @@ void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * 
 		createSockClientEvent(epollfd, sock);
 	initReq(&(tabClients->clients[tabClients->nbClients].requete));
 	tabClients->clients[tabClients->nbClients].isGET = isGet;
+	
+	int done = 0;
+	int i = 0;
+	while((done == 0) && (i < tabFichiers->nbFichiers))
+	{
+		if(tabFichiers->socks[i] == sock)
+		{
+			tabClients->sockClient[tabClients->nbClients].videoClient->infos = &tabFichiers->infosVideos[i];
+			done = 1;
+		}
+		i++;
+	}
 	tabClients->nbClients++;
 }
 
