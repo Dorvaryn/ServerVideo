@@ -164,7 +164,31 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 	tabClients->nbClients++;
 }
 
-int connectDataTCP(int epollfd, int sock, int port)
+int createEventPull(int epollfd, int csock)
+{
+	ev.events = EPOLLOUT | EPOLLET;
+	ev.data.fd = csock;
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
+			    &ev) == -1)
+	{
+	    perror("epoll_ctl: csock");
+		exit(EXIT_FAILURE);
+	}
+}
+
+int createEventPush(int epollfd, int csock)
+{
+	ev.events = EPOLLOUT;
+	ev.data.fd = csock;
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
+			    &ev) == -1)
+	{
+	    perror("epoll_ctl: csock");
+		exit(EXIT_FAILURE);
+	}
+}
+
+int connectDataTCP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
 	int csock, len;
@@ -174,8 +198,6 @@ int connectDataTCP(int epollfd, int sock, int port)
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
 	
-
-	socklen_t size_addr = sizeof(struct sockaddr_in);
 #if defined ( NEW )
 	csock = socket(AF_INET, SOCK_STREAM, SOCK_NONBLOCK); //socket NONBLOCK plus performant 
 #endif // NEW
@@ -186,15 +208,17 @@ int connectDataTCP(int epollfd, int sock, int port)
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 #endif // OLD
+
+	socklen_t size_addr = sizeof(struct sockaddr_in);
 	connect(csock, (struct sockaddr *)&saddr, size_addr);
 	
-	ev.events = EPOLLOUT | EPOLLET;
-	ev.data.fd = csock;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
-			    &ev) == -1)
+	if(type == TCP_PULL)
 	{
-	    perror("epoll_ctl: csock");
-		exit(EXIT_FAILURE);
+		createEventPull(epollfd, csock);
+	}
+	else if(type == TCP_PUSH)
+	{
+		createEventPush(epollfd, csock);
 	}
 
     return csock;	
