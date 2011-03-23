@@ -88,16 +88,18 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 		}
 
 		int j = 0;
+		char * tmp = (char *)malloc(512*sizeof(char));
+		char  * tmp2 = (char *)malloc(512*sizeof(char));
+		fgets(tmp,512,g);
+		printf("fgets : %s\n", strerror(errno));
+
 		while (!feof(g))
 		{
+			strncpy(tmp2,tmp,strlen(tmp)-2);
+			printf("%s : %d\n",tmp2,j);
+			
 			if (j < 7)
 			{
-				char * tmp = (char *)malloc(512*sizeof(char));
-				char  * tmp2 = (char *)malloc(512*sizeof(char));
-				fgets(tmp,512,g);
-				printf("fgets : %s\n", strerror(errno));
-				strncpy(tmp2,tmp,strlen(tmp)-2);
-				printf("%s : %d\n",tmp2,j);
 				if (j == 4)
 				{
 					int k;
@@ -144,41 +146,23 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 				strcat(buff,tmp2);
 				strcat(buff," ");
 
-				int l2 = strlen(tmp2);
-				for(i=0;i<l2;i++)
-				{
-					tmp2[i] = '\0';
-				}
-				int l = strlen(tmp);
-				for(i=0;i<l;i++)
-				{
-					tmp[i] = '\0';
-				}
 			}
 			else
 			{
-				printf("Debug else\n");
-				char * tmp = (char *)malloc(512*sizeof(char));
-				char  * tmp2 = (char *)malloc(512*sizeof(char));
-				fgets(tmp,512,g);
-				printf("fgets : %s\n", strerror(errno));
-				strncpy(tmp2,tmp,strlen(tmp)-2);
-				printf("%s : %d\n",tmp2,j);
-				printf("%s\n",tmp2);
 				addImage(tmp2, &tabFichiers->infosVideos[tabFichiers->nbFichiers-1]);
-				
-				int l2 = strlen(tmp2);
-				for(i=0;i<l2;i++)
-				{
-					tmp2[i] = '\0';
-				}
-				int l = strlen(tmp);
-				for(i=0;i<l;i++)
-				{
-					tmp[i] = '\0';
-				}
-			
 			}
+			int l2 = strlen(tmp2);
+			for(i=0;i<l2;i++)
+			{
+				tmp2[i] = '\0';
+			}
+			int l = strlen(tmp);
+			for(i=0;i<l;i++)
+			{
+				tmp[i] = '\0';
+			}
+			fgets(tmp,512,g);
+			printf("fgets : %s\n", strerror(errno));
 			j++;
 		}
 		printf("%s\n", "fin");

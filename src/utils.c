@@ -120,12 +120,12 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 	tabFichiers->nbFichiers++;
 }
 
-void addImage(char * image, struct infosVideo * infos)
+void addImage(char * uneImage, struct infosVideo * infos)
 {
-	printf("Debug precopy");
-	strcpy(infos->images[infos->nbImages], image);
-	printf("Debug postcopy");
-	infos->nbImages++;
+	printf("Debug precopy\n");
+	//strcpy(infos->images[infos->nbImages], uneImage);
+	printf("Debug postcopy\n");
+	//infos->nbImages++;
 }
 
 void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock, int * baseCourante, int isGet)
