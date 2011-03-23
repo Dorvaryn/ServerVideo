@@ -141,7 +141,8 @@ int main(int argc, char ** argv)
 	struct tabFichiers tabFichiers;
 	tabFichiers.nbFichiers = 0;
 	tabFichiers.socks = (int *)malloc(BASE_FICHIERS*sizeof(int));
-
+	tabFichiers.infosVideos = (struct infosVideo *) malloc(BASE_FICHIERS*sizeof(struct infosVideo));
+	
 	int baseFichierCourante = BASE_FICHIERS;
 	createFichier(epollfd, &tabFichiers, 8081, &baseFichierCourante);
 	

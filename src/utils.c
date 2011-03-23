@@ -122,7 +122,9 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 
 void addImage(char * image, struct infosVideo * infos)
 {
-	strcpy(infos->images[infos->nbImages],image);
+	printf("Debug precopy");
+	strcpy(infos->images[infos->nbImages], image);
+	printf("Debug postcopy");
 	infos->nbImages++;
 }
 

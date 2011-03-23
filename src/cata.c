@@ -114,30 +114,30 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 				}
 				else if (j == 5)
 				{	
-					char * dummy;
-					char * protocole;
+					char dummy[512];
+					char protocole[512];
 					sscanf(tmp2,"%s %s",dummy, protocole);
-					if(strcmp(protocole,"TCP_PULL"))
+					if(strcmp(protocole,"TCP_PULL") == 0)
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PULL;
 					}
-					else if(strcmp(protocole,"TCP_PUSH"))
+					else if(strcmp(protocole,"TCP_PUSH") == 0)
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PUSH;
 					}
-					else if(strcmp(protocole,"UDP_PULL"))
+					else if(strcmp(protocole,"UDP_PULL") == 0)
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PULL;
 					}
-					else if(strcmp(protocole,"UDP_PUSH"))
+					else if(strcmp(protocole,"UDP_PUSH") == 0)
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PUSH;
 					}
 				}	
 				else if (j == 6)
 				{
-					char * dummy;
-					char * fps;
+					char dummy[512];
+					char fps[512];
 					sscanf(tmp2,"%s %s",dummy, fps);
 					tabFichiers->infosVideos[tabFichiers->nbFichiers-1].fps = atof(fps);
 				}
@@ -157,13 +157,27 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 			}
 			else
 			{
+				printf("Debug else\n");
 				char * tmp = (char *)malloc(512*sizeof(char));
 				char  * tmp2 = (char *)malloc(512*sizeof(char));
 				fgets(tmp,512,g);
 				printf("fgets : %s\n", strerror(errno));
 				strncpy(tmp2,tmp,strlen(tmp)-2);
 				printf("%s : %d\n",tmp2,j);
+				printf("%s\n",tmp2);
 				addImage(tmp2, &tabFichiers->infosVideos[tabFichiers->nbFichiers-1]);
+				
+				int l2 = strlen(tmp2);
+				for(i=0;i<l2;i++)
+				{
+					tmp2[i] = '\0';
+				}
+				int l = strlen(tmp);
+				for(i=0;i<l;i++)
+				{
+					tmp[i] = '\0';
+				}
+			
 			}
 			j++;
 		}
