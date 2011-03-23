@@ -156,7 +156,7 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 	{
 		if(tabFichiers->socks[i] == sock)
 		{
-			tabClients->sockClient[tabClients->nbClients].videoClient->infos = &tabFichiers->infosVideos[i];
+			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFichiers->infosVideos[i];
 			done = 1;
 		}
 		i++;
@@ -166,6 +166,7 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 
 int createEventPull(int epollfd, int csock)
 {
+	struct epoll_event ev;
 	ev.events = EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
@@ -178,6 +179,7 @@ int createEventPull(int epollfd, int csock)
 
 int createEventPush(int epollfd, int csock)
 {
+	struct epoll_event ev;
 	ev.events = EPOLLOUT;
 	ev.data.fd = csock;
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
@@ -192,7 +194,6 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
 	int csock, len;
-	struct epoll_event ev;
 	getsockname(sock, (struct sockaddr*)&addr, &len);
 	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
 	saddr.sin_family = AF_INET;

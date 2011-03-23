@@ -117,19 +117,19 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 					char * dummy;
 					char * protocole;
 					sscanf(tmp2,"%s %s",dummy, protocole);
-					if(strcomp(protocole,"TCP_PULL"))
+					if(strcmp(protocole,"TCP_PULL"))
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PULL;
 					}
-					else if(strcomp(protocole,"TCP_PUSH"))
+					else if(strcmp(protocole,"TCP_PUSH"))
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PUSH;
 					}
-					else if(strcomp(protocole,"UDP_PULL"))
+					else if(strcmp(protocole,"UDP_PULL"))
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PULL;
 					}
-					else if(strcomp(protocole,"UDP_PUSH"))
+					else if(strcmp(protocole,"UDP_PUSH"))
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PUSH;
 					}

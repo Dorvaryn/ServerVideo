@@ -47,21 +47,21 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 		{
 			printf("%s\n", "action");
 			printf("%d\n", events[n].data.fd);
-			if (events[n].data.fd == (*tabFichiers).socks[0])
+			if (events[n].data.fd == tabFichiers->socks[0])
 			{
 				printf("%s\n", "connect8081");
-				connectClient(epollfd, &tabClients, (*tabFichiers).socks[0], &baseCourante, 1);
+				connectClient(epollfd, &tabClients, tabFichiers, tabFichiers->socks[0], &baseCourante, 1);
 			}
 			else
 			{
 				int j = 0;
 				int done2 = 0;
-				while((done2 == 0) && (j < (*tabFichiers).nbFichiers))
+				while((done2 == 0) && (j < tabFichiers->nbFichiers))
 				{
-					if (events[n].data.fd == (*tabFichiers).socks[j])
+					if (events[n].data.fd == tabFichiers->socks[j])
 					{
 						printf("%s\n", "connectOther");
-						connectClient(epollfd, &tabClients, (*tabFichiers).socks[j], &baseCourante, 0);
+						connectClient(epollfd, &tabClients, tabFichiers, tabFichiers->socks[j], &baseCourante, 0);
 						done2 = 1;
 					}
 					else if(events[n].data.fd == STDIN_FILENO)
@@ -82,7 +82,7 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 				}
 				int i = 0;
 				int done3 = 0;
-				while((done3 == 0) && (done2 == 0) && (i < (*tabFichiers).nbFichiers))
+				while((done3 == 0) && (done2 == 0) && (i < tabFichiers->nbFichiers))
 				{
 					if (events[n].data.fd == tabClients.clients[i].sock)
 					{
