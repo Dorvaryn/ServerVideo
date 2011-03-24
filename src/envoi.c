@@ -41,6 +41,8 @@ void createHeaderTCP(struct envoi* env) {
     strcat(env->buffer, "\r\n");
     
     //Taille
+	
+	//fseek plante je ne sait pas pourquoi
     fseek(env->curFile, 0, SEEK_END);
     env->fileSize = ftell(env->curFile);
     fseek(env->curFile, 0, SEEK_SET);

@@ -73,7 +73,8 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
                 videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier
                 videoClient->envoi->fileName = "./Images/img1.bmp";
-					
+				//envoie au cas ou le buffer soit déja vide
+				sendImage(videoClient);	
                 
                
             } else {
@@ -116,7 +117,8 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
         req->mot = malloc(MAX_TOCKEN*sizeof(char));
     }
     
-    if(req->type != NON_DEFINI) return;
+	// bloque le traitement des commandes
+    //if(req->type != NON_DEFINI) return;
 
     int i;
     for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
