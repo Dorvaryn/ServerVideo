@@ -174,7 +174,7 @@ int createEventPull(int epollfd, int csock)
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
 			    &ev) == -1)
 	{
-	    perror("epoll_ctl: csock");
+	    perror("epoll_ctl_pull: csock");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -187,7 +187,7 @@ int createEventPush(int epollfd, int csock)
 	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
 			    &ev) == -1)
 	{
-	    perror("epoll_ctl: csock");
+	    perror("epoll_ctl_push: csock");
 		exit(EXIT_FAILURE);
 	}
 }
@@ -202,7 +202,7 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 	saddr.sin_port = htons(port);
 	
 #if defined ( NEW )
-	csock = socket(AF_INET, SOCK_STREAM, SOCK_NONBLOCK); //socket NONBLOCK plus performant 
+	csock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK,0); //socket NONBLOCK plus performant 
 #endif // NEW
 	
 #if defined ( OLD )

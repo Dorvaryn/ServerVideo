@@ -60,7 +60,8 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 		temp[i] = '\0';
 	}
 
-	strcat(buff,"ServerAddress: 127.0.0.1\r\n");
+	strcat(buff,"ServerAddress: 10.0.2.2\r\n");
+	//strcat(buff,"ServerAddress: 127.0.0.1\r\n");
 	strcat(buff,"ServerPort: 8081\r\n");
 
 	fgets(temp,512,f);

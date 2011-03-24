@@ -1,7 +1,7 @@
 ID=5
 Name=video5
 Type=BMP
-Address=127.0.0.1
+Address=10.0.2.2
 Port=8084
 Protocol=TCP_PULL
 IPS=0.25
