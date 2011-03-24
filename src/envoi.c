@@ -12,10 +12,10 @@ double getTime() {
 
 void sendImage(struct videoClient* videoClient) {
 
-    struct envoi* env = videoClient->envoie;
+    struct envoi* env = videoClient->envoi;
 
     if(env->type == ENVOI_TCP && videoClient->etat == RUNNING) {
-        if(env->state == NOTHING_SENT && timevideoClient->dernierEnvoi ) {
+        if(env->state == NOTHING_SENT /*&& videoClient->dernierEnvoi*/ ) {
             createHeaderTCP(env);
         } else if(env->state == SENDING_HEADER) {
             sendHeaderTCP(env);
@@ -36,20 +36,20 @@ void createHeaderTCP(struct envoi* env) {
     env->buffer[0] = '\0';
     
     //Image_id
-    strcat(env->buffer, env->ids[env->id]);
+    strcat(env->buffer, env->fileName/*env->ids[env->id]*/);
     
     strcat(env->buffer, "\r\n");
     
     //Taille
-    fseek(fichier, 0, SEEK_END);
-    env->fileSize = ftell(fichier);
-    fseek(fichier, 0, SEEK_SET);
+    fseek(env->curFile, 0, SEEK_END);
+    env->fileSize = ftell(env->curFile);
+    fseek(env->curFile, 0, SEEK_SET);
     char sBufferTaille[16];
     sprintf(sBufferTaille, "%d", env->fileSize);
     
     strcat(env->buffer, "\r\n");
     
-    env->id = SENDING_HEADER;
+    env->state = SENDING_HEADER;
     env->currentPos = 0;
     env->bufLen = strlen(env->buffer);
     
@@ -70,11 +70,11 @@ void sendHeaderTCP(struct envoi* env) {
 }
 
 void createImageTCP(struct envoi* env) {
-    env->buffer = malloc(tailleFichier*sizeof(char));
+    env->buffer = malloc(env->fileSize*sizeof(char));
     env->currentPos = 0;
     env->bufLen = env->fileSize;
     
-    int retour = fread(buf, sizeof(char), tailleFichier, fichier);
+    int retour = fread(env->buffer, sizeof(char), env->fileSize, env->curFile);
     if(retour == -1) {
         perror("fread raté");
     }
@@ -91,7 +91,7 @@ void sendImageTCP(struct envoi* env) {
     if(env->currentPos == env->bufLen) {
         env->state = IMAGE_SENT;
         free(env->buffer);
-        close(curFile);
+        close(env->curFile);
     } else {
         //send(env); //TODO: supprimer après les tests
     }

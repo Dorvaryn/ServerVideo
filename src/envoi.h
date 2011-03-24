@@ -3,6 +3,7 @@
 
 #include <string.h>
 #include <stdlib.h>
+#include <sys/socket.h>
 #include <sys/time.h>
 
 #include "requete.h"
@@ -26,6 +27,7 @@ struct envoi {
     int bufLen; //Longueur du buffer
     char* buffer; //Buffer courant
 
+    char* fileName;
     FILE* curFile;
     int fileSize;
 };

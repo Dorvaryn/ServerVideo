@@ -72,8 +72,8 @@ int parseInt(char* entier);
 
 void initReq(struct requete* req);
 
-void traiteRequete(struct requete* req, struct videoClient* videoClient);
+void traiteRequete(struct requete* req, struct videoClient* videoClient, int epollfd, int sock);
 
-void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient);
+void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient, int epollfd, int sock);
 
 #endif // REQUETE_H_

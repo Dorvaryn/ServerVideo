@@ -44,7 +44,7 @@ void initReq(struct requete* req) {
     req->reqPosition = 0;
 }
 
-void traiteRequete(struct requete* req, struct videoClient* videoClient) {
+void traiteRequete(struct requete* req, struct videoClient* videoClient, int epollfd, int sock) {
     switch(req->type) {
         case BAD_REQUEST:
             puts("E: Mauvaise requete");
@@ -54,7 +54,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
 			{
                 printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
                 videoClient->envoi = malloc(sizeof(struct envoi));
-                videoClient->envoi->type = ENVOI_TCP;
+                videoClient->envoi->type = ENVOI_UDP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
                 videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
@@ -64,14 +64,17 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
                 
             } else if(req->listenPort != -1) {
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
+                
+                videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, TCP_PULL);
+                
                 videoClient->envoi = malloc(sizeof(struct envoi));
-                videoClient->envoi->type = ENVOI_UDP;
+                videoClient->envoi->type = ENVOI_TCP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
                 videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier
+                videoClient->envoi->fileName = "./Images/img1.bmp";
 					
-                //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans une structure...
-                //là on doit vraiment se connecter au client, pour que je puisse envoyer des choses !
+                
                
             } else {
                 printf("GET id:%d\n", req->imgId);
@@ -107,7 +110,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
     }
 }
 
-void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient) {
+void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient, int epollfd, int sock) {
 
     if(req->mot == 0) {
         req->mot = malloc(MAX_TOCKEN*sizeof(char));
@@ -219,7 +222,7 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
         if(req->type == BAD_REQUEST) {
             puts("mauvaise requete");
         } else*/
-        traiteRequete(req, videoClient);
+        traiteRequete(req, videoClient, epollfd, sock);
         initReq(req);
     }
 }
