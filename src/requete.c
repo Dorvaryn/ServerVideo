@@ -57,9 +57,10 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
                 videoClient->envoi->type = ENVOI_TCP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier !
+                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
                 
                 //TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
+                //remarque : on ne se connecte pas en udp, il faut donc que je récupère ici des données pour le send udp (à voir)
                 
             } else if(req->listenPort != -1) {
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
@@ -67,9 +68,10 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
                 videoClient->envoi->type = ENVOI_UDP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier !
+                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier
 					
                 //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans une structure...
+                //là on doit vraiment se connecter au client, pour que je puisse envoyer des choses !
                
             } else {
                 printf("GET id:%d\n", req->imgId);
@@ -77,7 +79,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
                 //TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
                 videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");
                 
-                send(videoClient); //TODO: enlever après le debuggage (placer dans le central)
+                //send(videoClient); enlever après le debuggage (placer dans le central)
             }
             break;
         case START:

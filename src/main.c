@@ -107,6 +107,8 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 						else if(events[n].events == EPOLLOUT)
 						{
 							printf("%s\n","TODO: ENVOIE");
+							//sendImage(tabClients.infosVideos[i]); ou un truc similaire
+							//ne marche pas tant qu'on se connecte pas au client dans requete.c
 						}
 						done3 = 1;
 					}
