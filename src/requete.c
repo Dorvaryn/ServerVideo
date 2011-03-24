@@ -68,7 +68,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient) {
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
                 videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier !
-                
+					
                 //TODO: Se connecter au client en TCP sur le port listenPort et mémoriser ce port dans une structure...
                
             } else {

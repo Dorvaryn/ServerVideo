@@ -120,13 +120,15 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 	tabFichiers->nbFichiers++;
 }
 
-void addImage(char * image, struct infosVideo * infos)
+void addImage(char * uneImage, struct infosVideo * infos)
 {
-	strcpy(infos->images[infos->nbImages],image);
-	infos->nbImages++;
+	printf("Debug precopy\n");
+	//strcpy(infos->images[infos->nbImages], uneImage);
+	printf("Debug postcopy\n");
+	//infos->nbImages++;
 }
 
-void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet)
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock, int * baseCourante, int isGet)
 {
 	if (tabClients->nbClients >= *baseCourante)
 	{
@@ -149,21 +151,56 @@ void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * 
 		createSockClientEvent(epollfd, sock);
 	initReq(&(tabClients->clients[tabClients->nbClients].requete));
 	tabClients->clients[tabClients->nbClients].isGET = isGet;
+	
+	int done = 0;
+	int i = 0;
+	while((done == 0) && (i < tabFichiers->nbFichiers))
+	{
+		if(tabFichiers->socks[i] == sock)
+		{
+			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFichiers->infosVideos[i];
+			done = 1;
+		}
+		i++;
+	}
 	tabClients->nbClients++;
 }
 
-int connectDataTCP(int epollfd, int sock, int port)
+int createEventPull(int epollfd, int csock)
+{
+	struct epoll_event ev;
+	ev.events = EPOLLOUT | EPOLLET;
+	ev.data.fd = csock;
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
+			    &ev) == -1)
+	{
+	    perror("epoll_ctl: csock");
+		exit(EXIT_FAILURE);
+	}
+}
+
+int createEventPush(int epollfd, int csock)
+{
+	struct epoll_event ev;
+	ev.events = EPOLLOUT;
+	ev.data.fd = csock;
+	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
+			    &ev) == -1)
+	{
+	    perror("epoll_ctl: csock");
+		exit(EXIT_FAILURE);
+	}
+}
+
+int connectDataTCP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
 	int csock, len;
-	struct epoll_event ev;
 	getsockname(sock, (struct sockaddr*)&addr, &len);
 	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
 	
-
-	socklen_t size_addr = sizeof(struct sockaddr_in);
 #if defined ( NEW )
 	csock = socket(AF_INET, SOCK_STREAM, SOCK_NONBLOCK); //socket NONBLOCK plus performant 
 #endif // NEW
@@ -174,15 +211,17 @@ int connectDataTCP(int epollfd, int sock, int port)
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 #endif // OLD
+
+	socklen_t size_addr = sizeof(struct sockaddr_in);
 	connect(csock, (struct sockaddr *)&saddr, size_addr);
 	
-	ev.events = EPOLLOUT | EPOLLET;
-	ev.data.fd = csock;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
-			    &ev) == -1)
+	if(type == TCP_PULL)
 	{
-	    perror("epoll_ctl: csock");
-		exit(EXIT_FAILURE);
+		createEventPull(epollfd, csock);
+	}
+	else if(type == TCP_PUSH)
+	{
+		createEventPush(epollfd, csock);
 	}
 
     return csock;	

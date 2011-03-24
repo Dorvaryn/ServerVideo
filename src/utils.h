@@ -50,9 +50,9 @@ int createSockClientEvent(int epollfd, int sock);
 
 void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante);
 
-void addImage(char * image, struct infosVideo * infos);
+void addImage(char * uneImage, struct infosVideo * infos);
 
-void connectClient(int epollfd, struct tabClients * tabClients, int sock, int * baseCourante, int isGet);
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock , int * baseCourante, int isGet);
 
-int connectDataTCP(int epollfd, int sock, int port);
+int connectDataTCP(int epollfd, int sock, int port, int type);
 #endif // UTILS_H_

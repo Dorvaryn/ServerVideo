@@ -1,10 +1,10 @@
-ID: 6
-Name: video6
-Type: BMP
-Address: 127.0.0.1
-Port: 8086
-Protocol: UDP_PULL
-IPS: 0.25
+ID=6
+Name=video6
+Type=BMP
+Address=127.0.0.1
+Port=8086
+Protocol=UDP_PULL
+IPS=0.25
 .\Images\img1.bmp
 .\Images\img2.bmp
 .\Images\img3.bmp
