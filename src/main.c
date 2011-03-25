@@ -37,12 +37,12 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		puts("working ...");
 		if (nfds == -1)
-	   	{
+		{
 			perror("epoll_pwait");
 			exit(EXIT_FAILURE);
 		}
 		int n,csock,csocktest;
-		
+
 		for (n = 0; n < nfds; ++n)
 		{
 			printf("%s\n", "action");
@@ -97,21 +97,24 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 								printf("%s\n", "recv");
 								recv(tabClients.clients[i].sock, buffer, 512*sizeof(char),0);
 								traiteChaine(buffer, &tabClients.clients[i].requete, &tabClients.clients[i].videoClient, 
-								             epollfd, tabClients.clients[i].sock);
+										epollfd, tabClients.clients[i].sock);
 								printf("%s\n", "done");
 							}
 							else
 							{
-									send_get_answer(events[n].data.fd, catalogue);
+								send_get_answer(events[n].data.fd, catalogue);
 							}
 						}
 						else if(events[n].events == EPOLLOUT)
 						{
-						//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
-							printf("%s\n","ENVOI");
-							printf("%d", tabClients.clients[i].videoClient.clientSocket);
-							if(tabClients.clients[i].videoClient.clientSocket != 0) {
-							    sendImage(&tabClients.clients[i].videoClient);
+							if (events[n].data.fd == tabClients.clients[i].videoClient.clientSocket)
+							{
+								//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
+								printf("%s\n","ENVOI");
+								printf("%d", tabClients.clients[i].videoClient.clientSocket);
+								if(tabClients.clients[i].videoClient.clientSocket != 0) {
+									sendImage(&tabClients.clients[i].videoClient);
+								}
 							}
 						}
 						done3 = 1;
@@ -148,10 +151,10 @@ int main(int argc, char ** argv)
 	tabFichiers.nbFichiers = 0;
 	tabFichiers.socks = (int *)malloc(BASE_FICHIERS*sizeof(int));
 	tabFichiers.infosVideos = (struct infosVideo *) malloc(BASE_FICHIERS*sizeof(struct infosVideo));
-	
+
 	int baseFichierCourante = BASE_FICHIERS;
 	createFichier(epollfd, &tabFichiers, 8081, &baseFichierCourante);
-	
+
 	catalogue = buildCatalogue(epollfd, &tabFichiers);
 
 	central(epollfd, &tabFichiers);
