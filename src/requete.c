@@ -57,7 +57,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 videoClient->envoi->type = ENVOI_UDP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
+                videoClient->envoi->curFile = fopen(".data/Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
                 
                 //TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
                 //remarque : on ne se connecte pas en udp, il faut donc que je récupère ici des données pour le send udp (à voir)
@@ -71,19 +71,23 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 videoClient->envoi->type = ENVOI_TCP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier
-                videoClient->envoi->fileName = "./Images/img1.bmp";
+                videoClient->envoi->curFile = fopen("./data/Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier
+                if(videoClient->envoi->curFile == NULL) {
+                    puts("E: ouverture du fichier");
+                }
+                videoClient->envoi->fileName = "./data/Images/img1.bmp";
 				//envoie au cas ou le buffer soit déja vide
-				sendImage(videoClient);	
+				sendImage(videoClient);
+				puts("VIDEO OKok !");
                 
                
             } else {
                 printf("GET id:%d\n", req->imgId);
                 
                 //TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
-                videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");
+                //videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");
                 
-                //send(videoClient); enlever après le debuggage (placer dans le central)
+                sendImage(videoClient); //enlever après le debuggage (placer dans le central)
             }
             break;
         case START:
@@ -119,6 +123,9 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
     
 	// bloque le traitement des commandes
     //if(req->type != NON_DEFINI) return;
+    puts("==>");
+    puts(chaine);
+    puts("<==");
 
     int i;
     for(i=0; chaine[i] != '\0' && !req->isOver; i++) {

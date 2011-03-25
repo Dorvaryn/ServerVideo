@@ -67,8 +67,9 @@ void sendHeaderTCP(struct envoi* env) {
     if(env->currentPos == env->bufLen) {
         env->state = HEADER_SENT;
         free(env->buffer);
+        createImageTCP(env);
     }
-    //send(env); //TODO: supprimer après les tests
+    
 }
 
 void createImageTCP(struct envoi* env) {
@@ -81,7 +82,7 @@ void createImageTCP(struct envoi* env) {
         perror("fread raté");
     }
     env->state = SENDING_IMAGE;
-    //send(env); //TODO: supprimer après les tests
+    sendImageTCP(env);
 }
 
 void sendImageTCP(struct envoi* env) {
@@ -94,6 +95,7 @@ void sendImageTCP(struct envoi* env) {
         env->state = IMAGE_SENT;
         free(env->buffer);
         close(env->curFile);
+        puts("Image envoyée");
     } else {
         //send(env); //TODO: supprimer après les tests
     }
