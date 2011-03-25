@@ -3,11 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define FAIL(x) if(x) {\
-	perror(#x);}
-
-#define FAIL_FATAL(x) if(x) {\
-	perror(#x);exit(EXIT_FAILURE);}
 
 void send_get_answer(int fd, char * catalogue)
 {
@@ -213,7 +208,7 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 #endif // OLD
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
-	connect(csock, (struct sockaddr *)&saddr, size_addr);
+	FAIL(connect(csock, (struct sockaddr *)&saddr, size_addr));
 	
 	if(type == TCP_PULL)
 	{

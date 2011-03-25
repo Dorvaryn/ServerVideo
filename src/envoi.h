@@ -17,6 +17,12 @@
 #define ENVOI_TCP 0
 #define ENVOI_UDP 1
 
+#define FAIL(x) if(x) {\
+	perror(#x);}
+
+#define FAIL_FATAL(x) if(x) {\
+	perror(#x);exit(EXIT_FAILURE);}
+
 struct envoi {
     int state;
     int clientSocket;
