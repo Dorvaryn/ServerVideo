@@ -1,0 +1,8 @@
+ID=8
+Name=video8
+Type=BMP
+Address=127.0.0.1
+Port=8084
+Protocol=TCP_PULL
+IPS=0.25
+./Data/Images/img1.bmp
