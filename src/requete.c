@@ -66,6 +66,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
                 
                 videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, TCP_PULL);
+                printf("socket du client : %d", videoClient->clientSocket);
                 
                 videoClient->envoi = malloc(sizeof(struct envoi));
                 videoClient->envoi->type = ENVOI_TCP;

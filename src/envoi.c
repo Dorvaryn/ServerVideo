@@ -1,4 +1,5 @@
 #include "envoi.h"
+#include <errno.h>
 
 double getTime() {
     struct timeval timev;
@@ -14,7 +15,7 @@ void sendImage(struct videoClient* videoClient) {
 
     struct envoi* env = videoClient->envoi;
 
-    if(env->type == ENVOI_TCP && videoClient->etat == RUNNING) {
+    if(env->type == ENVOI_TCP /*&& videoClient->etat == RUNNING*/) {
         if(env->state == NOTHING_SENT /*&& videoClient->dernierEnvoi*/ ) {
             createHeaderTCP(env);
         } else if(env->state == SENDING_HEADER) {
@@ -55,12 +56,14 @@ void createHeaderTCP(struct envoi* env) {
     env->currentPos = 0;
     env->bufLen = strlen(env->buffer);
     
+    puts("header cree");
     sendHeaderTCP(env);
 }
 
 void sendHeaderTCP(struct envoi* env) {
     
-    int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
+    int nbSent = send(env->clientSocket, env->buffer+env->currentPos, sizeof(env->buffer)-env->currentPos*sizeof(char), MSG_NOSIGNAL);
+    printf("send : %s\n", strerror(errno));
     
     env->currentPos += nbSent;
     
@@ -68,7 +71,10 @@ void sendHeaderTCP(struct envoi* env) {
         env->state = HEADER_SENT;
         free(env->buffer);
         createImageTCP(env);
+        puts("header sent");
     }
+    
+    printf("car envoyes (header) : %d_%d/%d", nbSent, env->currentPos, env->bufLen);
     
 }
 
@@ -82,12 +88,14 @@ void createImageTCP(struct envoi* env) {
         perror("fread raté");
     }
     env->state = SENDING_IMAGE;
+    puts("image cree");
     sendImageTCP(env);
 }
 
 void sendImageTCP(struct envoi* env) {
 
-    int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
+    int nbSent = send(env->clientSocket, env->buffer+env->currentPos, sizeof(env->buffer)-env->currentPos*sizeof(char), MSG_NOSIGNAL);
+    printf("send : %s\n", strerror(errno));
     
     env->currentPos += nbSent;
     
