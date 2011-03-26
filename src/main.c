@@ -112,7 +112,7 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 						{
 								//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
 								printf("%s\n","ENVOI");
-								printf("%d", tabClients.clients[i].videoClient.clientSocket);
+								printf("%d\n", tabClients.clients[i].videoClient.clientSocket);
 								if(tabClients.clients[i].videoClient.clientSocket != 0) 
 								{
 									sendImage(&tabClients.clients[i].videoClient);

@@ -22,7 +22,7 @@ void sendImage(struct videoClient* videoClient) {
             sendHeaderTCP(env);
         } else if(env->state == HEADER_SENT) {
             createImageTCP(env);
-        } else {
+        } else if(env->state != IMAGE_SENT) {
             sendImageTCP(env);
         }
     } else { //ENVOI_UDP
@@ -34,15 +34,14 @@ void sendImage(struct videoClient* videoClient) {
 
 void createHeaderTCP(struct envoi* env) {
     env->buffer = malloc(128*sizeof(char));
-    env->buffer[0] = '\0';
-    
+    memset(env->buffer,'\0',128*sizeof(char));
+    char id[2] = "1";
     //Image_id
-    strcat(env->buffer, env->fileName/*env->ids[env->id]*/);
+    strcat(env->buffer, id/*env->fileName env->ids[env->id]*/);
     
     strcat(env->buffer, "\r\n");
     
-    //Taille
-	
+    //Taille	
 	//fseek plante je ne sait pas pourquoi
     fseek(env->curFile, 0, SEEK_END);
     env->fileSize = ftell(env->curFile);
@@ -61,25 +60,45 @@ void createHeaderTCP(struct envoi* env) {
 }
 
 void sendHeaderTCP(struct envoi* env) {
-    
-    int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
+  
+	int nbSent;	
+   	do
+	{
+    nbSent = send(env->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
     FAIL(nbSent); 
-
     env->currentPos += nbSent;
+    printf("car envoyes (header) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
+	
+	char * tmp = (char *)malloc(128*sizeof(char));
+	memset(tmp,'\0',128*sizeof(char));
+	int i;
+	for (i = env->currentPos+1; i < env->bufLen; i++)
+	{
+		tmp[i-env->currentPos+1] = env->buffer[i];
+	}
+	
+	char * tmp2;
+	tmp2 = env->buffer;
+	env->buffer = tmp;
+	env->bufLen = strlen(env->buffer);
+	free(tmp2);
+	
+	} while (errno == EAGAIN);
+
     
-    if(env->currentPos == env->bufLen) {
+    if(env->currentPos >= env->bufLen) {
         env->state = HEADER_SENT;
         free(env->buffer);
-        createImageTCP(env);
         puts("header sent");
+        createImageTCP(env);
     }
     
-    printf("car envoyes (header) : %d_%d/%d", nbSent, env->currentPos, env->bufLen);
     
 }
 
 void createImageTCP(struct envoi* env) {
     env->buffer = malloc(env->fileSize*sizeof(char));
+	memset(env->buffer,'\0',env->fileSize*sizeof(char));
     env->currentPos = 0;
     env->bufLen = env->fileSize;
     
@@ -94,14 +113,35 @@ void createImageTCP(struct envoi* env) {
 
 void sendImageTCP(struct envoi* env) {
 
-    int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
+	int nbSent;
+	do
+	{
+    nbSent = send(env->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
     FAIL(nbSent);
-
     env->currentPos += nbSent;
+    printf("car envoyes (image) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
+	
+	char * tmp = (char *)malloc(env->fileSize*sizeof(char));
+	memset(tmp,'\0',env->fileSize*sizeof(char));
+	int i;
+	for (i = env->currentPos+1; i < env->bufLen; i++)
+	{
+		tmp[i-env->currentPos+1]=env->buffer[i];
+	}
+	
+	char * tmp2;
+	tmp2 = env->buffer;
+	env->buffer = tmp;
+	env->bufLen = strlen(env->buffer);
+	free(tmp2);
+	} while (errno == EAGAIN);
+
     
-    if(env->currentPos == env->bufLen) {
-        env->state = IMAGE_SENT;
-        free(env->buffer);
+    printf("car envoyes (image) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
+    if(env->currentPos >= env->bufLen) {
+        //env->state = IMAGE_SENT;
+        env->state = NOTHING_SENT;
+		free(env->buffer);
         close(env->curFile);
         puts("Image envoyée");
     } else {
