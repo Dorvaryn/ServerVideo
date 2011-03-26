@@ -53,11 +53,19 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			if(req->fragmentSize != -1) 
 			{
 				printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
+				
+				videoClient->clientSocket = initDataUDP(epollfd, sock, req->listenPort, UDP_PULL);
+				
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->type = ENVOI_UDP;
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
-				videoClient->envoi->curFile = fopen(".data/Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
+				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
+				if(videoClient->envoi->curFile == NULL) {
+					puts("E: ouverture du fichier");
+				}
+				videoClient->envoi->id = 1;
+				videoClient->id = 1;
 
 				//TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
 				//remarque : on ne se connecte pas en udp, il faut donc que je récupère ici des données pour le send udp (à voir)
@@ -104,7 +112,14 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 					videoClient->id = req->imgId;
 				}
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				videoClient->envoi->type = ENVOI_TCP;
+				if (videoClient->protocole == TCP_PULL)
+				{
+					videoClient->envoi->type = ENVOI_TCP;
+				}
+				else
+				{
+					videoClient->envoi->type = ENVOI_UDP;
+				}
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
 
