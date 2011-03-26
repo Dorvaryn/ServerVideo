@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include <sys/time.h>
 
+
 //Maximum d'un mot dans les requetes du client
 #define MAX_TOCKEN 256
 
@@ -33,6 +34,12 @@
 #define RUNNING 0
 #define PAUSED 1
 #define OVER 2
+struct infosVideo {
+	char type;
+	double fps;
+	int nbImages;
+	char * images[];
+};
 
 struct requete {
 	int type;

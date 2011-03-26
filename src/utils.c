@@ -111,16 +111,20 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 	}
 	tabFichiers->socks[tabFichiers->nbFichiers] = createSockEvent(epollfd,port);
 	tabFichiers->infosVideos[tabFichiers->nbFichiers].nbImages = 0;
-	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(512*sizeof(char)*254);
+	int k;
+	for (k = 0; k < 256; k++)
+	{
+		tabFichiers->infosVideos[tabFichiers->nbFichiers].images[k] = (char *)malloc(512*sizeof(char));
+	}
 	tabFichiers->nbFichiers++;
 }
 
 void addImage(char * uneImage, struct infosVideo * infos)
 {
 	printf("Debug precopy\n");
-	//strcpy(infos->images[infos->nbImages], uneImage);
+	strcpy(infos->images[infos->nbImages], uneImage);
 	printf("Debug postcopy\n");
-	//infos->nbImages++;
+	infos->nbImages++;
 }
 
 void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock, int * baseCourante, int isGet)

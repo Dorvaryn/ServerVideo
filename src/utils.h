@@ -36,12 +36,6 @@ struct tabClients {
 	int nbClients;
 	struct sockClient * clients;
 };
-struct infosVideo {
-	char type;
-	double fps;
-	int nbImages;
-	char ** images;
-};
 struct tabFichiers {
 	int nbFichiers;
 	int * socks;

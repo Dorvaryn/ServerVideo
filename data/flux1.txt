@@ -5,8 +5,8 @@ Address=10.0.2.2
 Port=8088
 Protocol=TCP_PUSH
 IPS=1.5
-.\Images\img1.bmp
-.\Images\img2.bmp
-.\Images\img3.bmp
-.\Images\img4.bmp
-.\Images\img5.bmp
+Images\img1.bmp
+Images\img2.bmp
+Images\img3.bmp
+Images\img4.bmp
+Images\img5.bmp

@@ -72,24 +72,52 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 videoClient->envoi->type = ENVOI_TCP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen("./data/Images/img1.bmp", "r"); //TODO: initialiser curFile avec le bon fichier
+                printf("%s\n",videoClient->infosVideo->images[0]);
+                videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
                 if(videoClient->envoi->curFile == NULL) {
                     puts("E: ouverture du fichier");
                 }
-                videoClient->envoi->fileName = "./data/Images/img1.bmp";
+                videoClient->envoi->id = 1;
+				videoClient->id = 1;
 				//envoie au cas ou le buffer soit déja vide
 				//sendImage(videoClient);
 				puts("VIDEO OKok !");
                 
                
-            } else {
-                printf("GET id:%d\n", req->imgId);
-                
-                //TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
-                //videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");
-                
-                sendImage(videoClient); //enlever après le debuggage (placer dans le central)
-            }
+			} else {
+				printf("GET id:%d\n", req->imgId);
+
+				//TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
+				//videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");
+				if (req->imgId == -1)
+				{	
+					if (videoClient->infosVideo->nbImages > videoClient->id)
+					{
+						videoClient->id++;
+					}
+					else
+					{
+						videoClient->id = 1;
+					}
+				}
+				else
+				{
+					videoClient->id = req->imgId;
+				}
+					videoClient->envoi = malloc(sizeof(struct envoi));
+					videoClient->envoi->type = ENVOI_TCP;
+					videoClient->envoi->state = NOTHING_SENT;
+					videoClient->envoi->clientSocket = videoClient->clientSocket;
+
+					videoClient->envoi->id = videoClient->id;
+
+					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r"); //TODO: initialiser curFile avec le bon fichier
+					if(videoClient->envoi->curFile == NULL)
+				   	{
+						puts("E: ouverture du fichier");
+					}
+					sendImage(videoClient); //enlever après le debuggage (placer dans le central)
+			}
             break;
         case START:
             printf("START\n");

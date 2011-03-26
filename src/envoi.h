@@ -33,7 +33,7 @@ struct envoi {
     int bufLen; //Longueur du buffer
     char* buffer; //Buffer courant
 
-    char* fileName;
+    int id;
     FILE* curFile;
     int fileSize;
 };

@@ -35,11 +35,6 @@ void sendImage(struct videoClient* videoClient) {
 void createHeaderTCP(struct envoi* env) {
     env->buffer = malloc(128*sizeof(char));
     memset(env->buffer,'\0',128*sizeof(char));
-    char id[2] = "1";
-    //Image_id
-    //strcat(env->buffer, id/*env->fileName env->ids[env->id]*/);
-    
-    //strcat(env->buffer, "\r\n");
     
     //Taille	
 	//fseek plante je ne sait pas pourquoi
@@ -47,9 +42,7 @@ void createHeaderTCP(struct envoi* env) {
     env->fileSize = ftell(env->curFile);
     fseek(env->curFile, 0, SEEK_SET);
     char sBufferTaille[16];
-    sprintf(env->buffer, "%d\r\n%d\r\n", id,env->fileSize);
-    
-    //strcat(env->buffer, "\r\n");
+    sprintf(env->buffer, "%d\r\n%d\r\n", env->id,env->fileSize);
     
     env->state = SENDING_HEADER;
     env->currentPos = 0;
@@ -139,10 +132,11 @@ void sendImageTCP(struct envoi* env) {
     
     printf("car envoyes (image) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
     if(env->currentPos >= env->bufLen) {
-        //env->state = IMAGE_SENT; Pour le moment on envoie toujours la même image
-        env->state = NOTHING_SENT;
+        env->state = IMAGE_SENT; //Pour le moment on envoie toujours la même image
+        //env->state = NOTHING_SENT;
 		free(env->buffer);
-        //close(env->curFile);
+        close(env->curFile);
+		free(env);
         puts("Image envoyée");
     } else {
         //send(env); //TODO: supprimer après les tests

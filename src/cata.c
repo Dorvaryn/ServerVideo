@@ -150,7 +150,9 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 			}
 			else
 			{
-				addImage(tmp2, &tabFichiers->infosVideos[tabFichiers->nbFichiers-1]);
+				char image[512];
+				sprintf(image, "%s%s", "./data/",tmp2);
+				addImage(image, &tabFichiers->infosVideos[tabFichiers->nbFichiers-1]);
 			}
 			int l2 = strlen(tmp2);
 			for(i=0;i<l2;i++)
