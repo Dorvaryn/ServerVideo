@@ -111,6 +111,7 @@ void sendImageTCP(struct envoi* env) {
 	int nbSent;
 	do
 	{
+    printf("socket du client : %d\n", env->clientSocket);
     nbSent = send(env->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
     FAIL(nbSent);
     env->currentPos += nbSent;

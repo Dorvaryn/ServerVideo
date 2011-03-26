@@ -72,7 +72,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 videoClient->envoi->type = ENVOI_TCP;
                 videoClient->envoi->state = NOTHING_SENT;
                 videoClient->envoi->clientSocket = videoClient->clientSocket;
-                printf("%s\n",videoClient->infosVideo->images[0]);
                 videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
                 if(videoClient->envoi->curFile == NULL) {
                     puts("E: ouverture du fichier");
