@@ -62,9 +62,9 @@ void createHeaderTCP(struct envoi* env) {
 
 void sendHeaderTCP(struct envoi* env) {
     
-    int nbSent = send(env->clientSocket, env->buffer+env->currentPos, sizeof(env->buffer)-env->currentPos*sizeof(char), MSG_NOSIGNAL);
-    printf("send : %s\n", strerror(errno));
-    
+    int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
+    FAIL(nbSent); 
+
     env->currentPos += nbSent;
     
     if(env->currentPos == env->bufLen) {
@@ -94,9 +94,9 @@ void createImageTCP(struct envoi* env) {
 
 void sendImageTCP(struct envoi* env) {
 
-    int nbSent = send(env->clientSocket, env->buffer+env->currentPos, sizeof(env->buffer)-env->currentPos*sizeof(char), MSG_NOSIGNAL);
-    printf("send : %s\n", strerror(errno));
-    
+    int nbSent = send(env->clientSocket, env->buffer, sizeof(env->buffer), MSG_NOSIGNAL);
+    FAIL(nbSent);
+
     env->currentPos += nbSent;
     
     if(env->currentPos == env->bufLen) {
