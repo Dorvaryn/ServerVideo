@@ -37,9 +37,9 @@ void createHeaderTCP(struct envoi* env) {
     memset(env->buffer,'\0',128*sizeof(char));
     char id[2] = "1";
     //Image_id
-    strcat(env->buffer, id/*env->fileName env->ids[env->id]*/);
+    //strcat(env->buffer, id/*env->fileName env->ids[env->id]*/);
     
-    strcat(env->buffer, "\r\n");
+    //strcat(env->buffer, "\r\n");
     
     //Taille	
 	//fseek plante je ne sait pas pourquoi
@@ -47,9 +47,9 @@ void createHeaderTCP(struct envoi* env) {
     env->fileSize = ftell(env->curFile);
     fseek(env->curFile, 0, SEEK_SET);
     char sBufferTaille[16];
-    sprintf(sBufferTaille, "%d", env->fileSize);
+    sprintf(env->buffer, "%d\r\n%d\r\n", id,env->fileSize);
     
-    strcat(env->buffer, "\r\n");
+    //strcat(env->buffer, "\r\n");
     
     env->state = SENDING_HEADER;
     env->currentPos = 0;
