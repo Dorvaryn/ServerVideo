@@ -15,6 +15,8 @@ void sendImage(struct videoClient* videoClient) {
 
     struct envoi* env = videoClient->envoi;
 
+	if(videoClient->etat != OVER)
+	{
     if(env->type == ENVOI_TCP /*&& videoClient->etat == RUNNING*/) {
         if(env->state == NOTHING_SENT /*&& videoClient->dernierEnvoi*/ ) {
             createHeaderTCP(env);
@@ -28,7 +30,7 @@ void sendImage(struct videoClient* videoClient) {
     } else { //ENVOI_UDP
         //TODO: Faire l'envoi udp
     }
-    
+	}
     
 }
 
