@@ -64,11 +64,18 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				if(videoClient->envoi->curFile == NULL) {
 					puts("E: ouverture du fichier");
 				}
-				videoClient->envoi->id = 1;
-				videoClient->id = 1;
+				fseek(videoClient->envoi->curFile, 0, SEEK_END);
+	            videoClient->envoi->fileSize = ftell(videoClient->envoi->curFile);
+	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
+				
+				videoClient->envoi->id = 0;
+				videoClient->id = 0;
+				
+				videoClient->envoi->posDansImage = 0;
+				videoClient->envoi->tailleMaxFragment = req->fragmentSize;
 
-				//TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
-				//remarque : on ne se connecte pas en udp, il faut donc que je récupère ici des données pour le send udp (à voir)
+				//TODO: faire le socket udp
+				//videoClient->clientSocket = iciLeSocketCree
 
 			} else if(req->listenPort != -1) {
 				printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
@@ -80,7 +87,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->envoi->type = videoClient->infosVideo->type;
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
-				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
+				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r");
 				if(videoClient->envoi->curFile == NULL) {
 					puts("E: ouverture du fichier");
 				}
@@ -118,12 +125,12 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 
 				videoClient->envoi->id = videoClient->id;
 
-				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r"); //TODO: initialiser curFile avec le bon fichier
+				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
 				if(videoClient->envoi->curFile == NULL)
 				{
 					puts("E: ouverture du fichier");
 				}
-				sendImage(videoClient); //enlever après le debuggage (placer dans le central)
+				sendImage(videoClient);
 			}
 			break;
 		case START:

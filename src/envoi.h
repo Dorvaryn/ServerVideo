@@ -13,6 +13,7 @@
 #define HEADER_SENT -1
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
+#define FRAGMENT_SENT 2
 
 #define FAIL(x) if(x) {\
 	perror(#x);}
@@ -27,11 +28,14 @@ struct envoi {
     int state;
     int clientSocket;
     
-    char type; //ENVOI_TCP ou ENVOI_UDP
+    char type; //TCP_PULL, TCP_PUSH, UDP_PULL ou UDP_PUSH
 
     int currentPos; //Position dans l'envoi
     int bufLen; //Longueur du buffer
     char* buffer; //Buffer courant
+    
+    int posDansImage; //Position du fragment dans l'image
+    int tailleMaxFragment; //Taille max du fragment
 
     int id;
     FILE* curFile;
@@ -48,6 +52,12 @@ void sendHeaderTCP(struct envoi* env) ;
 
 void createImageTCP(struct envoi* env);
 void sendImageTCP(struct envoi* env);
+
+void createHeaderUDP(struct envoi* env);
+void sendHeaderUDP(struct envoi* env) ;
+
+void createFragment(struct envoi* env);
+void sendFragment(struct envoi* env);
 
 
 #endif // ENVOI_H_

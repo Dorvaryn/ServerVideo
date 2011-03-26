@@ -22,6 +22,7 @@ void sendImage(struct videoClient* videoClient) {
 	if(videoClient->etat != OVER) //TODO: gérer la pause
 	{
 		if(env->type == TCP_PULL ) {
+		
 			if(env->state == NOTHING_SENT) {
 				createHeaderTCP(env);
 			} else if(env->state == SENDING_HEADER) {
@@ -31,7 +32,9 @@ void sendImage(struct videoClient* videoClient) {
 			} else if(env->state != IMAGE_SENT) {
 				sendImageTCP(env);
 			}
+			
 		} else if(env->type == TCP_PUSH) {
+		
 			if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) {
 				createHeaderTCP(env);
 				videoClient->dernierEnvoi = getTime();
@@ -42,10 +45,22 @@ void sendImage(struct videoClient* videoClient) {
 			} else if(env->state != IMAGE_SENT) {
 				sendImageTCP(env);
 			}
-		} else if(env->type == UDP_PULL) {
 			
+		} else if(env->type == UDP_PULL) {
+		
+			if(env->state == NOTHING_SENT) {
+				createHeaderUDP(env);
+			} else if(env->state == SENDING_HEADER) {
+				sendHeaderUDP(env);
+			} else if(env->state == HEADER_SENT) {
+				createFragment(env);
+			} else if(env->state != FRAGMENT_SENT) {
+				sendFragment(env);
+			}
 			
 		} else if(env->type == UDP_PUSH) {
+			
+			//TODO: push udp !
 			
 		}
 	}
@@ -60,7 +75,7 @@ void createHeaderTCP(struct envoi* env) {
 	fseek(env->curFile, 0, SEEK_END);
 	env->fileSize = ftell(env->curFile);
 	fseek(env->curFile, 0, SEEK_SET);
-	char sBufferTaille[16];
+
 	sprintf(env->buffer, "%d\r\n%d\r\n", env->id,env->fileSize);
 
 	env->state = SENDING_HEADER;
@@ -158,4 +173,37 @@ void sendImageTCP(struct envoi* env) {
 		free(env);
 		puts("Image envoyée");
 	}
+}
+
+//Cree un header pour un paquet
+void createHeaderUDP(struct envoi* env) {
+    //Prendre en compte la taille du fragment
+    //(par rapport à la taille totale de l'image et du nbre de fragments envoyes)
+    
+    env->buffer = malloc(128*sizeof(char));
+	memset(env->buffer,'\0',128*sizeof(char));
+
+	sprintf(env->buffer, "%d\r\n%d\r\n%d\r\n%d\r\n", env->id, env->fileSize, env->posDansImage, env->tailleMaxFragment);
+
+	env->state = SENDING_HEADER;
+	env->currentPos = 0;
+	env->bufLen = strlen(env->buffer);
+
+	puts("header cree");
+	sendHeaderTCP(env);
+}
+
+//Envoie le header
+void sendHeaderUDP(struct envoi* env) {
+    
+}
+
+//Charge la bonne partie de l'image dans le buffer
+void createFragment(struct envoi* env) {
+    //Mettre à jour la taille bufLen
+}
+
+//Envoie le fragment et met à jour la position dans le fichier
+void sendFragment(struct envoi* env) {
+    
 }
