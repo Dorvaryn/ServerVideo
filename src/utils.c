@@ -187,6 +187,38 @@ int createEventPush(int epollfd, int csock)
 	}
 }
 
+int initDataUDP(int epollfd, int sock, int port, int type)
+{
+	struct sockaddr_in addr, saddr;	
+	int csock, len;
+	getsockname(sock, (struct sockaddr*)&addr, &len);
+	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
+	saddr.sin_family = AF_INET;
+	saddr.sin_port = htons(port);
+	
+#if defined ( NEW )
+	csock = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK,0); //socket NONBLOCK plus performant 
+#endif // NEW
+	
+#if defined ( OLD )
+	csock = socket(AF_INET, SOCK_DGRAM, 0);
+	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
+	FAIL(flags);
+	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
+#endif // OLD
+	
+	if(type == UDP_PULL)
+	{
+		createEventPull(epollfd, csock);
+	}
+	else if(type == UDP_PUSH)
+	{
+		createEventPush(epollfd, csock);
+	}
+
+    return csock;	
+}
+
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
