@@ -7,82 +7,82 @@
  * d'un int non signé.
  */
 int parseInt(char* entier) {
-    if(strcmp(entier, "-1") == 0) {
-        return -1;
-    }
-    
-    int res = 0;
-    int i;
-    for(i = 0; entier[i] != '\0'; i++) {
-        char c = entier[i];
-        if(isdigit(c)) {
-            res = res*10+(c-'0');
-        } else {
-            return PARSE_ERROR;
-        }
-    }
+	if(strcmp(entier, "-1") == 0) {
+		return -1;
+	}
 
-    return res;
+	int res = 0;
+	int i;
+	for(i = 0; entier[i] != '\0'; i++) {
+		char c = entier[i];
+		if(isdigit(c)) {
+			res = res*10+(c-'0');
+		} else {
+			return PARSE_ERROR;
+		}
+	}
+
+	return res;
 }
 
 void initReq(struct requete* req) {
-    req->type = NON_DEFINI;
-    
-    req->isOver = 0;
-    
-    req->imgId = -2;
-    req->listenPort = -1;
-    req->fragmentSize = -1;
-    
-    req->inWord = 0;
-    req->space = 0;
-    req->crlfCounter = 0;
-    
-    req->mot = 0;
-    req->motPosition = 0;
-    
-    req->reqPosition = 0;
+	req->type = NON_DEFINI;
+
+	req->isOver = 0;
+
+	req->imgId = -2;
+	req->listenPort = -1;
+	req->fragmentSize = -1;
+
+	req->inWord = 0;
+	req->space = 0;
+	req->crlfCounter = 0;
+
+	req->mot = 0;
+	req->motPosition = 0;
+
+	req->reqPosition = 0;
 }
 
 void traiteRequete(struct requete* req, struct videoClient* videoClient, int epollfd, int sock) {
-    switch(req->type) {
-        case BAD_REQUEST:
-            puts("E: Mauvaise requete");
-            break;
-        case GET:
-            if(req->fragmentSize != -1) 
+	switch(req->type) {
+		case BAD_REQUEST:
+			puts("E: Mauvaise requete");
+			break;
+		case GET:
+			if(req->fragmentSize != -1) 
 			{
-                printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
-                videoClient->envoi = malloc(sizeof(struct envoi));
-                videoClient->envoi->type = ENVOI_UDP;
-                videoClient->envoi->state = NOTHING_SENT;
-                videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen(".data/Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
-                
-                //TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
-                //remarque : on ne se connecte pas en udp, il faut donc que je récupère ici des données pour le send udp (à voir)
-                
-            } else if(req->listenPort != -1) {
-                printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
-                
-                videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, TCP_PULL);
-                printf("socket du client : %d\n", videoClient->clientSocket);
-                
-                videoClient->envoi = malloc(sizeof(struct envoi));
-                videoClient->envoi->type = ENVOI_TCP;
-                videoClient->envoi->state = NOTHING_SENT;
-                videoClient->envoi->clientSocket = videoClient->clientSocket;
-                videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
-                if(videoClient->envoi->curFile == NULL) {
-                    puts("E: ouverture du fichier");
-                }
-                videoClient->envoi->id = 1;
+				printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
+				videoClient->envoi = malloc(sizeof(struct envoi));
+				videoClient->envoi->type = ENVOI_UDP;
+				videoClient->envoi->state = NOTHING_SENT;
+				videoClient->envoi->clientSocket = videoClient->clientSocket;
+				videoClient->envoi->curFile = fopen(".data/Images/img1.bmp", "r");//TODO: initialiser curFile avec le bon fichier
+
+				//TODO: Se connecter au client en UDP sur le port listenPort et mémoriser ce port dans une structure...
+				//remarque : on ne se connecte pas en udp, il faut donc que je récupère ici des données pour le send udp (à voir)
+
+			} else if(req->listenPort != -1) {
+				printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
+
+				videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, TCP_PULL);
+				printf("socket du client : %d\n", videoClient->clientSocket);
+
+				videoClient->envoi = malloc(sizeof(struct envoi));
+				videoClient->envoi->type = ENVOI_TCP;
+				videoClient->envoi->state = NOTHING_SENT;
+				videoClient->envoi->clientSocket = videoClient->clientSocket;
+				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
+				if(videoClient->envoi->curFile == NULL) {
+					puts("E: ouverture du fichier");
+				}
+				videoClient->envoi->id = 1;
 				videoClient->id = 1;
 				//envoie au cas ou le buffer soit déja vide
 				//sendImage(videoClient);
 				puts("VIDEO OKok !");
-                
-               
+
+
 			} else {
 				printf("GET id:%d\n", req->imgId);
 
@@ -103,198 +103,198 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				{
 					videoClient->id = req->imgId;
 				}
-					videoClient->envoi = malloc(sizeof(struct envoi));
-					videoClient->envoi->type = ENVOI_TCP;
-					videoClient->envoi->state = NOTHING_SENT;
-					videoClient->envoi->clientSocket = videoClient->clientSocket;
+				videoClient->envoi = malloc(sizeof(struct envoi));
+				videoClient->envoi->type = ENVOI_TCP;
+				videoClient->envoi->state = NOTHING_SENT;
+				videoClient->envoi->clientSocket = videoClient->clientSocket;
 
-					videoClient->envoi->id = videoClient->id;
+				videoClient->envoi->id = videoClient->id;
 
-					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r"); //TODO: initialiser curFile avec le bon fichier
-					if(videoClient->envoi->curFile == NULL)
-				   	{
-						puts("E: ouverture du fichier");
-					}
-					sendImage(videoClient); //enlever après le debuggage (placer dans le central)
+				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r"); //TODO: initialiser curFile avec le bon fichier
+				if(videoClient->envoi->curFile == NULL)
+				{
+					puts("E: ouverture du fichier");
+				}
+				sendImage(videoClient); //enlever après le debuggage (placer dans le central)
 			}
-            break;
-        case START:
-            printf("START\n");
-            if(videoClient->etat == PAUSED) {
-                videoClient->etat = RUNNING;
-            }
-            break;
-        case PAUSE:
-            printf("PAUSE\n");
-            if(videoClient->etat == RUNNING) {
-                videoClient->etat = PAUSED;
-            }
-            break;
-        case END:
-            printf("END\n");
-            videoClient->etat = OVER;
-            break;
-        case ALIVE:
-            printf("ALIVE id:%d port:%d\n", req->imgId, req->listenPort);
-            videoClient->lastAlive = time(NULL);
-            break;
-        default:
-            break;
-    }
+			break;
+		case START:
+			printf("START\n");
+			if(videoClient->etat == PAUSED) {
+				videoClient->etat = RUNNING;
+			}
+			break;
+		case PAUSE:
+			printf("PAUSE\n");
+			if(videoClient->etat == RUNNING) {
+				videoClient->etat = PAUSED;
+			}
+			break;
+		case END:
+			printf("END\n");
+			videoClient->etat = OVER;
+			break;
+		case ALIVE:
+			printf("ALIVE id:%d port:%d\n", req->imgId, req->listenPort);
+			videoClient->lastAlive = time(NULL);
+			break;
+		default:
+			break;
+	}
 }
 
 void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoClient, int epollfd, int sock) {
 
-    if(req->mot == 0) {
-        req->mot = malloc(MAX_TOCKEN*sizeof(char));
-    }
-    
-	// bloque le traitement des commandes
-    //if(req->type != NON_DEFINI) return;
-    puts("==>");
-    puts(chaine);
-    puts("<==");
+	if(req->mot == 0) {
+		req->mot = malloc(MAX_TOCKEN*sizeof(char));
+	}
 
-    int i;
-    for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
-        
-        char c = chaine[i];
+	// bloque le traitement des commandes
+	//if(req->type != NON_DEFINI) return;
+	puts("==>");
+	puts(chaine);
+	puts("<==");
+
+	int i;
+	for(i=0; chaine[i] != '\0' && !req->isOver; i++) {
+
+		char c = chaine[i];
 		//printf("%s\n",chaine);
 
-        //est-ce que le caractère est un espace ?
-        req->space = (c == ' ' || c == '\n' || c == '\r');
-        
-        if(req->inWord && req->space) { //Le mot est fini, on peut le traiter
-            req->mot[req->motPosition] = '\0';
-            req->inWord = 0;
-            
+		//est-ce que le caractère est un espace ?
+		req->space = (c == ' ' || c == '\n' || c == '\r');
+
+		if(req->inWord && req->space) { //Le mot est fini, on peut le traiter
+			req->mot[req->motPosition] = '\0';
+			req->inWord = 0;
+
 			//printf("%s\n",req->mot);
 
-            //Traitement du mot lu
-            //puts(req->mot);
-            if(req->reqPosition == 0) {
-                //puts("choix..");
-                if(strcmp(req->mot, "GET") == 0) {
-                    req->type = GET;
-                } else if(strcmp(req->mot, "START") == 0) {
-                    req->type = START;
-                } else if(strcmp(req->mot, "PAUSE") == 0) {
-                    req->type = PAUSE;
-                } else if(strcmp(req->mot, "END") == 0) {
-                    req->type = END;
-                } else if(strcmp(req->mot, "ALIVE") == 0) {
-                    req->type = ALIVE;
-                } else {
-                    req->type = BAD_REQUEST;
-                }
-            } else if(req->reqPosition == 1) {
-                int numero = parseInt(req->mot);
-                if(numero == PARSE_ERROR) {
-                    req->imgId = 0;
-                } else {
-                    req->imgId = numero;
-                }
-            } else if(req->reqPosition == 2 && strcmp(req->mot, "LISTEN_PORT") != 0) {
-                req->type = BAD_REQUEST;
-            } else if(req->reqPosition == 3) {
-                int numero = parseInt(req->mot);
-                if(numero == PARSE_ERROR) {
-                    req->type = BAD_REQUEST;
-                } else {
-                    req->listenPort = numero;
-                }
-            } else if(req->reqPosition == 4) {
-                if(req->type == ALIVE || strcmp(req->mot, "FRAGMENT_SIZE") != 0) {
-                    req->type = BAD_REQUEST;
-                }
-            } else if(req->reqPosition == 5) {
-                int numero = parseInt(req->mot);
-                if(numero == PARSE_ERROR) {
-                    req->type = BAD_REQUEST;
-                } else {
-                    req->fragmentSize = numero;
-                }
-            } else if(req->reqPosition == 6) {
-                req->type = BAD_REQUEST;
-            }
-            
-            req->reqPosition++;
-            
-            /*if(c=='\r') {
-                req->crlfCounter = 1;
-            }*/
-            
-        } else if(req->inWord && !req->space) { //Le mot continue
-            req->mot[req->motPosition] = c;
-            req->motPosition++;
-        } else if(!req->inWord && !req->space) { //Le mot commence
-            req->crlfCounter = 0;
-            req->motPosition = 0;
-            req->inWord = 1;
-            req->mot[req->motPosition] = c;
-            req->motPosition++;
-        } else { //Sinon les espaces continuent
-            if(c == '\n') {
-                req->crlfCounter++;
-            }
-            if(req->crlfCounter == 2) {
-                req->isOver = 1;
-                //puts(req->mot);
-            }
-        }
-        
-        //printf("### %c %d %d %d ###\n", c, req->inWord, req->space, req->motPosition);
-    }
-    
-    if(req->isOver) {
-        free(req->mot);
-        
-        if(req->type == GET && req->imgId == -2) {
-            req->type = BAD_REQUEST;
-        }
-        if(req->type == ALIVE && req->imgId == -2) {
-            req->type = BAD_REQUEST;
-        }
-        /*puts("requete terminée");
-        if(req->type == BAD_REQUEST) {
-            puts("mauvaise requete");
-        } else*/
-        traiteRequete(req, videoClient, epollfd, sock);
-        initReq(req);
-    }
+			//Traitement du mot lu
+			//puts(req->mot);
+			if(req->reqPosition == 0) {
+				//puts("choix..");
+				if(strcmp(req->mot, "GET") == 0) {
+					req->type = GET;
+				} else if(strcmp(req->mot, "START") == 0) {
+					req->type = START;
+				} else if(strcmp(req->mot, "PAUSE") == 0) {
+					req->type = PAUSE;
+				} else if(strcmp(req->mot, "END") == 0) {
+					req->type = END;
+				} else if(strcmp(req->mot, "ALIVE") == 0) {
+					req->type = ALIVE;
+				} else {
+					req->type = BAD_REQUEST;
+				}
+			} else if(req->reqPosition == 1) {
+				int numero = parseInt(req->mot);
+				if(numero == PARSE_ERROR) {
+					req->imgId = 0;
+				} else {
+					req->imgId = numero;
+				}
+			} else if(req->reqPosition == 2 && strcmp(req->mot, "LISTEN_PORT") != 0) {
+				req->type = BAD_REQUEST;
+			} else if(req->reqPosition == 3) {
+				int numero = parseInt(req->mot);
+				if(numero == PARSE_ERROR) {
+					req->type = BAD_REQUEST;
+				} else {
+					req->listenPort = numero;
+				}
+			} else if(req->reqPosition == 4) {
+				if(req->type == ALIVE || strcmp(req->mot, "FRAGMENT_SIZE") != 0) {
+					req->type = BAD_REQUEST;
+				}
+			} else if(req->reqPosition == 5) {
+				int numero = parseInt(req->mot);
+				if(numero == PARSE_ERROR) {
+					req->type = BAD_REQUEST;
+				} else {
+					req->fragmentSize = numero;
+				}
+			} else if(req->reqPosition == 6) {
+				req->type = BAD_REQUEST;
+			}
+
+			req->reqPosition++;
+
+			/*if(c=='\r') {
+			  req->crlfCounter = 1;
+			  }*/
+
+		} else if(req->inWord && !req->space) { //Le mot continue
+			req->mot[req->motPosition] = c;
+			req->motPosition++;
+		} else if(!req->inWord && !req->space) { //Le mot commence
+			req->crlfCounter = 0;
+			req->motPosition = 0;
+			req->inWord = 1;
+			req->mot[req->motPosition] = c;
+			req->motPosition++;
+		} else { //Sinon les espaces continuent
+			if(c == '\n') {
+				req->crlfCounter++;
+			}
+			if(req->crlfCounter == 2) {
+				req->isOver = 1;
+				//puts(req->mot);
+			}
+		}
+
+		//printf("### %c %d %d %d ###\n", c, req->inWord, req->space, req->motPosition);
+	}
+
+	if(req->isOver) {
+		free(req->mot);
+
+		if(req->type == GET && req->imgId == -2) {
+			req->type = BAD_REQUEST;
+		}
+		if(req->type == ALIVE && req->imgId == -2) {
+			req->type = BAD_REQUEST;
+		}
+		/*puts("requete terminée");
+		  if(req->type == BAD_REQUEST) {
+		  puts("mauvaise requete");
+		  } else*/
+		traiteRequete(req, videoClient, epollfd, sock);
+		initReq(req);
+	}
 }
 
 /*int main() {
-    struct requete req;
-    initReq(&req);
+  struct requete req;
+  initReq(&req);
 
-    // tests
-    //assert(parseInt("1") == 1);
-    //assert(parseInt("-1") == -1);
-    //assert(parseInt("e") == PARSE_ERROR);
-    //assert(parseInt("523654") == 523654);
-    
-    
-    //req.mot = malloc(MAX_TOCKEN*sizeof(char));
-    
-    traiteChaine("ALIV", &req);
-    traiteChaine("E 0 LISTEN_PORT \n  5\r\n \r\n", &req);
-    
-    traiteChaine("START\r\n\r\n", &req);
-    
-    traiteChaine("PAUSE\r\n\r\n", &req);
-    
-    traiteChaine("END\r\n\r\n", &req);
-    
-    traiteChaine("GET\r\n\r\n", &req);
-    
-    traiteChaine("GET -1\r\n\r\n", &req);
-    
-    traiteChaine("GET 5\r\n LISTEN_PORT 404\r\n\r\n", &req);
-    
-    traiteChaine("GET 1024\r\n LISTEN_PORT 4096\r\n FRAGMENT_SIZE 32 \r\n\r\n", &req);
-    
-    //printf("### %d ###\n", req.type);
-    
-    return 0;
+// tests
+//assert(parseInt("1") == 1);
+//assert(parseInt("-1") == -1);
+//assert(parseInt("e") == PARSE_ERROR);
+//assert(parseInt("523654") == 523654);
+
+
+//req.mot = malloc(MAX_TOCKEN*sizeof(char));
+
+traiteChaine("ALIV", &req);
+traiteChaine("E 0 LISTEN_PORT \n  5\r\n \r\n", &req);
+
+traiteChaine("START\r\n\r\n", &req);
+
+traiteChaine("PAUSE\r\n\r\n", &req);
+
+traiteChaine("END\r\n\r\n", &req);
+
+traiteChaine("GET\r\n\r\n", &req);
+
+traiteChaine("GET -1\r\n\r\n", &req);
+
+traiteChaine("GET 5\r\n LISTEN_PORT 404\r\n\r\n", &req);
+
+traiteChaine("GET 1024\r\n LISTEN_PORT 4096\r\n FRAGMENT_SIZE 32 \r\n\r\n", &req);
+
+//printf("### %d ###\n", req.type);
+
+return 0;
 }*/

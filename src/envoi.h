@@ -20,6 +20,9 @@
 #define FAIL(x) if(x) {\
 	perror(#x);}
 
+#define FAIL_SEND(x) if(x == -1) {\
+	perror(#x);}
+
 #define FAIL_FATAL(x) if(x) {\
 	perror(#x);exit(EXIT_FAILURE);}
 
