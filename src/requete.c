@@ -78,7 +78,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
                 }
                 videoClient->envoi->fileName = "./data/Images/img1.bmp";
 				//envoie au cas ou le buffer soit déja vide
-				sendImage(videoClient);
+				//sendImage(videoClient);
 				puts("VIDEO OKok !");
                 
                

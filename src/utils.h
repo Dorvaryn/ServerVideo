@@ -60,7 +60,7 @@ void addImage(char * uneImage, struct infosVideo * infos);
 
 void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock , int * baseCourante, int isGet);
 
-int initDataUDP(int epollfd, int sock, int port, int type)
+int initDataUDP(int epollfd, int sock, int port, int type);
 
 int connectDataTCP(int epollfd, int sock, int port, int type);
 #endif // UTILS_H_

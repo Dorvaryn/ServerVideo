@@ -142,7 +142,7 @@ void sendImageTCP(struct envoi* env) {
         //env->state = IMAGE_SENT; Pour le moment on envoie toujours la même image
         env->state = NOTHING_SENT;
 		free(env->buffer);
-        close(env->curFile);
+        //close(env->curFile);
         puts("Image envoyée");
     } else {
         //send(env); //TODO: supprimer après les tests
