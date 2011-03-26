@@ -14,9 +14,6 @@
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
 
-#define ENVOI_TCP 0
-#define ENVOI_UDP 1
-
 #define FAIL(x) if(x) {\
 	perror(#x);}
 
@@ -42,6 +39,7 @@ struct envoi {
 };
 
 double getTime();
+double timeInterval(double t1, double t2);
 
 void sendImage(struct videoClient* videoClient);
 

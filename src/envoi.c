@@ -11,14 +11,18 @@ double getTime() {
 	return sec + micro/1000000;
 }
 
+double timeInterval(double t1, double t2) {
+    return (t1 < t2 ? t2-t1 : t2); //Evite le bug de minuit :)
+}
+
 void sendImage(struct videoClient* videoClient) {
 
 	struct envoi* env = videoClient->envoi;
 
-	if(videoClient->etat != OVER)
+	if(videoClient->etat != OVER) //TODO: gérer la pause
 	{
-		if(env->type == ENVOI_TCP /*&& videoClient->etat == RUNNING*/) {
-			if(env->state == NOTHING_SENT /*&& videoClient->dernierEnvoi*/ ) {
+		if(env->type == TCP_PULL ) {
+			if(env->state == NOTHING_SENT) {
 				createHeaderTCP(env);
 			} else if(env->state == SENDING_HEADER) {
 				sendHeaderTCP(env);
@@ -27,8 +31,22 @@ void sendImage(struct videoClient* videoClient) {
 			} else if(env->state != IMAGE_SENT) {
 				sendImageTCP(env);
 			}
-		} else { //ENVOI_UDP
-			//TODO: Faire l'envoi udp
+		} else if(env->type == TCP_PUSH) {
+			if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) {
+				createHeaderTCP(env);
+				videoClient->dernierEnvoi = getTime();
+			} else if(env->state == SENDING_HEADER) {
+				sendHeaderTCP(env);
+			} else if(env->state == HEADER_SENT) {
+				createImageTCP(env);
+			} else if(env->state != IMAGE_SENT) {
+				sendImageTCP(env);
+			}
+		} else if(env->type == UDP_PULL) {
+			
+			
+		} else if(env->type == UDP_PUSH) {
+			
 		}
 	}
 
@@ -38,8 +56,7 @@ void createHeaderTCP(struct envoi* env) {
 	env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
 
-	//Taille	
-	//fseek plante je ne sait pas pourquoi
+	//Taille
 	fseek(env->curFile, 0, SEEK_END);
 	env->fileSize = ftell(env->curFile);
 	fseek(env->curFile, 0, SEEK_SET);
@@ -135,13 +152,10 @@ void sendImageTCP(struct envoi* env) {
 
 	printf("car envoyes (image) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
 	if(env->currentPos >= env->bufLen) {
-		env->state = IMAGE_SENT; //Pour le moment on envoie toujours la même image
-		//env->state = NOTHING_SENT;
+		env->state = IMAGE_SENT;
 		free(env->buffer);
 		close(env->curFile);
 		free(env);
 		puts("Image envoyée");
-	} else {
-		//send(env); //TODO: supprimer après les tests
 	}
 }

@@ -63,7 +63,7 @@ struct requete {
 struct videoClient {
     int clientSocket;
     
-    int protocole;
+    //int protocole;
     
     char etat; //RUNNING, PAUSED ou OVER
     

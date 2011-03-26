@@ -57,7 +57,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->clientSocket = initDataUDP(epollfd, sock, req->listenPort, UDP_PULL);
 				
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				videoClient->envoi->type = ENVOI_UDP;
+				videoClient->envoi->type = videoClient->infosVideo->type;
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
@@ -77,7 +77,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				printf("socket du client : %d\n", videoClient->clientSocket);
 
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				videoClient->envoi->type = ENVOI_TCP;
+				videoClient->envoi->type = videoClient->infosVideo->type;
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
@@ -94,8 +94,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			} else {
 				printf("GET id:%d\n", req->imgId);
 
-				//TODO: ligne suivante : traiter avec le id et les fichiers du catalogue correspondant au port
-				//videoClient->envoi->curFile = fopen("./Images/img1.bmp", "r");
 				if (req->imgId == -1)
 				{	
 					if (videoClient->infosVideo->nbImages > videoClient->id)
@@ -112,14 +110,9 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 					videoClient->id = req->imgId;
 				}
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				if (videoClient->protocole == TCP_PULL)
-				{
-					videoClient->envoi->type = ENVOI_TCP;
-				}
-				else
-				{
-					videoClient->envoi->type = ENVOI_UDP;
-				}
+
+				videoClient->envoi->type = videoClient->infosVideo->type;
+				
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
 
