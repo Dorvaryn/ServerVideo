@@ -45,8 +45,8 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 
 		for (n = 0; n < nfds; ++n)
 		{
-			printf("%s\n", "action");
-			printf("%d\n", events[n].data.fd);
+			printf("%s\n", "event");
+			printf("%d\n", events[n].events);
 			if (events[n].data.fd == tabFichiers->socks[0])
 			{
 				printf("%s\n", "connect8081");
@@ -82,7 +82,7 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 				}
 				int i = 0;
 				int done3 = 0;
-				while((done3 == 0) && (done2 == 0) && (i < tabFichiers->nbFichiers))
+				while((done3 == 0) && (done2 == 0) && (i < tabClients.nbClients))
 				{
 					if (events[n].data.fd == tabClients.clients[i].sock)
 					{
@@ -105,17 +105,18 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 								send_get_answer(events[n].data.fd, catalogue);
 							}
 						}
-						else if(events[n].events == EPOLLOUT)
+					}
+					else if (events[n].data.fd == tabClients.clients[i].videoClient.clientSocket)
+					{
+						if(events[n].events == EPOLLOUT)
 						{
-							if (events[n].data.fd == tabClients.clients[i].videoClient.clientSocket)
-							{
 								//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
 								printf("%s\n","ENVOI");
 								printf("%d", tabClients.clients[i].videoClient.clientSocket);
-								if(tabClients.clients[i].videoClient.clientSocket != 0) {
+								if(tabClients.clients[i].videoClient.clientSocket != 0) 
+								{
 									sendImage(&tabClients.clients[i].videoClient);
 								}
-							}
 						}
 						done3 = 1;
 					}
