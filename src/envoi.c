@@ -78,7 +78,7 @@ void sendHeaderTCP(struct envoi* env) {
 	env->bufLen = strlen(env->buffer);
 	free(tmp2);
 	
-	} while (errno == EAGAIN); //on boucle tant que le buffer n'est pas plein
+	} while (errno == EAGAIN && env->bufLen > 0); //on boucle tant que le buffer n'est pas plein
 
     
     if(env->currentPos >= env->bufLen) {
@@ -130,7 +130,7 @@ void sendImageTCP(struct envoi* env) {
 	env->buffer = tmp;
 	env->bufLen = strlen(env->buffer);
 	free(tmp2);
-	} while (errno == EAGAIN);
+	} while (errno == EAGAIN && env->bufLen > 0);
 
     
     printf("car envoyes (image) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
