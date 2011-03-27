@@ -7,7 +7,7 @@ KERNEL=$(shell uname -r | cut -d '-' -f1 | cut -d '.' -f3)
 ifeq ($(shell expr $(KERNEL) \< 28),1)
 CCFLAGS=-DOLD
 else
-CCFLAGS=-DNEW
+CCFLAGS=-DNEW -g -O0 -Wall -Werror
 endif
 LDFLAGS=
 RMFLAGS=-f

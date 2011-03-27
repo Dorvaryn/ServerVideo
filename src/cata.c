@@ -107,7 +107,7 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 					int created = 0;
 					for (k = 0; k < strlen(tmp2); k++)
 					{
-						if ((isdigit(tmp2[k]) != 0) & (created != 1) )
+						if ((isdigit(tmp2[k]) != 0) && (created != 1) )
 						{
 							printf("%s : %d\n",tmp2+k,atoi(tmp+k));
 							createFichier(epollfd, tabFichiers, atoi(tmp2+k), &baseFichierCourante);
@@ -117,9 +117,8 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 				}
 				else if (j == 5)
 				{	
-					char dummy[512];
 					char protocole[512];
-					sscanf(tmp2,"%s %s",dummy, protocole);
+					sscanf(tmp2,"%*9s%s",protocole);
 					if(strcmp(protocole,"TCP_PULL") == 0)
 					{
 						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PULL;
@@ -139,9 +138,8 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 				}	
 				else if (j == 6)
 				{
-					char dummy[512];
 					char fps[512];
-					sscanf(tmp2,"%s %s",dummy, fps);
+					sscanf(tmp2,"%*4s%s",fps);
 					tabFichiers->infosVideos[tabFichiers->nbFichiers-1].fps = atof(fps);
 				}
 				strcat(buff,tmp2);
