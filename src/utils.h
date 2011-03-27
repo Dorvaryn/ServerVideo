@@ -77,7 +77,8 @@ struct requete {
 };
 
 struct videoClient {
-    int clientSocket;
+	
+	int clientSocket;
     
     int protocole;
     

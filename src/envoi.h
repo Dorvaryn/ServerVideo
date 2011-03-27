@@ -28,16 +28,11 @@
 
 struct envoi {
     int state;
-    int clientSocket;
     
-    char type; //ENVOI_TCP ou ENVOI_UDP
-
-    int currentPos; //Position dans l'envoi
     int bufLen; //Longueur du buffer
     char* originBuffer;
 	char* buffer; //Buffer courant
 
-    int id;
     FILE* curFile;
     int fileSize;
 };
@@ -46,11 +41,11 @@ double getTime();
 
 void sendImage(struct videoClient* videoClient);
 
-void createHeaderTCP(struct envoi* env);
+void createHeaderTCP(struct videoClient* videoClient);
 
-void createImageTCP(struct envoi* env);
+void createImageTCP(struct videoClient* videoClient);
 
-void sendTCP(struct envoi* env);
+void sendTCP(struct videoClient* videoClient);
 
 
 #endif // ENVOI_H_
