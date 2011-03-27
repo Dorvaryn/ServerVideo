@@ -35,12 +35,9 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 	{
 
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
+		FAIL(nfds);
 		puts("working ...");
-		if (nfds == -1)
-		{
-			perror("epoll_pwait");
-			exit(EXIT_FAILURE);
-		}
+		
 		int n;
 
 		for (n = 0; n < nfds; ++n)
@@ -136,17 +133,12 @@ int main(int argc, char ** argv)
 	int epollfd;
 
 	epollfd = epoll_create(10);
-	if (epollfd == -1) {
-		perror("epoll_create");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(epollfd);
+
 	//Ajout à epoll de l'entrée standard
 	ev.events = EPOLLIN;
 	ev.data.fd = STDIN_FILENO;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, STDIN_FILENO, &ev) == -1) {
-		perror("epoll_ctl: stdin");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, STDIN_FILENO, &ev));
 
 	struct tabFichiers tabFichiers;
 	tabFichiers.nbFichiers = 0;

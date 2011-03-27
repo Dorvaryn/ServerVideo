@@ -14,11 +14,9 @@
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
 
-#define FAIL_SEND(x) if(x == -1) {\
-	perror(#x);}
+#define SENDING_FRAGMENT 3
+#define FRAGMENT_SENT 2
 
-#define FAIL_SEND_FATAL(x) if(x == -1) {\
-	perror(#x);exit(EXIT_FAILURE);}
 
 struct envoi {
     int state;
@@ -27,11 +25,16 @@ struct envoi {
     char* originBuffer;
 	char* buffer; //Buffer courant
 
+	int posDansImage;
+	int tailleMaxFragment;
+
     FILE* curFile;
     int fileSize;
 };
 
 double getTime();
+
+double timeInterval(double t1, double t2);
 
 void sendImage(struct videoClient* videoClient);
 
@@ -40,6 +43,13 @@ void createHeaderTCP(struct videoClient* videoClient);
 void createImageTCP(struct videoClient* videoClient);
 
 void sendTCP(struct videoClient* videoClient);
+
+void createHeaderUDP(struct videoClient* videoClient);
+
+void createFragment(struct videoClient* videoClient);
+
+void sendUDP(struct videoClient* videoClient);
+
 
 
 #endif // ENVOI_H_
