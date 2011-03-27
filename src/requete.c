@@ -114,18 +114,32 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			break;
 		case START:
 			printf("START\n");
-			if(videoClient->etat == PAUSED) {
+			if(videoClient->etat == PAUSED) 
+			{
+				struct epoll_event ev;
+				ev.events = EPOLLOUT;
+				ev.data.fd = videoClient->clientSocket;
+				FAIL(epoll_ctl(epollfd, EPOLL_CTL_MOD, videoClient->clientSocket, &ev));
 				videoClient->etat = RUNNING;
 			}
 			break;
 		case PAUSE:
 			printf("PAUSE\n");
-			if(videoClient->etat == RUNNING) {
+			if(videoClient->etat == RUNNING) 
+			{
+				struct epoll_event ev;
+				ev.events = 0;
+				ev.data.fd = videoClient->clientSocket;
+				FAIL(epoll_ctl(epollfd, EPOLL_CTL_MOD, videoClient->clientSocket, &ev));
 				videoClient->etat = PAUSED;
 			}
 			break;
 		case END:
 			printf("END\n");
+			struct epoll_event ev;
+			ev.events = 0;
+			ev.data.fd = videoClient->clientSocket;
+			FAIL(epoll_ctl(epollfd, EPOLL_CTL_MOD, videoClient->clientSocket, &ev));
 			videoClient->etat = OVER;
 			break;
 		case ALIVE:

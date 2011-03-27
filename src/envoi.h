@@ -17,11 +17,6 @@
 #define SENDING_FRAGMENT 3
 #define FRAGMENT_SENT 2
 
-#define FAIL_SEND(x) if(x == -1) {\
-	perror(#x);}
-
-#define FAIL_SEND_FATAL(x) if(x == -1) {\
-	perror(#x);exit(EXIT_FAILURE);}
 
 struct envoi {
     int state;

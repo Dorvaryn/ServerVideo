@@ -45,10 +45,10 @@
 #define BASE_FICHIERS 32 
 #define BASE_IMAGES 2048 
 
-#define FAIL(x) if(x) {\
+#define FAIL(x) if(x == -1) {\
 	perror(#x);}
 
-#define FAIL_FATAL(x) if(x) {\
+#define FAIL_FATAL(x) if(x == -1) {\
 	perror(#x);exit(EXIT_FAILURE);}
 
 struct infosVideo {
