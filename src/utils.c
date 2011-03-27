@@ -190,7 +190,7 @@ void createEventPush(int epollfd, int csock)
 	}
 }
 
-int initDataUDP(int epollfd, int sock, int port, int type)
+/*int initDataUDP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
 	int csock;
@@ -221,7 +221,7 @@ int initDataUDP(int epollfd, int sock, int port, int type)
 	}
 
     return csock;	
-}
+}*/
 
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
