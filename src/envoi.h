@@ -14,16 +14,10 @@
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
 
-#define ENVOI_TCP 0
-#define ENVOI_UDP 1
-
-#define FAIL(x) if(x) {\
-	perror(#x);}
-
 #define FAIL_SEND(x) if(x == -1) {\
 	perror(#x);}
 
-#define FAIL_FATAL(x) if(x) {\
+#define FAIL_SEND_FATAL(x) if(x == -1) {\
 	perror(#x);exit(EXIT_FAILURE);}
 
 struct envoi {

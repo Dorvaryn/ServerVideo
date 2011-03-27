@@ -109,9 +109,9 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 	}
 	tabFichiers->socks[tabFichiers->nbFichiers] = createSockEvent(epollfd,port);
 	tabFichiers->infosVideos[tabFichiers->nbFichiers].nbImages = 0;
-	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(256*sizeof(char*));
+	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
 	int k;
-	for (k = 0; k < 256; k++)
+	for (k = 0; k < BASE_IMAGES; k++)
 	{
 		tabFichiers->infosVideos[tabFichiers->nbFichiers].images[k] = (char *)malloc(512*sizeof(char));
 	}

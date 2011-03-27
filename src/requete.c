@@ -73,10 +73,12 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			} else if(req->listenPort != -1) {
 				printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
 
-				videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, videoClient->protocole);
+				videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, videoClient->infosVideo->type);
 				printf("socket du client : %d\n", videoClient->clientSocket);
 
 				videoClient->envoi = malloc(sizeof(struct envoi));
+				videoClient->dernierEnvoi = getTime();
+				videoClient->etat = PAUSED;
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
 				if(videoClient->envoi->curFile == NULL) {
@@ -91,14 +93,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 
 				if (req->imgId == -1)
 				{	
-					if (videoClient->infosVideo->nbImages > videoClient->id)
-					{
-						videoClient->id++;
-					}
-					else
-					{
-						videoClient->id = 1;
-					}
+					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
 				}
 				else
 				{
@@ -107,7 +102,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				free(videoClient->envoi);
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
-				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r"); //TODO: initialiser curFile avec le bon fichier
+				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
 				if(videoClient->envoi->curFile == NULL)
 				{
 					puts("E: ouverture du fichier");

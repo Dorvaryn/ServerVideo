@@ -43,6 +43,7 @@
 #define MAX_EVENTS 10
 #define BASE_CLIENTS 32
 #define BASE_FICHIERS 32 
+#define BASE_IMAGES 2048 
 
 #define FAIL(x) if(x) {\
 	perror(#x);}
@@ -79,8 +80,6 @@ struct requete {
 struct videoClient {
 	
 	int clientSocket;
-    
-    int protocole;
     
     char etat; //RUNNING, PAUSED ou OVER
     
