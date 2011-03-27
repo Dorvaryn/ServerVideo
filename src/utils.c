@@ -34,11 +34,7 @@ int createSockEvent(int epollfd, int port)
 
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev) == -1) 
-	{
-		perror("epoll_ctl: sock");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
 
 	return sock;
 }
@@ -65,20 +61,11 @@ int createSockClientEvent(int epollfd, int sock)
 
 	printf("Connection de %s :: %d\n", inet_ntoa(saddr_client.sin_addr), 
 			htons(saddr_client.sin_port));
-	if (csock == -1)
-	{
-		perror("accept");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(csock);
 
 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
-				&ev) == -1)
-	{
-		perror("epoll_ctl: csock");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
 
 	return csock;
 }
@@ -169,12 +156,7 @@ void createEventPull(int epollfd, int csock)
 	struct epoll_event ev;
 	ev.events = EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
-			    &ev) == -1)
-	{
-	    perror("epoll_ctl_pull: csock");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
 }
 
 void createEventPush(int epollfd, int csock)
@@ -182,12 +164,7 @@ void createEventPush(int epollfd, int csock)
 	struct epoll_event ev;
 	ev.events = EPOLLOUT;
 	ev.data.fd = csock;
-	if (epoll_ctl(epollfd, EPOLL_CTL_ADD, csock,
-			    &ev) == -1)
-	{
-	    perror("epoll_ctl_push: csock");
-		exit(EXIT_FAILURE);
-	}
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
 }
 
 /*int initDataUDP(int epollfd, int sock, int port, int type)

@@ -109,10 +109,7 @@ void createImageTCP(struct videoClient* videoClient)
 	memset(env->buffer,'\0',env->fileSize*sizeof(char));
 	env->bufLen = env->fileSize;
 
-	int retour = fread(env->buffer, sizeof(char), env->fileSize, env->curFile);
-	if(retour == -1) {
-		perror("fread raté");
-	}
+	FAIL(fread(env->buffer, sizeof(char), env->fileSize, env->curFile));
 	env->state = SENDING_IMAGE;
 	puts("image cree");
 }
@@ -128,7 +125,7 @@ void sendTCP(struct videoClient* videoClient)
 		printf("socket du client : %d\n", videoClient->clientSocket);
 
 		nbSent = send(videoClient->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
-		FAIL_SEND(nbSent);
+		FAIL(nbSent);
 
 		env->buffer += nbSent;
 		env->bufLen -= nbSent;
