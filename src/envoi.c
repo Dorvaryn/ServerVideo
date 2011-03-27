@@ -195,8 +195,15 @@ void createHeaderUDP(struct videoClient* videoClient) {
     
     env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
+	
+	int tailleFragment;
+	if(env->fileSize - env->posDansImage*env->tailleMaxFragment < env->tailleMaxFragment) {
+	    tailleFragment = env->fileSize - env->posDansImage*env->tailleMaxFragment;
+	} else {
+	    tailleFragment = env->tailleMaxFragment;
+	}
 
-	sprintf(env->buffer, "%d\r\n%d\r\n%d\r\n%d\r\n", videoClient->id, env->fileSize, env->posDansImage, env->tailleMaxFragment);
+	sprintf(env->buffer, "%d\r\n%d\r\n%d\r\n%d\r\n", videoClient->id, env->fileSize, env->posDansImage, tailleFragment);
 
 	env->state = SENDING_HEADER;
 	env->currentPos = 0;
@@ -212,7 +219,7 @@ void sendHeaderUDP(struct videoClient* videoClient) {
     
 }
 
-//Charge la bonne partie de l'image dans le buffer
+//Charge la bonne partie de l'image dans le buffer (memcpy)
 void createFragment(struct videoClient* videoClient) {
     struct envoi* env = videoClient->envoi;
     //Mettre à jour la taille bufLen
