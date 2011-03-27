@@ -1,6 +1,7 @@
 #if ! defined ( UTILS_H_ )
 #define UTILS_H_
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -13,8 +14,31 @@
 #include <fcntl.h> // Pour déclarer non bloquant
 #include <sys/utsname.h> //Pour connaitre version noyau
 
-#include "requete.h"
-#include "cata.h"
+//Maximum d'un mot dans les requetes du client
+#define MAX_TOCKEN 256
+
+//Protocoles
+#define TCP_PULL 0
+#define TCP_PUSH 1
+#define UDP_PULL 2
+#define UDP_PUSH 3
+
+//Type de requete
+#define BAD_REQUEST (-2)
+#define NON_DEFINI (-1)
+#define GET 1
+#define START 2
+#define PAUSE 3
+#define END 4
+#define ALIVE 5
+
+//Erreur de converion char->int
+#define PARSE_ERROR -2
+
+//Etats
+#define RUNNING 0
+#define PAUSED 1
+#define OVER 2
 
 #define MAX_EVENTS 10
 #define BASE_CLIENTS 32
@@ -26,6 +50,46 @@
 #define FAIL_FATAL(x) if(x) {\
 	perror(#x);exit(EXIT_FAILURE);}
 
+struct infosVideo {
+	char type;
+	double fps;
+	int nbImages;
+	char ** images;
+};
+
+struct requete {
+	int type;
+    
+    int isOver;
+    
+    int imgId;
+    int listenPort;
+    int fragmentSize;
+    
+    int inWord;
+    int space;
+    int crlfCounter;
+    
+    char* mot;
+    int motPosition; //position dans le mot lu
+    
+    int reqPosition; //position du mot dans la requete
+};
+
+struct videoClient {
+    int clientSocket;
+    
+    int protocole;
+    
+    char etat; //RUNNING, PAUSED ou OVER
+    
+    int id; //Image courante
+    time_t dernierEnvoi; //pour gérer les ips
+    time_t lastAlive;
+    
+    struct envoi* envoi;
+    struct infosVideo* infosVideo;
+};
 struct sockClient {
 	int sock;
 	int isGET;
@@ -41,6 +105,8 @@ struct tabFichiers {
 	int * socks;
 	struct infosVideo * infosVideos;
 };
+
+void initReq(struct requete* req);
 
 void send_get_answer(int fd, char * catalogue);
 

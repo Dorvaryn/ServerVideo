@@ -7,73 +7,10 @@
 #include <assert.h>
 #include <ctype.h>
 #include <sys/time.h>
+#include <time.h>
 
+#include "utils.h"
 
-//Maximum d'un mot dans les requetes du client
-#define MAX_TOCKEN 256
-
-//Protocoles
-#define TCP_PULL 0
-#define TCP_PUSH 1
-#define UDP_PULL 2
-#define UDP_PUSH 3
-
-//Type de requete
-#define BAD_REQUEST (-2)
-#define NON_DEFINI (-1)
-#define GET 1
-#define START 2
-#define PAUSE 3
-#define END 4
-#define ALIVE 5
-
-//Erreur de converion char->int
-#define PARSE_ERROR -2
-
-//Etats
-#define RUNNING 0
-#define PAUSED 1
-#define OVER 2
-struct infosVideo {
-	char type;
-	double fps;
-	int nbImages;
-	char * images[];
-};
-
-struct requete {
-	int type;
-    
-    int isOver;
-    
-    int imgId;
-    int listenPort;
-    int fragmentSize;
-    
-    int inWord;
-    int space;
-    int crlfCounter;
-    
-    char* mot;
-    int motPosition; //position dans le mot lu
-    
-    int reqPosition; //position du mot dans la requete
-};
-
-struct videoClient {
-    int clientSocket;
-    
-    int protocole;
-    
-    char etat; //RUNNING, PAUSED ou OVER
-    
-    int id; //Image courante
-    time_t dernierEnvoi; //pour gérer les ips
-    time_t lastAlive;
-    
-    struct envoi* envoi;
-    struct infosVideo* infosVideo;
-};
 
 int parseInt(char* entier);
 

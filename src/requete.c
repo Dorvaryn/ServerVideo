@@ -111,6 +111,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				{
 					videoClient->id = req->imgId;
 				}
+				free(videoClient->envoi);
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				if (videoClient->protocole == TCP_PULL)
 				{
@@ -125,6 +126,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 
 				videoClient->envoi->id = videoClient->id;
 
+				printf("%s\n",videoClient->infosVideo->images[videoClient->id-1]);
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r"); //TODO: initialiser curFile avec le bon fichier
 				if(videoClient->envoi->curFile == NULL)
 				{

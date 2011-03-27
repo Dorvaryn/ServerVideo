@@ -107,7 +107,7 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 					int created = 0;
 					for (k = 0; k < strlen(tmp2); k++)
 					{
-						if ((isdigit(tmp2[k]) != 0) & (created != 1) )
+						if ((isdigit(tmp2[k]) != 0) && (created != 1) )
 						{
 							printf("%s : %d\n",tmp2+k,atoi(tmp+k));
 							createFichier(epollfd, tabFichiers, atoi(tmp2+k), &baseFichierCourante);

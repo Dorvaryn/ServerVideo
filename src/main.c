@@ -41,7 +41,7 @@ void central(int epollfd, struct tabFichiers * tabFichiers)
 			perror("epoll_pwait");
 			exit(EXIT_FAILURE);
 		}
-		int n,csock,csocktest;
+		int n;
 
 		for (n = 0; n < nfds; ++n)
 		{

@@ -10,6 +10,7 @@
 #include <errno.h>
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
+#include <ctype.h>
 #include "utils.h"
 
 #define DATA_DIRECTORY "data/"

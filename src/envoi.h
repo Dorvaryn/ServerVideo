@@ -34,7 +34,8 @@ struct envoi {
 
     int currentPos; //Position dans l'envoi
     int bufLen; //Longueur du buffer
-    char* buffer; //Buffer courant
+    char* originBuffer;
+	char* buffer; //Buffer courant
 
     int id;
     FILE* curFile;
@@ -46,10 +47,10 @@ double getTime();
 void sendImage(struct videoClient* videoClient);
 
 void createHeaderTCP(struct envoi* env);
-void sendHeaderTCP(struct envoi* env) ;
 
 void createImageTCP(struct envoi* env);
-void sendImageTCP(struct envoi* env);
+
+void sendTCP(struct envoi* env);
 
 
 #endif // ENVOI_H_

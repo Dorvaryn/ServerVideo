@@ -1,8 +1,6 @@
-#include "cata.h"
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
-
 
 void send_get_answer(int fd, char * catalogue)
 {
@@ -111,6 +109,7 @@ void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int 
 	}
 	tabFichiers->socks[tabFichiers->nbFichiers] = createSockEvent(epollfd,port);
 	tabFichiers->infosVideos[tabFichiers->nbFichiers].nbImages = 0;
+	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(256*sizeof(char*));
 	int k;
 	for (k = 0; k < 256; k++)
 	{
@@ -165,7 +164,7 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 	tabClients->nbClients++;
 }
 
-int createEventPull(int epollfd, int csock)
+void createEventPull(int epollfd, int csock)
 {
 	struct epoll_event ev;
 	ev.events = EPOLLOUT | EPOLLET;
@@ -178,7 +177,7 @@ int createEventPull(int epollfd, int csock)
 	}
 }
 
-int createEventPush(int epollfd, int csock)
+void createEventPush(int epollfd, int csock)
 {
 	struct epoll_event ev;
 	ev.events = EPOLLOUT;
@@ -194,7 +193,8 @@ int createEventPush(int epollfd, int csock)
 int initDataUDP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
-	int csock, len;
+	int csock;
+	socklen_t len;
 	getsockname(sock, (struct sockaddr*)&addr, &len);
 	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
 	saddr.sin_family = AF_INET;
@@ -226,7 +226,8 @@ int initDataUDP(int epollfd, int sock, int port, int type)
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
 	struct sockaddr_in addr, saddr;	
-	int csock, len;
+	int csock;
+	socklen_t len;
 	getsockname(sock, (struct sockaddr*)&addr, &len);
 	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
 	saddr.sin_family = AF_INET;
