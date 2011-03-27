@@ -37,7 +37,6 @@ struct envoi {
     int posDansImage; //Position du fragment dans l'image
     int tailleMaxFragment; //Taille max du fragment
 
-    int id;
     FILE* curFile;
     int fileSize;
 };
@@ -47,17 +46,17 @@ double timeInterval(double t1, double t2);
 
 void sendImage(struct videoClient* videoClient);
 
-void createHeaderTCP(struct envoi* env);
-void sendHeaderTCP(struct envoi* env) ;
+void createHeaderTCP(struct videoClient* videoClient);
+void sendHeaderTCP(struct videoClient* videoClient);
 
-void createImageTCP(struct envoi* env);
-void sendImageTCP(struct envoi* env);
+void createImageTCP(struct videoClient* videoClient);
+void sendImageTCP(struct videoClient* videoClient);
 
-void createHeaderUDP(struct envoi* env);
-void sendHeaderUDP(struct envoi* env) ;
+void createHeaderUDP(struct videoClient* videoClient);
+void sendHeaderUDP(struct videoClient* videoClient);
 
-void createFragment(struct envoi* env);
-void sendFragment(struct envoi* env);
+void createFragment(struct videoClient* videoClient);
+void sendFragment(struct videoClient* videoClient);
 
 
 #endif // ENVOI_H_

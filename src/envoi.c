@@ -24,38 +24,38 @@ void sendImage(struct videoClient* videoClient) {
 		if(env->type == TCP_PULL ) {
 		
 			if(env->state == NOTHING_SENT) {
-				createHeaderTCP(env);
+				createHeaderTCP(videoClient);
 			} else if(env->state == SENDING_HEADER) {
-				sendHeaderTCP(env);
+				sendHeaderTCP(videoClient);
 			} else if(env->state == HEADER_SENT) {
-				createImageTCP(env);
+				createImageTCP(videoClient);
 			} else if(env->state != IMAGE_SENT) {
-				sendImageTCP(env);
+				sendImageTCP(videoClient);
 			}
 			
 		} else if(env->type == TCP_PUSH) {
 		
 			if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) {
-				createHeaderTCP(env);
+				createHeaderTCP(videoClient);
 				videoClient->dernierEnvoi = getTime();
 			} else if(env->state == SENDING_HEADER) {
-				sendHeaderTCP(env);
+				sendHeaderTCP(videoClient);
 			} else if(env->state == HEADER_SENT) {
-				createImageTCP(env);
+				createImageTCP(videoClient);
 			} else if(env->state != IMAGE_SENT) {
-				sendImageTCP(env);
+				sendImageTCP(videoClient);
 			}
 			
 		} else if(env->type == UDP_PULL) {
 		
 			if(env->state == NOTHING_SENT) {
-				createHeaderUDP(env);
+				createHeaderUDP(videoClient);
 			} else if(env->state == SENDING_HEADER) {
-				sendHeaderUDP(env);
+				sendHeaderUDP(videoClient);
 			} else if(env->state == HEADER_SENT) {
-				createFragment(env);
+				createFragment(videoClient);
 			} else if(env->state != FRAGMENT_SENT) {
-				sendFragment(env);
+				sendFragment(videoClient);
 			}
 			
 		} else if(env->type == UDP_PUSH) {
@@ -67,7 +67,9 @@ void sendImage(struct videoClient* videoClient) {
 
 }
 
-void createHeaderTCP(struct envoi* env) {
+void createHeaderTCP(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
+
 	env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
 
@@ -76,17 +78,18 @@ void createHeaderTCP(struct envoi* env) {
 	env->fileSize = ftell(env->curFile);
 	fseek(env->curFile, 0, SEEK_SET);
 
-	sprintf(env->buffer, "%d\r\n%d\r\n", env->id,env->fileSize);
+	sprintf(env->buffer, "%d\r\n%d\r\n", videoClient->id ,env->fileSize);
 
 	env->state = SENDING_HEADER;
 	env->currentPos = 0;
 	env->bufLen = strlen(env->buffer);
 
 	puts("header cree");
-	sendHeaderTCP(env);
+	sendHeaderTCP(videoClient);
 }
 
-void sendHeaderTCP(struct envoi* env) {
+void sendHeaderTCP(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
 
 	int nbSent;	
 	do
@@ -117,13 +120,15 @@ void sendHeaderTCP(struct envoi* env) {
 		env->state = HEADER_SENT;
 		free(env->buffer);
 		puts("header sent");
-		createImageTCP(env);
+		createImageTCP(videoClient);
 	}
 
 
 }
 
-void createImageTCP(struct envoi* env) {
+void createImageTCP(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
+
 	env->buffer = malloc(env->fileSize*sizeof(char));
 	memset(env->buffer,'\0',env->fileSize*sizeof(char));
 	env->currentPos = 0;
@@ -135,10 +140,11 @@ void createImageTCP(struct envoi* env) {
 	}
 	env->state = SENDING_IMAGE;
 	puts("image cree");
-	sendImageTCP(env);
+	sendImageTCP(videoClient);
 }
 
-void sendImageTCP(struct envoi* env) {
+void sendImageTCP(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
 
 	int nbSent;
 	do
@@ -167,43 +173,53 @@ void sendImageTCP(struct envoi* env) {
 
 	printf("car envoyes (image) : %d_%d/%d\n", nbSent, env->currentPos, env->bufLen);
 	if(env->currentPos >= env->bufLen) {
-		env->state = IMAGE_SENT;
-		free(env->buffer);
 		close(env->curFile);
-		free(env);
 		puts("Image envoyée");
+		if(env->type == TCP_PUSH) {
+		    videoClient->id = (videoClient->id+1 < videoClient->infosVideo->nbImages ? videoClient->id+1 : 0);
+		    videoClient->envoi->state = NOTHING_SENT;
+		    videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id], "r");
+		} else {
+		    env->state = IMAGE_SENT;
+		    free(env->buffer);
+		    free(videoClient);
+		}
 	}
 }
 
 //Cree un header pour un paquet
-void createHeaderUDP(struct envoi* env) {
+void createHeaderUDP(struct videoClient* videoClient) {
     //Prendre en compte la taille du fragment
     //(par rapport à la taille totale de l'image et du nbre de fragments envoyes)
+    struct envoi* env = videoClient->envoi;
     
     env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
 
-	sprintf(env->buffer, "%d\r\n%d\r\n%d\r\n%d\r\n", env->id, env->fileSize, env->posDansImage, env->tailleMaxFragment);
+	sprintf(env->buffer, "%d\r\n%d\r\n%d\r\n%d\r\n", videoClient->id, env->fileSize, env->posDansImage, env->tailleMaxFragment);
 
 	env->state = SENDING_HEADER;
 	env->currentPos = 0;
 	env->bufLen = strlen(env->buffer);
 
 	puts("header cree");
-	sendHeaderTCP(env);
+	sendHeaderUDP(videoClient);
 }
 
 //Envoie le header
-void sendHeaderUDP(struct envoi* env) {
+void sendHeaderUDP(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
     
 }
 
 //Charge la bonne partie de l'image dans le buffer
-void createFragment(struct envoi* env) {
+void createFragment(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
     //Mettre à jour la taille bufLen
 }
 
 //Envoie le fragment et met à jour la position dans le fichier
-void sendFragment(struct envoi* env) {
+void sendFragment(struct videoClient* videoClient) {
+    struct envoi* env = videoClient->envoi;
     
 }

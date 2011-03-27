@@ -68,7 +68,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 	            videoClient->envoi->fileSize = ftell(videoClient->envoi->curFile);
 	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
 				
-				videoClient->envoi->id = 0;
 				videoClient->id = 0;
 				
 				videoClient->envoi->posDansImage = 0;
@@ -91,10 +90,9 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				if(videoClient->envoi->curFile == NULL) {
 					puts("E: ouverture du fichier");
 				}
-				videoClient->envoi->id = 1;
 				videoClient->id = 1;
 				//envoie au cas ou le buffer soit déja vide
-				//sendImage(videoClient);
+				sendImage(videoClient);
 				puts("VIDEO OKok !");
 
 
@@ -102,15 +100,8 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				printf("GET id:%d\n", req->imgId);
 
 				if (req->imgId == -1)
-				{	
-					if (videoClient->infosVideo->nbImages > videoClient->id)
-					{
-						videoClient->id++;
-					}
-					else
-					{
-						videoClient->id = 1;
-					}
+				{
+					videoClient->id = (videoClient->id+1 < videoClient->infosVideo->nbImages ? videoClient->id+1 : 0);
 				}
 				else
 				{
@@ -122,8 +113,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->clientSocket = videoClient->clientSocket;
-
-				videoClient->envoi->id = videoClient->id;
 
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
 				if(videoClient->envoi->curFile == NULL)
