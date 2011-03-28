@@ -119,7 +119,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				struct epoll_event ev;
 				ev.events = EPOLLOUT;
 				ev.data.fd = videoClient->clientSocket;
-				FAIL(epoll_ctl(epollfd, EPOLL_CTL_MOD, videoClient->clientSocket, &ev));
+				FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, videoClient->clientSocket, &ev));
 				videoClient->etat = RUNNING;
 			}
 			break;
@@ -130,7 +130,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				struct epoll_event ev;
 				ev.events = 0;
 				ev.data.fd = videoClient->clientSocket;
-				FAIL(epoll_ctl(epollfd, EPOLL_CTL_MOD, videoClient->clientSocket, &ev));
+				FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
 				videoClient->etat = PAUSED;
 			}
 			break;

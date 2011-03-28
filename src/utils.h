@@ -84,8 +84,8 @@ struct videoClient {
     char etat; //RUNNING, PAUSED ou OVER
     
     int id; //Image courante
-    time_t dernierEnvoi; //pour gérer les ips
-    time_t lastAlive;
+    double dernierEnvoi; //pour gérer les ips
+    double lastAlive;
     
     struct envoi* envoi;
     struct infosVideo* infosVideo;
