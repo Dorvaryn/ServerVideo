@@ -13,9 +13,7 @@
 #define HEADER_SENT -1
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
-
-#define SENDING_FRAGMENT 3
-#define FRAGMENT_SENT 2
+#define SENDING_FRAGMENT 2
 
 
 struct envoi {
@@ -27,6 +25,9 @@ struct envoi {
 
 	int posDansImage;
 	int tailleMaxFragment;
+	int tailleFragment;
+	char more;
+	struct sockaddr * dest_addr;
 
     FILE* curFile;
     int fileSize;
