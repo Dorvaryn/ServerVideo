@@ -8,7 +8,7 @@ double getTime() {
 	double micro = (double)timev.tv_usec;
 	double sec = (double)timev.tv_sec;
 
-	return sec + micro/10000000;
+	return sec + micro/1000000;
 }
 
 double timeInterval(double t1, double t2) {
@@ -37,10 +37,13 @@ void sendImage(struct videoClient* videoClient) {
 				sendTCP(videoClient);
 			}
 		}
-		else if(videoClient->infosVideo->type == TCP_PUSH && videoClient->etat == RUNNING && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
+		else if(videoClient->infosVideo->type == TCP_PUSH && videoClient->etat == RUNNING )
 			{
-				if(env->state == NOTHING_SENT) 
+				if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) 
 				{
+					printf("interval : %f ; time : %f\n", timeInterval(videoClient->dernierEnvoi, getTime()), 1.0/videoClient->infosVideo->fps);
+					videoClient->dernierEnvoi = getTime();
+					printf("interval : %f ; time : %f\n", timeInterval(videoClient->dernierEnvoi, getTime()), 1.0/videoClient->infosVideo->fps);
 					createHeaderTCP(videoClient);
 					sendTCP(videoClient);
 				}
@@ -150,7 +153,6 @@ void sendTCP(struct videoClient* videoClient)
 				fclose(env->curFile);
 				free(env->originBuffer);
 				videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
-				videoClient->dernierEnvoi = getTime();
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
 				if(videoClient->envoi->curFile == NULL)
