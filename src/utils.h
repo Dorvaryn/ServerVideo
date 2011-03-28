@@ -87,6 +87,8 @@ struct videoClient {
     double dernierEnvoi; //pour gérer les ips
     double lastAlive;
     
+    struct sockaddr * dest_addr;
+    
     struct envoi* envoi;
     struct infosVideo* infosVideo;
 };

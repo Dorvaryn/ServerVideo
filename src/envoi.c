@@ -226,7 +226,8 @@ void sendUDP(struct videoClient* videoClient) {
     int nbSent = 0;
     do
 	{	
-		nbSent = sendto(videoClient->clientSocket, env->buffer, env->bufLen, (env->more == 1 ? MSG_MORE : 0) , env->dest_addr, sizeof(env->dest_addr));
+		nbSent = sendto(videoClient->clientSocket, env->buffer, env->bufLen, (env->more == 1 ? MSG_MORE : 0),
+		                videoClient->dest_addr, sizeof(videoClient->dest_addr));
 		FAIL(nbSent);
 
 		env->buffer += nbSent;

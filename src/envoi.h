@@ -27,7 +27,6 @@ struct envoi {
 	int tailleMaxFragment;
 	int tailleFragment;
 	char more;
-	struct sockaddr * dest_addr;
 
     FILE* curFile;
     int fileSize;
