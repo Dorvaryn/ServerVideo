@@ -156,8 +156,9 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 		}
 		else
 		{
-			tabFlux->socksData[tabFlux->nbFlux] = sockData;
+			createEventPull(epollfd, sockData);
 		}
+		tabFlux->socksData[tabFlux->nbFlux] = sockData;
 	}
 	tabFlux->infosVideos[tabFlux->nbFlux].nbImages = 0;
 	tabFlux->infosVideos[tabFlux->nbFlux].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
