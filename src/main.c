@@ -130,6 +130,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 	} //Fin de la boucle principale
 
 	//TODO: fermer les ressources proprement ici
+	free(tabClientsTCP.clients);
 
 }  
 
@@ -163,6 +164,24 @@ int main(int argc, char ** argv)
 
 	central(epollfd, &tabFluxTCP, &tabFluxUDP);
 
+    int i, j;
+    for(i = 0; i < tabFluxTCP.nbFlux; i++) {
+        for(j = 0; j < BASE_IMAGES; j++) {
+            free(tabFluxTCP.infosVideos[i].images[j]);
+        }
+        free(tabFluxTCP.infosVideos[i].images);
+    }
+    free(tabFluxTCP.infosVideos);
+    for(i = 0; i < tabFluxUDP.nbFlux; i++) {
+        for(j = 0; j < BASE_IMAGES; j++) {
+            free(tabFluxUDP.infosVideos[i].images[j]);
+        }
+        free(tabFluxUDP.infosVideos[i].images);
+    }
+    free(tabFluxUDP.infosVideos);    
+
+    free(tabFluxUDP.socks);
+    free(tabFluxTCP.socks);
 	free(catalogue);
 
 	return 0;
