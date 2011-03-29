@@ -76,7 +76,6 @@ struct requete {
     
     int reqPosition; //position du mot dans la requete
 };
-
 struct videoClient {
 	
 	int clientSocket;
@@ -87,7 +86,7 @@ struct videoClient {
     double dernierEnvoi; //pour gérer les ips
     double lastAlive;
     
-    struct sockaddr * dest_addr;
+    struct sockaddr_in dest_addr;
     
     struct envoi* envoi;
     struct infosVideo* infosVideo;
@@ -105,6 +104,7 @@ struct tabClients {
 struct tabFlux {
 	int nbFlux;
 	int * socks;
+	int * socksData;
 	struct infosVideo * infosVideos;
 };
 
@@ -124,7 +124,9 @@ void addImage(char * uneImage, struct infosVideo * infos);
 
 void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux * tabFlux, int sock , int * baseCourante, int isGet);
 
-//int initDataUDP(int epollfd, int sock, int port, int type);
+void createEventPush(int epoll, int csock);
+
+void createEventPull(int epoll, int csock);
 
 int connectDataTCP(int epollfd, int sock, int port, int type);
 #endif // UTILS_H_

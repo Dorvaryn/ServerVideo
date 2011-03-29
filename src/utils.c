@@ -110,6 +110,22 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 		struct infosVideo * temp2;
 		temp2 = (struct infosVideo *) realloc(tabFlux->infosVideos,
 				*baseFichierCourante*sizeof(struct infosVideo));
+		if( type == UDP_PULL || type == UDP_PUSH )
+		{
+			int * temp;
+			temp = (int *) realloc(tabFlux->socksData,
+					*baseFichierCourante*sizeof(int));
+			if (temp!=NULL) 
+			{
+				tabFlux->socksData = temp;
+			}
+			else 
+			{
+				free (tabFlux->socksData);
+				puts ("Error (re)allocating memory");
+				exit (1);
+			}
+		}
 		if (temp!=NULL && temp2!=NULL) 
 		{
 			tabFlux->socks = temp;
@@ -123,13 +139,25 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 			exit (1);
 		}
 	}
-	if( type == 0 )
+	if( type == TCP_PULL || type == TCP_PUSH )
 	{
 		tabFlux->socks[tabFlux->nbFlux] = createSockEventTCP(epollfd,port);
 	}
 	else
 	{
 		tabFlux->socks[tabFlux->nbFlux] = createSockEventUDP(epollfd,port);
+		int sockData = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
+		int flags = fcntl(sockData,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
+		FAIL(flags);
+		FAIL(fcntl(sockData,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
+		if(type == UDP_PUSH)
+		{
+			createEventPush(epollfd, sockData);
+		}
+		else
+		{
+			tabFlux->socksData[tabFlux->nbFlux] = sockData;
+		}
 	}
 	tabFlux->infosVideos[tabFlux->nbFlux].nbImages = 0;
 	tabFlux->infosVideos[tabFlux->nbFlux].images = (char **)malloc(BASE_IMAGES*sizeof(char*));

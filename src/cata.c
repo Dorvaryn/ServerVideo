@@ -126,25 +126,25 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 					if(strcmp(protocole,"TCP_PULL") == 0)
 					{
 						typeCourant = 0;
-						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, typeCourant);
+						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, TCP_PULL);
 						tabFluxTCP->infosVideos[tabFluxTCP->nbFlux-1].type = TCP_PULL;
 					}
 					else if(strcmp(protocole,"TCP_PUSH") == 0)
 					{
 						typeCourant = 0;
-						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, typeCourant);
+						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, TCP_PUSH);
 						tabFluxTCP->infosVideos[tabFluxTCP->nbFlux-1].type = TCP_PUSH;
 					}
 					else if(strcmp(protocole,"UDP_PULL") == 0)
 					{
 						typeCourant = 1;
-						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, typeCourant);
+						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PULL);
 						tabFluxUDP->infosVideos[tabFluxUDP->nbFlux-1].type = UDP_PULL;
 					}
 					else if(strcmp(protocole,"UDP_PUSH") == 0)
 					{
 						typeCourant = 1;
-						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, typeCourant);
+						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PUSH);
 						tabFluxUDP->infosVideos[tabFluxUDP->nbFlux-1].type = UDP_PUSH;
 					}
 				}	

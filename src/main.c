@@ -26,9 +26,14 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 	tabClientsTCP.clients =
 		(struct sockClient *)malloc(BASE_CLIENTS*sizeof(struct sockClient));
 	tabClientsTCP.nbClients = 0;
+	
+	struct tabClients tabClientsUDP;
+	tabClientsUDP.clients =
+		(struct sockClient *)malloc(BASE_CLIENTS*sizeof(struct sockClient));
+	tabClientsUDP.nbClients = 0;
 
 	int baseCouranteTCP = BASE_CLIENTS;
-	//int baseCouranteUDP = BASE_CLIENTS;
+	int baseCouranteUDP = BASE_CLIENTS;
 	int nfds;
 	int done = 0;
 
@@ -123,7 +128,87 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 				int done4 = 0;
 				while((done4 == 1) && (done3 == 0) && (done2 == 0) && (i < tabFluxUDP->nbFlux))
 				{
+					if (events[n].data.fd == tabFluxUDP->socks[i])
+					{
+						if (events[n].events == (EPOLLIN | EPOLLOUT))
+						{					
+							printf("%s\n", "buffer");
+							char * buffer = (char *)malloc(512*sizeof(char));
+							memset(buffer, '\0', 512);
 
+							struct sockaddr_in faddr;
+							memset(&faddr, 0, sizeof(struct sockaddr_in));
+							socklen_t len = sizeof(faddr);
+
+							printf("%s\n", "recv");
+							recvfrom(tabClientsTCP.clients[i].sock, buffer, 512*sizeof(char),0, (struct sockaddr*)&faddr, &len);
+
+							int j = 0;
+							int trouve = -1;
+							while((trouve == -1) && (j < tabClientsUDP.nbClients))
+							{
+								struct sockaddr_in * comp = &tabClientsUDP.clients[j].videoClient.dest_addr;
+								if(faddr.sin_addr.s_addr == comp->sin_addr.s_addr 
+										&& faddr.sin_family == comp->sin_family
+											&& faddr.sin_port == comp->sin_port)
+								{
+									trouve = j;
+								}
+								j++;
+							}
+							if(trouve == -1)
+							{
+								if (tabClientsUDP.nbClients >= baseCouranteUDP)
+								{
+									baseCouranteUDP *=2;
+									struct sockClient *  temp;
+									temp = (struct sockClient *) realloc(tabClientsUDP.clients,
+											baseCouranteUDP*sizeof(struct sockClient));
+									if (temp!=NULL) 
+									{
+										tabClientsUDP.clients = temp;
+									}
+									else 
+									{
+										free (tabClientsUDP.clients);
+										puts ("Error (re)allocating memory");
+										exit (1);
+									}
+								}
+								initReq(&(tabClientsUDP.clients[tabClientsUDP.nbClients].requete));
+								memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.dest_addr,0,sizeof(struct sockaddr));
+								memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.dest_addr, &faddr, sizeof(struct sockaddr));
+								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.clientSocket = tabFluxUDP->socksData[i];
+								trouve = tabClientsUDP.nbClients++;
+							}
+							traiteChaine(buffer, &tabClientsUDP.clients[trouve].requete, &tabClientsUDP.clients[trouve].videoClient, 
+									epollfd, 0);
+							printf("%s\n", "done");
+							done4 = 1;
+						}
+
+					}
+					i++;
+				}
+				i = 0;
+				int done5 = 0;
+				while((done5 == 0) && (done4 == 0) && (done3 == 0) && (done2 == 0) && (i < tabClientsUDP.nbClients))
+				{
+					if (events[n].data.fd == tabClientsUDP.clients[i].videoClient.clientSocket)
+					{
+						if(events[n].events == EPOLLOUT)
+						{
+								//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
+								printf("%s\n","ENVOI");
+								printf("%d\n", tabClientsUDP.clients[i].videoClient.clientSocket);
+								if(tabClientsUDP.clients[i].videoClient.clientSocket != 0) 
+								{
+									sendImage(&tabClientsUDP.clients[i].videoClient);
+								}
+						}
+						done5 = 1;
+					}
+					i++;
 				}
 			}
 		}
@@ -156,6 +241,7 @@ int main(int argc, char ** argv)
 	struct tabFlux tabFluxUDP;
 	tabFluxUDP.nbFlux = 0;
 	tabFluxUDP.socks = (int *)malloc(BASE_FICHIERS*sizeof(int));
+	tabFluxTCP.socksData = (int *)malloc(BASE_FICHIERS*sizeof(int));
 	tabFluxUDP.infosVideos = (struct infosVideo *) malloc(BASE_FICHIERS*sizeof(struct infosVideo));
 
 	int baseFichiersCourante = BASE_FICHIERS;
