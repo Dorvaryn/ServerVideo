@@ -42,14 +42,16 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		FAIL(nfds);
-		puts("working ...");
+		//puts("working ...");
 		
 		int n;
 
 		for (n = 0; n < nfds; ++n)
 		{
-			printf("%s\n", "event");
-			printf("%d\n", events[n].events);
+			if (events[n].events != (EPOLLOUT))
+			{	
+				printf("event : %d : fd : %d\n",events[n].events,events[n].data.fd);
+			}
 			if (events[n].data.fd == tabFluxTCP->socks[0])
 			{
 				printf("%s\n", "connect8081");
@@ -112,7 +114,6 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 					{
 						if(events[n].events == EPOLLOUT)
 						{
-								//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
 								printf("%s\n","ENVOI");
 								printf("%d\n", tabClientsTCP.clients[i].videoClient.clientSocket);
 								if(tabClientsTCP.clients[i].videoClient.clientSocket != 0) 
@@ -126,11 +127,12 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 				}
 				i = 0;
 				int done4 = 0;
-				while((done4 == 1) && (done3 == 0) && (done2 == 0) && (i < tabFluxUDP->nbFlux))
+				while((done4 == 0) && (done3 == 0) && (done2 == 0) && (i < tabFluxUDP->nbFlux))
 				{
 					if (events[n].data.fd == tabFluxUDP->socks[i])
 					{
-						if (events[n].events == (EPOLLIN | EPOLLOUT))
+						puts("plop");
+						if (events[n].events == EPOLLIN )
 						{					
 							printf("%s\n", "buffer");
 							char * buffer = (char *)malloc(512*sizeof(char));
@@ -139,9 +141,10 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 							struct sockaddr_in faddr;
 							memset(&faddr, 0, sizeof(struct sockaddr_in));
 							socklen_t len = sizeof(faddr);
-
-							printf("%s\n", "recv");
-							recvfrom(tabClientsTCP.clients[i].sock, buffer, 512*sizeof(char),0, (struct sockaddr*)&faddr, &len);
+							
+							printf("socket : %d\n",tabFluxUDP->socks[i]);
+							printf("%s\n", "recvfrom");
+							FAIL(recvfrom(tabFluxUDP->socks[i], buffer, 512*sizeof(char),0, (struct sockaddr*)&faddr, &len));
 
 							int j = 0;
 							int trouve = -1;
@@ -179,6 +182,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 								memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.dest_addr,0,sizeof(struct sockaddr));
 								memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.dest_addr, &faddr, sizeof(struct sockaddr));
 								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.clientSocket = tabFluxUDP->socksData[i];
+								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.infosVideo = &tabFluxUDP->infosVideos[i];
 								trouve = tabClientsUDP.nbClients++;
 							}
 							traiteChaine(buffer, &tabClientsUDP.clients[trouve].requete, &tabClientsUDP.clients[trouve].videoClient, 
@@ -198,7 +202,6 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 					{
 						if(events[n].events == EPOLLOUT)
 						{
-								//TODO: vérifier que cette fonction n'est pas appellée au mauvais moment (catalogue)
 								printf("%s\n","ENVOI");
 								printf("%d\n", tabClientsUDP.clients[i].videoClient.clientSocket);
 								if(tabClientsUDP.clients[i].videoClient.clientSocket != 0) 

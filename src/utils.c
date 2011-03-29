@@ -43,6 +43,7 @@ int createSockEventTCP(int epollfd, int port)
 int createSockEventUDP(int epollfd, int port)
 {
 	int sock = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
+	FAIL(sock);
 	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
 	FAIL(flags);
 	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
@@ -61,6 +62,7 @@ int createSockEventUDP(int epollfd, int port)
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
 
+	printf("socket : %d\n",sock);
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
