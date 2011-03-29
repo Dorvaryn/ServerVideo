@@ -202,7 +202,8 @@ void createEventPush(int epollfd, int csock)
 
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
-	struct sockaddr_in addr, saddr;	
+	struct sockaddr_in addr, saddr;
+	memset(&addr, 0, sizeof(struct sockaddr_in));
 	int csock;
 	socklen_t len;
 	getsockname(sock, (struct sockaddr*)&addr, &len);
