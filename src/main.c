@@ -120,6 +120,12 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 					}
 					i++;
 				}
+				i = 0;
+				int done4 = 0;
+				while((done4 == 0) && (done3 == 0) && (done2 == 0) && (i < tabFluxUDP->nbFlux))
+				{
+
+				}
 			}
 		}
 	} //Fin de la boucle principale
@@ -152,7 +158,7 @@ int main(int argc, char ** argv)
 	tabFluxUDP.infosVideos = (struct infosVideo *) malloc(BASE_FICHIERS*sizeof(struct infosVideo));
 
 	int baseFichiersCourante = BASE_FICHIERS;
-	createFichier(epollfd, &tabFluxTCP, 8081, &baseFichiersCourante);
+	createFichier(epollfd, &tabFluxTCP, 8081, &baseFichiersCourante, 0);
 
 	catalogue = buildCatalogue(epollfd, &tabFluxTCP, &tabFluxUDP);
 

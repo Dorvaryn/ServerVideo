@@ -9,7 +9,7 @@ void send_get_answer(int fd, char * catalogue)
 	printf("send : %s\n", strerror(errno));
 }
 
-int createSockEvent(int epollfd, int port)
+int createSockEventTCP(int epollfd, int port)
 {
 	int sock = socket(AF_INET, SOCK_STREAM, 0); //Version portable des sockets non bloquants
 	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
@@ -29,6 +29,33 @@ int createSockEvent(int epollfd, int port)
 
 	listen(sock, 10);
 	printf("listen : %s\n", strerror(errno));
+
+	struct epoll_event ev;
+
+	ev.events = EPOLLIN | EPOLLET;
+	ev.data.fd = sock;
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
+
+	return sock;
+}
+
+int createSockEventUDP(int epollfd, int port)
+{
+	int sock = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
+	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
+	FAIL(flags);
+	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
+
+	printf("socket : %s\n", strerror(errno));
+
+	struct sockaddr_in saddr;
+
+	saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	saddr.sin_family = AF_INET;
+	saddr.sin_port = htons(port);
+
+	bind(sock, (struct sockaddr *)&saddr, sizeof(saddr));
+	printf("bind : %s\n", strerror(errno));
 
 	struct epoll_event ev;
 
@@ -70,7 +97,7 @@ int createSockClientEvent(int epollfd, int sock)
 	return csock;
 }
 
-void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante)
+void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante, int type)
 {
 	if (tabFlux->nbFlux >= *baseFichierCourante)
 	{
@@ -94,7 +121,14 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 			exit (1);
 		}
 	}
-	tabFlux->socks[tabFlux->nbFlux] = createSockEvent(epollfd,port);
+	if( type == 0 )
+	{
+		tabFlux->socks[tabFlux->nbFlux] = createSockEventTCP(epollfd,port);
+	}
+	else
+	{
+		tabFlux->socks[tabFlux->nbFlux] = createSockEventUDP(epollfd,port);
+	}
 	tabFlux->infosVideos[tabFlux->nbFlux].nbImages = 0;
 	tabFlux->infosVideos[tabFlux->nbFlux].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
 	int k;

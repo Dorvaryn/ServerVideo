@@ -112,11 +112,13 @@ void initReq(struct requete* req);
 
 void send_get_answer(int fd, char * catalogue);
 
-int createSockEvent(int epollfd, int port);
+int createSockEventTCP(int epollfd, int port);
+
+int createSockEventUDP(int epollfd, int port);
 
 int createSockClientEvent(int epollfd, int sock);
 
-void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante);
+void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante, int type);
 
 void addImage(char * uneImage, struct infosVideo * infos);
 
