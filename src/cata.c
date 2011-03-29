@@ -91,7 +91,9 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 
 		int j = 0;
 		char * tmp = (char *)malloc(512*sizeof(char));
+		memset(tmp, 0, 512);
 		char  * tmp2 = (char *)malloc(512*sizeof(char));
+		memset(tmp, 0, 512);
 		fgets(tmp,512,g);
 		printf("fgets : %s\n", strerror(errno));
 		int port;
@@ -196,6 +198,9 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 		fclose(g);
 		fgets(temp,512,f);
 		printf("fgets : %s\n", strerror(errno));
+		
+		free(tmp);
+        free(tmp2);
 
 	}while(!feof(f));
 	strcat(buff,"\r\n");
@@ -211,6 +216,8 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 	strcpy(buff2, header);
 	strcat(buff2, buff);
 
+    free(temp);
+    free(temp2);
 	free(buff);
 	free(header);
 
