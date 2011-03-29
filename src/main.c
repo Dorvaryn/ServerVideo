@@ -64,15 +64,14 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 					}
 					else if(events[n].data.fd == STDIN_FILENO)
 					{
-						char chaine[512];
-						scanf("\n%s", chaine); //récupère l'entrée standart
+						char chaine[16];
+						fgets(chaine, 15, stdin); //récupère l'entrée standard
 
 						//Traite la commande
-						printf("%s\n", "sort");
-						if(strcmp(chaine, "exit") == 0)
+						if(strcmp(chaine, "exit\n") == 0)
 						{
 							done = 1;
-							printf("%s\n", "done = 1");
+							printf("%s\n", "Fin du serveur");
 						}
 						done2 = 1;
 					}
@@ -122,7 +121,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 				}
 				i = 0;
 				int done4 = 0;
-				while((done4 == 0) && (done3 == 0) && (done2 == 0) && (i < tabFluxUDP->nbFlux))
+				while((done4 == 1) && (done3 == 0) && (done2 == 0) && (i < tabFluxUDP->nbFlux))
 				{
 
 				}
