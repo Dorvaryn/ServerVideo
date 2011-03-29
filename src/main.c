@@ -137,6 +137,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 int main(int argc, char ** argv)
 {
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	int epollfd;
 
 	epollfd = epoll_create(10);

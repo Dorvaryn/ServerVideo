@@ -93,7 +93,7 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 		char * tmp = (char *)malloc(512*sizeof(char));
 		memset(tmp, 0, 512);
 		char  * tmp2 = (char *)malloc(512*sizeof(char));
-		memset(tmp, 0, 512);
+		memset(tmp2, 0, 512);
 		fgets(tmp,512,g);
 		printf("fgets : %s\n", strerror(errno));
 		int port;

@@ -31,6 +31,7 @@ int createSockEventTCP(int epollfd, int port)
 	printf("listen : %s\n", strerror(errno));
 
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
@@ -58,6 +59,7 @@ int createSockEventUDP(int epollfd, int port)
 	printf("bind : %s\n", strerror(errno));
 
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
