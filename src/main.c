@@ -241,7 +241,7 @@ int main(int argc, char ** argv)
 	struct tabFlux tabFluxUDP;
 	tabFluxUDP.nbFlux = 0;
 	tabFluxUDP.socks = (int *)malloc(BASE_FICHIERS*sizeof(int));
-	tabFluxTCP.socksData = (int *)malloc(BASE_FICHIERS*sizeof(int));
+	tabFluxUDP.socksData = (int *)malloc(BASE_FICHIERS*sizeof(int));
 	tabFluxUDP.infosVideos = (struct infosVideo *) malloc(BASE_FICHIERS*sizeof(struct infosVideo));
 
 	int baseFichiersCourante = BASE_FICHIERS;
