@@ -56,6 +56,8 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				
 				//videoClient->clientSocket = initDataUDP(epollfd, sock, req->listenPort, UDP_PULL);
 				
+				videoClient->dest_addr.sin_port = htons(req->listenPort);
+				
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
