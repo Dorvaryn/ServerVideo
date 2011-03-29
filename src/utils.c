@@ -72,6 +72,7 @@ int createSockClientEvent(int epollfd, int sock)
 {
 	int csock;
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	struct sockaddr_in saddr_client;
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
@@ -219,6 +220,7 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux *
 void createEventPull(int epollfd, int csock)
 {
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	ev.events = EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
@@ -227,6 +229,7 @@ void createEventPull(int epollfd, int csock)
 void createEventPush(int epollfd, int csock)
 {
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	ev.events = EPOLLOUT;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
@@ -239,6 +242,7 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 	memset(&addr, 0, sizeof(struct sockaddr_in));
 	int csock;
 	socklen_t len;
+	memset(&len, 0, sizeof(socklen_t));
 	getsockname(sock, (struct sockaddr*)&addr, &len);
 	saddr.sin_addr.s_addr = addr.sin_addr.s_addr;
 	saddr.sin_family = AF_INET;

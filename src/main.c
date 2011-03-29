@@ -25,11 +25,13 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 	struct tabClients tabClientsTCP;
 	tabClientsTCP.clients =
 		(struct sockClient *)malloc(BASE_CLIENTS*sizeof(struct sockClient));
+	memset(tabClientsTCP.clients, 0, sizeof(struct sockClient)*BASE_CLIENTS);
 	tabClientsTCP.nbClients = 0;
 	
 	struct tabClients tabClientsUDP;
 	tabClientsUDP.clients =
 		(struct sockClient *)malloc(BASE_CLIENTS*sizeof(struct sockClient));
+	memset(tabClientsUDP.clients, 0, sizeof(struct sockClient)*BASE_CLIENTS);
 	tabClientsUDP.nbClients = 0;
 
 	int baseCouranteTCP = BASE_CLIENTS;
@@ -100,6 +102,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 								recv(tabClientsTCP.clients[i].sock, buffer, 512*sizeof(char),0);
 								traiteChaine(buffer, &tabClientsTCP.clients[i].requete, &tabClientsTCP.clients[i].videoClient, 
 										epollfd, tabClientsTCP.clients[i].sock);
+								free(buffer);
 								printf("%s\n", "done");
 							}
 							else
@@ -216,6 +219,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 
 	//TODO: fermer les ressources proprement ici
 	free(tabClientsTCP.clients);
+	free(tabClientsUDP.clients);
 
 }  
 

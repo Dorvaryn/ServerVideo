@@ -146,6 +146,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 		case END:
 			printf("END\n");
 			struct epoll_event ev;
+			memset(&ev, 0, sizeof(struct epoll_event));
 			ev.events = 0;
 			ev.data.fd = videoClient->clientSocket;
 			FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
