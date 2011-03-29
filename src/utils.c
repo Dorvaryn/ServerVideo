@@ -70,39 +70,39 @@ int createSockClientEvent(int epollfd, int sock)
 	return csock;
 }
 
-void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante)
+void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante)
 {
-	if (tabFichiers->nbFichiers >= *baseFichierCourante)
+	if (tabFlux->nbFlux >= *baseFichierCourante)
 	{
 		*baseFichierCourante *=2;
 		int * temp;
-		temp = (int *) realloc(tabFichiers->socks,
+		temp = (int *) realloc(tabFlux->socks,
 				*baseFichierCourante*sizeof(int));
 		struct infosVideo * temp2;
-		temp2 = (struct infosVideo *) realloc(tabFichiers->infosVideos,
+		temp2 = (struct infosVideo *) realloc(tabFlux->infosVideos,
 				*baseFichierCourante*sizeof(struct infosVideo));
 		if (temp!=NULL && temp2!=NULL) 
 		{
-			tabFichiers->socks = temp;
-			tabFichiers->infosVideos = temp2;
+			tabFlux->socks = temp;
+			tabFlux->infosVideos = temp2;
 		}
 		else 
 		{
-			free (tabFichiers->socks);
-			free (tabFichiers->infosVideos);
+			free (tabFlux->socks);
+			free (tabFlux->infosVideos);
 			puts ("Error (re)allocating memory");
 			exit (1);
 		}
 	}
-	tabFichiers->socks[tabFichiers->nbFichiers] = createSockEvent(epollfd,port);
-	tabFichiers->infosVideos[tabFichiers->nbFichiers].nbImages = 0;
-	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
+	tabFlux->socks[tabFlux->nbFlux] = createSockEvent(epollfd,port);
+	tabFlux->infosVideos[tabFlux->nbFlux].nbImages = 0;
+	tabFlux->infosVideos[tabFlux->nbFlux].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
 	int k;
 	for (k = 0; k < BASE_IMAGES; k++)
 	{
-		tabFichiers->infosVideos[tabFichiers->nbFichiers].images[k] = (char *)malloc(512*sizeof(char));
+		tabFlux->infosVideos[tabFlux->nbFlux].images[k] = (char *)malloc(512*sizeof(char));
 	}
-	tabFichiers->nbFichiers++;
+	tabFlux->nbFlux++;
 }
 
 void addImage(char * uneImage, struct infosVideo * infos)
@@ -113,7 +113,7 @@ void addImage(char * uneImage, struct infosVideo * infos)
 	infos->nbImages++;
 }
 
-void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock, int * baseCourante, int isGet)
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux * tabFlux, int sock, int * baseCourante, int isGet)
 {
 	if (tabClients->nbClients >= *baseCourante)
 	{
@@ -139,11 +139,11 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 	
 	int done = 0;
 	int i = 0;
-	while((done == 0) && (i < tabFichiers->nbFichiers))
+	while((done == 0) && (i < tabFlux->nbFlux))
 	{
-		if(tabFichiers->socks[i] == sock)
+		if(tabFlux->socks[i] == sock)
 		{
-			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFichiers->infosVideos[i];
+			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFlux->infosVideos[i];
 			done = 1;
 		}
 		i++;
@@ -167,38 +167,6 @@ void createEventPush(int epollfd, int csock)
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
 }
 
-/*int initDataUDP(int epollfd, int sock, int port, int type)
-{
-	struct sockaddr_in addr, saddr;	
-	int csock;
-	socklen_t len;
-	getsockname(sock, (struct sockaddr*)&addr, &len);
-	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
-	saddr.sin_family = AF_INET;
-	saddr.sin_port = htons(port);
-	
-#if defined ( NEW )
-	csock = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK,0); //socket NONBLOCK plus performant 
-#endif // NEW
-	
-#if defined ( OLD )
-	csock = socket(AF_INET, SOCK_DGRAM, 0);
-	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
-	FAIL(flags);
-	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
-#endif // OLD
-	
-	if(type == UDP_PULL)
-	{
-		createEventPull(epollfd, csock);
-	}
-	else if(type == UDP_PUSH)
-	{
-		createEventPush(epollfd, csock);
-	}
-
-    return csock;	
-}*/
 
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
@@ -207,7 +175,7 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 	int csock;
 	socklen_t len;
 	getsockname(sock, (struct sockaddr*)&addr, &len);
-	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
+	saddr.sin_addr.s_addr = addr.sin_addr.s_addr;
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
 	

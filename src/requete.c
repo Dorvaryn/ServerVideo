@@ -79,19 +79,28 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				printf("socket du client : %d\n", videoClient->clientSocket);
 
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				videoClient->etat = RUNNING;
+				if(videoClient->infosVideo->type == TCP_PUSH)
+				{
+					videoClient->etat = RUNNING;
+					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r");
+					if(videoClient->envoi->curFile == NULL)
+					{
+						puts("E: ouverture du fichier");
+					}
+				}
+				else
+				{
+					videoClient->etat = PAUSE;
+				}
 				videoClient->dernierEnvoi = getTime();
 				videoClient->envoi->state = NOTHING_SENT;
-				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r");
-				if(videoClient->envoi->curFile == NULL) {
-					puts("E: ouverture du fichier");
-				}
-				videoClient->id = 1;
+				videoClient->id = 0;
 				puts("VIDEO OKok !");
 
 
 			} else {
 				printf("GET id:%d\n", req->imgId);
+				videoClient->etat = RUNNING;
 
 				if (req->imgId == -1)
 				{	

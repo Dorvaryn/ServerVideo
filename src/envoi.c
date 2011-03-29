@@ -19,7 +19,7 @@ void sendImage(struct videoClient* videoClient) {
 
 	struct envoi* env = videoClient->envoi;
 
-	if(videoClient->etat != OVER )
+	if(videoClient->etat == RUNNING)
 	{
 		if(videoClient->infosVideo->type == TCP_PULL)
 		{
@@ -37,7 +37,7 @@ void sendImage(struct videoClient* videoClient) {
 				sendTCP(videoClient);
 			}
 		}
-		else if(videoClient->infosVideo->type == TCP_PUSH && videoClient->etat == RUNNING )
+		else if(videoClient->infosVideo->type == TCP_PUSH )
 			{
 				if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) 
 				{
@@ -71,7 +71,7 @@ void sendImage(struct videoClient* videoClient) {
 				sendUDP(videoClient);
 			}
 		}
-		else if(videoClient->infosVideo->type ==UDP_PUSH && videoClient->etat == RUNNING)
+		else if(videoClient->infosVideo->type ==UDP_PUSH) 
 		{
 			if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
 			{

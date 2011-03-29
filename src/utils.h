@@ -102,8 +102,8 @@ struct tabClients {
 	int nbClients;
 	struct sockClient * clients;
 };
-struct tabFichiers {
-	int nbFichiers;
+struct tabFlux {
+	int nbFlux;
 	int * socks;
 	struct infosVideo * infosVideos;
 };
@@ -116,11 +116,11 @@ int createSockEvent(int epollfd, int port);
 
 int createSockClientEvent(int epollfd, int sock);
 
-void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante);
+void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante);
 
 void addImage(char * uneImage, struct infosVideo * infos);
 
-void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock , int * baseCourante, int isGet);
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux * tabFlux, int sock , int * baseCourante, int isGet);
 
 //int initDataUDP(int epollfd, int sock, int port, int type);
 
