@@ -1,4 +1,5 @@
 #include "udp_push.h"
+#include "envoi.h"
 
 void* udp_push(void * leflux)
 {
@@ -107,6 +108,7 @@ void* udp_push(void * leflux)
 				for(i = 0; i < tabClientsUDP.nbClients; i++)
 				{
 					//sendImage avec les bons paramètres
+					sendImage(&tabClientsUDP.clients[i].videoClient);
 				}
 			}
 

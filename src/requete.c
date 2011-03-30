@@ -140,6 +140,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				}
 				videoClient->etat = RUNNING;
 			}
+			sendImage(videoClient);
 			break;
 		case PAUSE:
 			printf("PAUSE\n");

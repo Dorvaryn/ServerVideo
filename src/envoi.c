@@ -76,23 +76,27 @@ void sendImage(struct videoClient* videoClient) {
 		}
 		else if(videoClient->infosVideo->type == UDP_PUSH) 
 		{
-			while(env->state != IMAGE_SENT)
-			{
-				if((env->state == NOTHING_SENT || env->state == FRAGMENT_SENT)
-					&& timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
-				{
-					videoClient->dernierEnvoi = getTime();
-					createHeaderUDP(videoClient);
-					sendUDP(videoClient);
-				}
-				if(env->state == HEADER_SENT) 
-				{
-					createFragment(videoClient);
-				}
-				if(env->state == SENDING_FRAGMENT || env->state == SENDING_HEADER) 
-				{
-					sendUDP(videoClient);
-				}
+		    if(timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
+		    {
+		        videoClient->dernierEnvoi = getTime();
+			    while(env->state != IMAGE_SENT)
+			    {
+				    if((env->state == NOTHING_SENT || env->state == FRAGMENT_SENT))
+				    {
+					
+					    createHeaderUDP(videoClient);
+					    sendUDP(videoClient);
+				    }
+				    if(env->state == HEADER_SENT) 
+				    {
+					    createFragment(videoClient);
+				    }
+				    if(env->state == SENDING_FRAGMENT || env->state == SENDING_HEADER) 
+				    {
+					    sendUDP(videoClient);
+				    }
+			    }
+				env->state = NOTHING_SENT;
 			}
 		}
 	}
@@ -261,6 +265,17 @@ void sendUDP(struct videoClient* videoClient) {
 				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
+				if(videoClient->infosVideo->type == UDP_PUSH)
+				{
+					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
+					videoClient->envoi->state = IMAGE_SENT;
+					env->posDansImage = 0;
+					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
+					if(videoClient->envoi->curFile == NULL)
+					{
+						puts("E: ouverture du fichier");
+					}
+				}
 			}
 		}
 		else
