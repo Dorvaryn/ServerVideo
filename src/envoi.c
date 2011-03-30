@@ -71,7 +71,7 @@ void sendImage(struct videoClient* videoClient) {
 				sendUDP(videoClient);
 			}
 		}
-		else if(videoClient->infosVideo->type ==UDP_PUSH) 
+		else if(videoClient->infosVideo->type == UDP_PUSH) 
 		{
 			if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
 			{
@@ -187,7 +187,8 @@ void createHeaderUDP(struct videoClient* videoClient) {
     
     env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
-	
+	env->originBuffer = env->buffer;
+
 	//Taille
 	fseek(env->curFile, 0, SEEK_END);
 	env->fileSize = ftell(env->curFile);
@@ -258,5 +259,11 @@ void sendUDP(struct videoClient* videoClient) {
                 env->posDansImage++;
             }
         }
+		else
+		{
+			env->state = HEADER_SENT;
+            free(env->originBuffer);
+		}
+
     }
 }
