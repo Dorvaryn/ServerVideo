@@ -107,65 +107,35 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 	if (tabFlux->nbFlux >= *baseFichierCourante)
 	{
 		*baseFichierCourante *=2;
-		int * temp;
-		temp = (int *) realloc(tabFlux->socks,
-				*baseFichierCourante*sizeof(int));
-		struct infosVideo * temp2;
-		temp2 = (struct infosVideo *) realloc(tabFlux->infosVideos,
-				*baseFichierCourante*sizeof(struct infosVideo));
-		if( type == UDP_PULL || type == UDP_PUSH )
+		struct flux * temp;
+		temp = (struct flux *) realloc(tabFlux->flux,
+				*baseFichierCourante*sizeof(struct flux));
+		
+		if (temp!=NULL) 
 		{
-			int * temp;
-			temp = (int *) realloc(tabFlux->socksData,
-					*baseFichierCourante*sizeof(int));
-			if (temp!=NULL) 
-			{
-				tabFlux->socksData = temp;
-			}
-			else 
-			{
-				free (tabFlux->socksData);
-				puts ("Error (re)allocating memory");
-				exit (1);
-			}
-		}
-		if (temp!=NULL && temp2!=NULL) 
-		{
-			tabFlux->socks = temp;
-			tabFlux->infosVideos = temp2;
+			tabFlux->flux = temp;
 		}
 		else 
 		{
-			free (tabFlux->socks);
-			free (tabFlux->infosVideos);
+			free (tabFlux->flux);
 			puts ("Error (re)allocating memory");
 			exit (1);
 		}
 	}
 	if( type == TCP_PULL || type == TCP_PUSH )
 	{
-		tabFlux->socks[tabFlux->nbFlux] = createSockEventTCP(epollfd,port);
+		tabFlux->flux[tabFlux->nbFlux].sock = createSockEventTCP(epollfd,port);
 	}
 	else
 	{
-		tabFlux->socks[tabFlux->nbFlux] = createSockEventUDP(epollfd,port);
-		int sockData = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
-		if(type == UDP_PUSH)
-		{
-			createEventPush(epollfd, sockData);
-		}
-		else
-		{
-			//createEventPull(epollfd, sockData);
-		}
-		tabFlux->socksData[tabFlux->nbFlux] = sockData;
+		tabFlux->flux[tabFlux->nbFlux].sock = createSockEventUDP(epollfd,port);
 	}
-	tabFlux->infosVideos[tabFlux->nbFlux].nbImages = 0;
-	tabFlux->infosVideos[tabFlux->nbFlux].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
+	tabFlux->flux[tabFlux->nbFlux].infosVideo.nbImages = 0;
+	tabFlux->flux[tabFlux->nbFlux].infosVideo.images = (char **)malloc(BASE_IMAGES*sizeof(char*));
 	int k;
 	for (k = 0; k < BASE_IMAGES; k++)
 	{
-		tabFlux->infosVideos[tabFlux->nbFlux].images[k] = (char *)malloc(512*sizeof(char));
+		tabFlux->flux[tabFlux->nbFlux].infosVideo.images[k] = (char *)malloc(512*sizeof(char));
 	}
 	tabFlux->nbFlux++;
 }
@@ -206,9 +176,9 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux *
 	int i = 0;
 	while((done == 0) && (i < tabFlux->nbFlux))
 	{
-		if(tabFlux->socks[i] == sock)
+		if(tabFlux->flux[i].sock == sock)
 		{
-			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFlux->infosVideos[i];
+			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFlux->flux[i].infosVideo;
 			done = 1;
 		}
 		i++;

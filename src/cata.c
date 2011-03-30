@@ -127,25 +127,25 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 					{
 						typeCourant = 0;
 						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, TCP_PULL);
-						tabFluxTCP->infosVideos[tabFluxTCP->nbFlux-1].type = TCP_PULL;
+						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.type = TCP_PULL;
 					}
 					else if(strcmp(protocole,"TCP_PUSH") == 0)
 					{
 						typeCourant = 0;
 						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, TCP_PUSH);
-						tabFluxTCP->infosVideos[tabFluxTCP->nbFlux-1].type = TCP_PUSH;
+						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.type = TCP_PUSH;
 					}
 					else if(strcmp(protocole,"UDP_PULL") == 0)
 					{
 						typeCourant = 1;
 						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PULL);
-						tabFluxUDP->infosVideos[tabFluxUDP->nbFlux-1].type = UDP_PULL;
+						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.type = UDP_PULL;
 					}
 					else if(strcmp(protocole,"UDP_PUSH") == 0)
 					{
 						typeCourant = 1;
 						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PUSH);
-						tabFluxUDP->infosVideos[tabFluxUDP->nbFlux-1].type = UDP_PUSH;
+						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.type = UDP_PUSH;
 					}
 				}	
 				else if (j == 6)
@@ -154,11 +154,11 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 					sscanf(tmp2,"%*4s%s",fps);
 					if(typeCourant == 0)
 					{
-						tabFluxTCP->infosVideos[tabFluxTCP->nbFlux-1].fps = atof(fps);
+						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.fps = atof(fps);
 					}
 					else
 					{
-						tabFluxUDP->infosVideos[tabFluxUDP->nbFlux-1].fps = atof(fps);
+						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.fps = atof(fps);
 					}
 				}
 				strcat(buff,tmp2);
@@ -171,11 +171,11 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 				sprintf(image, "%s%s", "./data/",tmp2);
 				if(typeCourant == 0)
 				{
-					addImage(image, &tabFluxTCP->infosVideos[tabFluxTCP->nbFlux-1]);
+					addImage(image, &tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo);
 				}
 				else
 				{
-					addImage(image, &tabFluxUDP->infosVideos[tabFluxUDP->nbFlux-1]);
+					addImage(image, &tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo);
 				}
 			}
 			int l2 = strlen(tmp2);
