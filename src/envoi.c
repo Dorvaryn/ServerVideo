@@ -261,9 +261,24 @@ void sendUDP(struct videoClient* videoClient) {
 			env->posDansImage += env->tailleFragment;
 			if(env->posDansImage >= env->fileSize)
 			{
-				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
+				if(videoClient->infosVideo->type == UDP_PUSH)
+				{
+					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
+					videoClient->envoi->state = NOTHING_SENT;
+					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
+					if(videoClient->envoi->curFile == NULL)
+					{
+						puts("E: ouverture du fichier");
+					}
+				}
+				else
+				{
+					env->state = IMAGE_SENT;
+					fclose(env->curFile);
+					free(env->originBuffer);
+				}
 			}
 		}
 		else
