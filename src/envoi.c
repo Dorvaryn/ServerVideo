@@ -96,6 +96,7 @@ void sendImage(struct videoClient* videoClient) {
 					    sendUDP(videoClient);
 				    }
 			    }
+				env->state = NOTHING_SENT;
 			}
 		}
 	}
@@ -267,7 +268,7 @@ void sendUDP(struct videoClient* videoClient) {
 				if(videoClient->infosVideo->type == UDP_PUSH)
 				{
 					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
-					videoClient->envoi->state = NOTHING_SENT;
+					videoClient->envoi->state = IMAGE_SENT;
 					env->posDansImage = 0;
 					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
 					if(videoClient->envoi->curFile == NULL)
