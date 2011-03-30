@@ -134,7 +134,6 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 				{
 					if (events[n].data.fd == tabFluxUDP->socks[i])
 					{
-						puts("plop");
 						if (events[n].events == EPOLLIN )
 						{					
 							printf("%s\n", "buffer");
@@ -159,13 +158,11 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 											&& faddr.sin_port == comp->sin_port)
 								{
 									trouve = j;
-									puts("exists");
 								}
 								j++;
 							}
 							if(trouve == -1)
 							{
-								puts("new");
 								if (tabClientsUDP.nbClients >= baseCouranteUDP)
 								{
 									baseCouranteUDP *=2;

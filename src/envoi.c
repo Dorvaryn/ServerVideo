@@ -235,14 +235,8 @@ void sendUDP(struct videoClient* videoClient) {
 	{	
 		nbSent = sendto(videoClient->clientSocket, env->buffer, env->bufLen, (env->more == 1 ? MSG_MORE : 0),
 		                (struct sockaddr*)&videoClient->dest_addr, sizeof(struct sockaddr));
-        
 		FAIL(nbSent);
-		//perror("coucou");
-		//printf("contenu : %s\n", env->buffer);
 		
-		//printf("taille %d\n", env->bufLen);
-	    //abort();
-
 		env->buffer += nbSent;
 		env->bufLen -= nbSent;
 
