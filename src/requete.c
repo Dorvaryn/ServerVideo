@@ -119,6 +119,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
+				videoClient->envoi->posDansImage = 0;
 				if(videoClient->envoi->curFile == NULL)
 				{
 					puts("E: ouverture du fichier");
