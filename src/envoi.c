@@ -276,6 +276,7 @@ void sendUDP(struct videoClient* videoClient) {
 				else
 				{
 					env->state = IMAGE_SENT;
+					env->posDansImage = 0;
 					fclose(env->curFile);
 					free(env->originBuffer);
 				}
