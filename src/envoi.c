@@ -261,8 +261,6 @@ void sendUDP(struct videoClient* videoClient) {
 			env->posDansImage += env->tailleFragment;
 			if(env->posDansImage >= env->fileSize)
 			{
-				fclose(env->curFile);
-				free(env->originBuffer);
 				if(videoClient->infosVideo->type == UDP_PUSH)
 				{
 					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
