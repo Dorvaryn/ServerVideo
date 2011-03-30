@@ -150,16 +150,13 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 	{
 		tabFlux->socks[tabFlux->nbFlux] = createSockEventUDP(epollfd,port);
 		int sockData = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
-		int flags = fcntl(sockData,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
-		FAIL(flags);
-		FAIL(fcntl(sockData,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
 		if(type == UDP_PUSH)
 		{
 			createEventPush(epollfd, sockData);
 		}
 		else
 		{
-			createEventPull(epollfd, sockData);
+			//createEventPull(epollfd, sockData);
 		}
 		tabFlux->socksData[tabFlux->nbFlux] = sockData;
 	}

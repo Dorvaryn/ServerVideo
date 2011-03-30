@@ -14,6 +14,7 @@
 #define SENDING_IMAGE 0
 #define IMAGE_SENT 1
 #define SENDING_FRAGMENT 2
+#define FRAGMENT_SENT 3
 
 
 struct envoi {
