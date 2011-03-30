@@ -163,9 +163,11 @@ int main(int argc, char ** argv)
 	{
 		if(tabFluxUDP.flux[i].infosVideo.type == UDP_PULL)
 		{
-			/*pid_t p_udp_pull = fork();
-			if(p_udp_pull == 0)
-				udp_pull(&tabFluxUDP.flux[i]);*/
+			//threader
+		}
+		else if(tabFluxUDP.flux[i].infosVideo.type == UDP_PUSH)
+		{
+			//threader
 		}
 	}
 	
