@@ -57,13 +57,13 @@ void sendImage(struct videoClient* videoClient) {
 		
 		else if(videoClient->infosVideo->type == UDP_PULL)
 		{
-			if(env->state == NOTHING_SENT)
-			{
-				createHeaderUDP(videoClient);
-				sendUDP(videoClient);
-			}
 			while(env->state != IMAGE_SENT)
 			{
+				if(env->state == NOTHING_SENT)
+				{
+					createHeaderUDP(videoClient);
+					sendUDP(videoClient);
+				}
 				if(env->state == HEADER_SENT || env->state == FRAGMENT_SENT) 
 				{
 					createFragment(videoClient);
@@ -259,7 +259,7 @@ void sendUDP(struct videoClient* videoClient) {
 			else
 			{
 				env->state = FRAGMENT_SENT;
-				env->posDansImage++;
+				env->posDansImage += env->tailleFragment;
 			}
 		}
 		else
