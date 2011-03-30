@@ -15,6 +15,7 @@
 #include "envoi.h"
 #include "udp_pull.h"
 #include "udp_push.h"
+#include "multicast.h"
 
 #define MAX_EVENTS 10
 #define BASE_CLIENTS 32
@@ -161,29 +162,37 @@ int main(int argc, char ** argv)
 
 	catalogue = buildCatalogue(epollfd, &tabFluxTCP, &tabFluxUDP);
 
+    //Lancement du multicast catalogue
+    pthread_t thread;
+	pthread_create(&thread, NULL, multiCatalogue, (void*)&catalogue);
+    pthread_detach(thread);
+
 	int i;
 	for(i = 0; i < tabFluxUDP.nbFlux; i++)
 	{
 		if(tabFluxUDP.flux[i].infosVideo.type == UDP_PULL)
 		{
-			//threader
 			//UDP_PULL
 			pthread_t thread;
-			//memset(&thread, 0, sizeof(pthread_t));
 			pthread_create(&thread, NULL, udp_pull, (void*)&tabFluxUDP.flux[i]);
             pthread_detach(thread);
 		}
 		else if(tabFluxUDP.flux[i].infosVideo.type == UDP_PUSH)
 		{
-			//threader
-			//UDP_PUSH -> flux
+			//UDP_PUSH
 			pthread_t thread;
-			//memset(&thread, 0, sizeof(pthread_t));
 			pthread_create(&thread, NULL, udp_push, (void*)&tabFluxUDP.flux[i]);
             pthread_detach(thread);
 		}
 	}
 	
+	//Lancement des flux multicast
+	/*for(i = 0; i < tabFluxMutlicast.nbFlux; i++) {
+        pthread_t thread;
+	    pthread_create(&thread, NULL, multiFlux, (void*)tabFluxMutlicast.flux[i]);
+        pthread_detach(thread);
+    }*/
+		
 	central(epollfd, &tabFluxTCP, &tabFluxUDP);
 
     int j;
