@@ -76,23 +76,26 @@ void sendImage(struct videoClient* videoClient) {
 		}
 		else if(videoClient->infosVideo->type == UDP_PUSH) 
 		{
-			while(env->state != IMAGE_SENT)
-			{
-				if((env->state == NOTHING_SENT || env->state == FRAGMENT_SENT)
-					&& timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
-				{
-					videoClient->dernierEnvoi = getTime();
-					createHeaderUDP(videoClient);
-					sendUDP(videoClient);
-				}
-				if(env->state == HEADER_SENT) 
-				{
-					createFragment(videoClient);
-				}
-				if(env->state == SENDING_FRAGMENT || env->state == SENDING_HEADER) 
-				{
-					sendUDP(videoClient);
-				}
+		    if(timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
+		    {
+		        videoClient->dernierEnvoi = getTime();
+			    while(env->state != IMAGE_SENT)
+			    {
+				    if((env->state == NOTHING_SENT || env->state == FRAGMENT_SENT))
+				    {
+					
+					    createHeaderUDP(videoClient);
+					    sendUDP(videoClient);
+				    }
+				    if(env->state == HEADER_SENT) 
+				    {
+					    createFragment(videoClient);
+				    }
+				    if(env->state == SENDING_FRAGMENT || env->state == SENDING_HEADER) 
+				    {
+					    sendUDP(videoClient);
+				    }
+			    }
 			}
 		}
 	}
