@@ -7,11 +7,14 @@
 #include <errno.h>
 #include <sys/epoll.h>
 #include <unistd.h> //Pour STDIN_FILENO
+#include <pthread.h>
 
 #include "requete.h"
 #include "cata.h"
 #include "utils.h"
 #include "envoi.h"
+#include "udp_pull.h"
+#include "udp_push.h"
 
 #define MAX_EVENTS 10
 #define BASE_CLIENTS 32
@@ -164,10 +167,20 @@ int main(int argc, char ** argv)
 		if(tabFluxUDP.flux[i].infosVideo.type == UDP_PULL)
 		{
 			//threader
+			//UDP_PULL
+			pthread_t thread;
+			//memset(&thread, 0, sizeof(pthread_t));
+			pthread_create(&thread, NULL, udp_pull, (void*)&tabFluxUDP.flux[i]);
+            pthread_detach(thread);
 		}
 		else if(tabFluxUDP.flux[i].infosVideo.type == UDP_PUSH)
 		{
 			//threader
+			//UDP_PUSH -> flux
+			pthread_t thread;
+			//memset(&thread, 0, sizeof(pthread_t));
+			pthread_create(&thread, NULL, udp_push, (void*)&tabFluxUDP.flux[i]);
+            pthread_detach(thread);
 		}
 	}
 	

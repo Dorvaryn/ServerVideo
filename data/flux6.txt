@@ -4,7 +4,7 @@ Type=BMP
 Address=127.0.0.1
 Port=8086
 Protocol=UDP_PULL
-IPS=0.25
+IPS=1
 Images/img1.bmp
 Images/img2.bmp
 Images/img3.bmp
