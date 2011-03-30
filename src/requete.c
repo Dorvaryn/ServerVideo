@@ -67,7 +67,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				fseek(videoClient->envoi->curFile, 0, SEEK_END);
 	            videoClient->envoi->fileSize = ftell(videoClient->envoi->curFile);
 	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
-				
+				printf("socket : %d\n",videoClient->clientSocket);	
 				videoClient->envoi->posDansImage = 0;
 				videoClient->envoi->tailleMaxFragment = req->fragmentSize;
 				

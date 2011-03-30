@@ -153,17 +153,19 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 							int trouve = -1;
 							while((trouve == -1) && (j < tabClientsUDP.nbClients))
 							{
-								struct sockaddr_in * comp = &tabClientsUDP.clients[j].videoClient.dest_addr;
+								struct sockaddr_in * comp = &tabClientsUDP.clients[j].videoClient.orig_addr;
 								if(faddr.sin_addr.s_addr == comp->sin_addr.s_addr 
 										&& faddr.sin_family == comp->sin_family
 											&& faddr.sin_port == comp->sin_port)
 								{
 									trouve = j;
+									puts("exists");
 								}
 								j++;
 							}
 							if(trouve == -1)
 							{
+								puts("new");
 								if (tabClientsUDP.nbClients >= baseCouranteUDP)
 								{
 									baseCouranteUDP *=2;
@@ -182,9 +184,10 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 									}
 								}
 								initReq(&(tabClientsUDP.clients[tabClientsUDP.nbClients].requete));
-								memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.dest_addr,0,sizeof(struct sockaddr));
-								memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.dest_addr, &faddr, sizeof(struct sockaddr));
+								memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr,0,sizeof(struct sockaddr));
+								memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr, &faddr, sizeof(struct sockaddr));
 								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.clientSocket = tabFluxUDP->socksData[i];
+								printf(" sockData: %d\n",tabFluxUDP->socksData[i]);
 								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.infosVideo = &tabFluxUDP->infosVideos[i];
 								trouve = tabClientsUDP.nbClients++;
 							}
@@ -207,10 +210,7 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 						{
 								printf("%s\n","ENVOI");
 								printf("%d\n", tabClientsUDP.clients[i].videoClient.clientSocket);
-								if(tabClientsUDP.clients[i].videoClient.clientSocket != 0) 
-								{
-									sendImage(&tabClientsUDP.clients[i].videoClient);
-								}
+								sendImage(&tabClientsUDP.clients[i].videoClient);
 						}
 						done5 = 1;
 					}

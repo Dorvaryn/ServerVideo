@@ -87,6 +87,7 @@ struct videoClient {
     double lastAlive;
     
     struct sockaddr_in dest_addr;
+    struct sockaddr_in orig_addr;
     
     struct envoi* envoi;
     struct infosVideo* infosVideo;
