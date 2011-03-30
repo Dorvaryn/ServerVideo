@@ -244,7 +244,7 @@ void sendUDP(struct videoClient* videoClient) {
 		env->buffer += nbSent;
 		env->bufLen -= nbSent;
 
-	} while (errno != EAGAIN && env->bufLen > 0);
+	} while (env->bufLen > 0);
 
 	if(env->bufLen <= 0) //Quand tout est envoyé
 	{
