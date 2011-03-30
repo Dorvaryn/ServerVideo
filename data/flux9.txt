@@ -3,8 +3,8 @@ Name=SintelHD
 Type=JPEG
 Address=127.0.0.1
 Port=8093
-Protocol=TCP_PULL
-IPS=25
+Protocol=TCP_PUSH
+IPS=60
 Images/Sintel/Sintel0384.jpg
 Images/Sintel/Sintel0385.jpg
 Images/Sintel/Sintel0386.jpg
