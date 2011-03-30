@@ -72,7 +72,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
 				printf("socket : %d\n",videoClient->clientSocket);	
 				videoClient->envoi->posDansImage = 0;
-				videoClient->envoi->tailleMaxFragment = req->fragmentSize;
+				videoClient->envoi->tailleMaxFragment = req->fragmentSize - 128;
 				
 				videoClient->id = 1;
 
@@ -119,6 +119,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
+				videoClient->envoi->posDansImage = 0;
 				if(videoClient->envoi->curFile == NULL)
 				{
 					puts("E: ouverture du fichier");
@@ -130,10 +131,13 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			printf("START\n");
 			if(videoClient->etat == PAUSED) 
 			{
-				struct epoll_event ev;
-				ev.events = EPOLLOUT;
-				ev.data.fd = videoClient->clientSocket;
-				FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, videoClient->clientSocket, &ev));
+				if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
+				{
+					struct epoll_event ev;
+					ev.events = EPOLLOUT;
+					ev.data.fd = videoClient->clientSocket;
+					FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, videoClient->clientSocket, &ev));
+				}
 				videoClient->etat = RUNNING;
 			}
 			break;
@@ -141,20 +145,26 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			printf("PAUSE\n");
 			if(videoClient->etat == RUNNING) 
 			{
-				struct epoll_event ev;
-				ev.events = 0;
-				ev.data.fd = videoClient->clientSocket;
-				FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
+				if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
+				{
+					struct epoll_event ev;
+					ev.events = 0;
+					ev.data.fd = videoClient->clientSocket;
+					FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
+				}
 				videoClient->etat = PAUSED;
 			}
 			break;
 		case END:
 			printf("END\n");
-			struct epoll_event ev;
-			memset(&ev, 0, sizeof(struct epoll_event));
-			ev.events = 0;
-			ev.data.fd = videoClient->clientSocket;
-			FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
+			if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
+			{
+				struct epoll_event ev;
+				memset(&ev, 0, sizeof(struct epoll_event));
+				ev.events = 0;
+				ev.data.fd = videoClient->clientSocket;
+				FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
+			}
 			videoClient->etat = OVER;
 			break;
 		case ALIVE:

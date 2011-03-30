@@ -1,7 +1,8 @@
 #include "udp_push.h"
 
-void udp_push(struct flux * flux)
+void* udp_push(void * leflux)
 {
+    struct flux * flux = (struct flux *) leflux;
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
 	int epollfd;
@@ -114,5 +115,7 @@ void udp_push(struct flux * flux)
 		//TODO : GESTION des signaux de fin free(tabClientsUDP.clients);
 
 	}
+	
+	return NULL;
 }
 

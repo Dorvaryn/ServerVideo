@@ -5,14 +5,14 @@ BUILDDIR=build/
 SRCDIR=src/
 KERNEL=$(shell uname -r | cut -d '-' -f1 | cut -d '.' -f3)
 ifeq ($(shell expr $(KERNEL) \< 28),1)
-CCFLAGS=-DOLD
+CCFLAGS=-DOLD -g -O0 -Wall -Werror
 else
 CCFLAGS=-DNEW -g -O0 -Wall -Werror
 endif
 LDFLAGS=
 RMFLAGS=-f
 EXE=ServerVideo
-LIBS=
+LIBS=-lpthread
 EFFACE=clean
 OBJ=$(BUILDDIR)utils.o $(BUILDDIR)requete.o $(BUILDDIR)cata.o $(BUILDDIR)envoi.o $(BUILDDIR)udp_pull.o $(BUILDDIR)udp_push.o
 

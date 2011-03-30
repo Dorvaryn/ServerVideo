@@ -59,12 +59,12 @@ void sendImage(struct videoClient* videoClient) {
 		{
 			while(env->state != IMAGE_SENT)
 			{
-				if(env->state == NOTHING_SENT)
+				if(env->state == NOTHING_SENT || env->state == FRAGMENT_SENT)
 				{
 					createHeaderUDP(videoClient);
 					sendUDP(videoClient);
 				}
-				if(env->state == HEADER_SENT || env->state == FRAGMENT_SENT) 
+				if(env->state == HEADER_SENT) 
 				{
 					createFragment(videoClient);
 				}
@@ -76,19 +76,23 @@ void sendImage(struct videoClient* videoClient) {
 		}
 		else if(videoClient->infosVideo->type == UDP_PUSH) 
 		{
-			if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
+			while(env->state != IMAGE_SENT)
 			{
-			    videoClient->dernierEnvoi = getTime();
-				createHeaderUDP(videoClient);
-				sendUDP(videoClient);
-			}
-			if(env->state == HEADER_SENT) 
-			{
-				createFragment(videoClient);
-			}
-			if(env->state == SENDING_FRAGMENT || env->state == SENDING_HEADER) 
-			{
-				sendUDP(videoClient);
+				if((env->state == NOTHING_SENT || env->state == FRAGMENT_SENT)
+					&& timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
+				{
+					videoClient->dernierEnvoi = getTime();
+					createHeaderUDP(videoClient);
+					sendUDP(videoClient);
+				}
+				if(env->state == HEADER_SENT) 
+				{
+					createFragment(videoClient);
+				}
+				if(env->state == SENDING_FRAGMENT || env->state == SENDING_HEADER) 
+				{
+					sendUDP(videoClient);
+				}
 			}
 		}
 	}
@@ -198,8 +202,8 @@ void createHeaderUDP(struct videoClient* videoClient) {
 	fseek(env->curFile, 0, SEEK_SET);
 
 
-	if(env->fileSize - env->posDansImage*env->tailleMaxFragment < env->tailleMaxFragment) {
-		env->tailleFragment = env->fileSize - env->posDansImage*env->tailleMaxFragment;
+	if(env->fileSize - env->posDansImage < env->tailleMaxFragment) {
+		env->tailleFragment = env->fileSize - env->posDansImage;
 	} else {
 		env->tailleFragment = env->tailleMaxFragment;
 	}
@@ -223,7 +227,7 @@ void createFragment(struct videoClient* videoClient) {
 	memset(env->buffer,'\0',env->tailleFragment*sizeof(char));
 	env->bufLen = env->tailleFragment;
 
-	fseek(env->curFile, env->posDansImage*env->tailleMaxFragment, SEEK_SET);
+	fseek(env->curFile, env->posDansImage, SEEK_SET);
 	FAIL(fread(env->buffer, sizeof(char), env->tailleFragment, env->curFile));
 
 	env->state = SENDING_FRAGMENT;
@@ -244,22 +248,19 @@ void sendUDP(struct videoClient* videoClient) {
 		env->buffer += nbSent;
 		env->bufLen -= nbSent;
 
-	} while (errno != EAGAIN && env->bufLen > 0);
+	} while (env->bufLen > 0);
 
 	if(env->bufLen <= 0) //Quand tout est envoyé
 	{
 		if(env->more == 0)
 		{
-			if(env->posDansImage*env->tailleMaxFragment >= env->fileSize)
+		    env->state = FRAGMENT_SENT;
+			env->posDansImage += env->tailleFragment;
+			if(env->posDansImage >= env->fileSize)
 			{
 				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
-			}
-			else
-			{
-				env->state = FRAGMENT_SENT;
-				env->posDansImage += env->tailleFragment;
 			}
 		}
 		else
