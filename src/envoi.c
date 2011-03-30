@@ -221,7 +221,7 @@ void createFragment(struct videoClient* videoClient) {
 	env->bufLen = env->tailleFragment;
 
     fseek(env->curFile, env->posDansImage*env->tailleMaxFragment, SEEK_SET);
-	FAIL(fread(env->buffer, sizeof(char), env->fileSize, env->curFile));
+	FAIL(fread(env->buffer, sizeof(char), env->tailleFragment, env->curFile));
     
     env->state = SENDING_FRAGMENT;
     env->more = 0;
