@@ -195,22 +195,14 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 						}
 
 					}
-					i++;
-				}
-				i = 0;
-				int done5 = 0;
-				while((done5 == 0) && (done4 == 0) && (done3 == 0) && (done2 == 0) && (i < tabClientsUDP.nbClients))
-				{
-					if (events[n].data.fd == tabClientsUDP.clients[i].videoClient.clientSocket)
+					else if(events[n].data.fd == tabFluxUDP->socksData[i])
 					{
-						if(events[n].events == EPOLLOUT)
+						if (events[n].events == EPOLLOUT )
 						{
-								printf("%s\n","ENVOI");
-								printf("%d\n", tabClientsUDP.clients[i].videoClient.clientSocket);
-								sendImage(&tabClientsUDP.clients[i].videoClient);
+							//TODO trouver a qui il faut faire le send!					
 						}
-						done5 = 1;
 					}
+
 					i++;
 				}
 			}
