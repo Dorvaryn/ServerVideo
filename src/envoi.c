@@ -188,6 +188,12 @@ void createHeaderUDP(struct videoClient* videoClient) {
     env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
 	
+	//Taille
+	fseek(env->curFile, 0, SEEK_END);
+	env->fileSize = ftell(env->curFile);
+	fseek(env->curFile, 0, SEEK_SET);
+
+	
 	if(env->fileSize - env->posDansImage*env->tailleMaxFragment < env->tailleMaxFragment) {
 	    env->tailleFragment = env->fileSize - env->posDansImage*env->tailleMaxFragment;
 	} else {
@@ -199,7 +205,8 @@ void createHeaderUDP(struct videoClient* videoClient) {
 	env->state = SENDING_HEADER;
 	env->bufLen = strlen(env->buffer);
 	env->more = 1;
-
+	printf(" buffer %s\n",env->buffer);
+	printf(" socket %d\n",videoClient->clientSocket);
 	puts("header cree");
 }
 
