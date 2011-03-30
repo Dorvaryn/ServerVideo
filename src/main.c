@@ -184,8 +184,8 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 									}
 								}
 								initReq(&(tabClientsUDP.clients[tabClientsUDP.nbClients].requete));
-								memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr,0,sizeof(struct sockaddr));
-								memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr, &faddr, sizeof(struct sockaddr));
+								memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr,0,sizeof(struct sockaddr_in));
+								memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr, &faddr, sizeof(struct sockaddr_in));
 								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.clientSocket = tabFluxUDP->socksData[i];
 								printf(" sockData: %d\n",tabFluxUDP->socksData[i]);
 								tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.infosVideo = &tabFluxUDP->infosVideos[i];

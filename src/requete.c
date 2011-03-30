@@ -56,8 +56,9 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				
 				//videoClient->clientSocket = initDataUDP(epollfd, sock, req->listenPort, UDP_PULL);
 				
-				memset(&videoClient->dest_addr,0,sizeof(struct sockaddr));
-				memcpy(&videoClient->dest_addr, &videoClient->orig_addr, sizeof(struct sockaddr));
+				memset(&videoClient->dest_addr,0,sizeof(&videoClient->dest_addr));
+				memcpy(&videoClient->dest_addr, &videoClient->orig_addr, sizeof(&videoClient->orig_addr));
+				
 				videoClient->dest_addr.sin_port = htons(req->listenPort);
 				
 				videoClient->envoi = malloc(sizeof(struct envoi));
