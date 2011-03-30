@@ -9,7 +9,7 @@ void send_get_answer(int fd, char * catalogue)
 	printf("send : %s\n", strerror(errno));
 }
 
-int createSockEvent(int epollfd, int port)
+int createSockEventTCP(int epollfd, int port)
 {
 	int sock = socket(AF_INET, SOCK_STREAM, 0); //Version portable des sockets non bloquants
 	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
@@ -31,7 +31,38 @@ int createSockEvent(int epollfd, int port)
 	printf("listen : %s\n", strerror(errno));
 
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 
+	ev.events = EPOLLIN | EPOLLET;
+	ev.data.fd = sock;
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
+
+	return sock;
+}
+
+int createSockEventUDP(int epollfd, int port)
+{
+	int sock = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
+	FAIL(sock);
+	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
+	FAIL(flags);
+	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
+
+	printf("socket : %s\n", strerror(errno));
+
+	struct sockaddr_in saddr;
+
+	saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+	saddr.sin_family = AF_INET;
+	saddr.sin_port = htons(port);
+
+	bind(sock, (struct sockaddr *)&saddr, sizeof(saddr));
+	printf("bind : %s\n", strerror(errno));
+
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
+
+	printf("socket : %d\n",sock);
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
@@ -43,6 +74,7 @@ int createSockClientEvent(int epollfd, int sock)
 {
 	int csock;
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	struct sockaddr_in saddr_client;
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
@@ -70,39 +102,39 @@ int createSockClientEvent(int epollfd, int sock)
 	return csock;
 }
 
-void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante)
+void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante, int type)
 {
-	if (tabFichiers->nbFichiers >= *baseFichierCourante)
+	if (tabFlux->nbFlux >= *baseFichierCourante)
 	{
 		*baseFichierCourante *=2;
-		int * temp;
-		temp = (int *) realloc(tabFichiers->socks,
-				*baseFichierCourante*sizeof(int));
-		struct infosVideo * temp2;
-		temp2 = (struct infosVideo *) realloc(tabFichiers->infosVideos,
-				*baseFichierCourante*sizeof(struct infosVideo));
-		if (temp!=NULL && temp2!=NULL) 
+		struct flux * temp;
+		temp = (struct flux *) realloc(tabFlux->flux,
+				*baseFichierCourante*sizeof(struct flux));
+		
+		if (temp!=NULL) 
 		{
-			tabFichiers->socks = temp;
-			tabFichiers->infosVideos = temp2;
+			tabFlux->flux = temp;
 		}
 		else 
 		{
-			free (tabFichiers->socks);
-			free (tabFichiers->infosVideos);
+			free (tabFlux->flux);
 			puts ("Error (re)allocating memory");
 			exit (1);
 		}
 	}
-	tabFichiers->socks[tabFichiers->nbFichiers] = createSockEvent(epollfd,port);
-	tabFichiers->infosVideos[tabFichiers->nbFichiers].nbImages = 0;
-	tabFichiers->infosVideos[tabFichiers->nbFichiers].images = (char **)malloc(BASE_IMAGES*sizeof(char*));
+	if( type == TCP_PULL || type == TCP_PUSH )
+	{
+		tabFlux->flux[tabFlux->nbFlux].sock = createSockEventTCP(epollfd,port);
+	}
+	tabFlux->flux[tabFlux->nbFlux].port = port;
+	tabFlux->flux[tabFlux->nbFlux].infosVideo.nbImages = 0;
+	tabFlux->flux[tabFlux->nbFlux].infosVideo.images = (char **)malloc(BASE_IMAGES*sizeof(char*));
 	int k;
 	for (k = 0; k < BASE_IMAGES; k++)
 	{
-		tabFichiers->infosVideos[tabFichiers->nbFichiers].images[k] = (char *)malloc(512*sizeof(char));
+		tabFlux->flux[tabFlux->nbFlux].infosVideo.images[k] = (char *)malloc(512*sizeof(char));
 	}
-	tabFichiers->nbFichiers++;
+	tabFlux->nbFlux++;
 }
 
 void addImage(char * uneImage, struct infosVideo * infos)
@@ -113,7 +145,7 @@ void addImage(char * uneImage, struct infosVideo * infos)
 	infos->nbImages++;
 }
 
-void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock, int * baseCourante, int isGet)
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux * tabFlux, int sock, int * baseCourante, int isGet)
 {
 	if (tabClients->nbClients >= *baseCourante)
 	{
@@ -139,11 +171,11 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 	
 	int done = 0;
 	int i = 0;
-	while((done == 0) && (i < tabFichiers->nbFichiers))
+	while((done == 0) && (i < tabFlux->nbFlux))
 	{
-		if(tabFichiers->socks[i] == sock)
+		if(tabFlux->flux[i].sock == sock)
 		{
-			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFichiers->infosVideos[i];
+			tabClients->clients[tabClients->nbClients].videoClient.infosVideo = &tabFlux->flux[i].infosVideo;
 			done = 1;
 		}
 		i++;
@@ -154,6 +186,7 @@ void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichie
 void createEventPull(int epollfd, int csock)
 {
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	ev.events = EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
@@ -162,51 +195,22 @@ void createEventPull(int epollfd, int csock)
 void createEventPush(int epollfd, int csock)
 {
 	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
 	ev.events = EPOLLOUT;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
 }
 
-/*int initDataUDP(int epollfd, int sock, int port, int type)
-{
-	struct sockaddr_in addr, saddr;	
-	int csock;
-	socklen_t len;
-	getsockname(sock, (struct sockaddr*)&addr, &len);
-	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
-	saddr.sin_family = AF_INET;
-	saddr.sin_port = htons(port);
-	
-#if defined ( NEW )
-	csock = socket(AF_INET, SOCK_DGRAM | SOCK_NONBLOCK,0); //socket NONBLOCK plus performant 
-#endif // NEW
-	
-#if defined ( OLD )
-	csock = socket(AF_INET, SOCK_DGRAM, 0);
-	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
-	FAIL(flags);
-	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
-#endif // OLD
-	
-	if(type == UDP_PULL)
-	{
-		createEventPull(epollfd, csock);
-	}
-	else if(type == UDP_PUSH)
-	{
-		createEventPush(epollfd, csock);
-	}
-
-    return csock;	
-}*/
 
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
-	struct sockaddr_in addr, saddr;	
+	struct sockaddr_in addr, saddr;
+	memset(&addr, 0, sizeof(struct sockaddr_in));
 	int csock;
 	socklen_t len;
+	memset(&len, 0, sizeof(socklen_t));
 	getsockname(sock, (struct sockaddr*)&addr, &len);
-	saddr.sin_addr.s_addr = inet_addr(inet_ntoa(addr.sin_addr));
+	saddr.sin_addr.s_addr = addr.sin_addr.s_addr;
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
 	

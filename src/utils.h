@@ -76,7 +76,6 @@ struct requete {
     
     int reqPosition; //position du mot dans la requete
 };
-
 struct videoClient {
 	
 	int clientSocket;
@@ -86,6 +85,9 @@ struct videoClient {
     int id; //Image courante
     double dernierEnvoi; //pour gérer les ips
     double lastAlive;
+    
+    struct sockaddr_in dest_addr;
+    struct sockaddr_in orig_addr;
     
     struct envoi* envoi;
     struct infosVideo* infosVideo;
@@ -100,27 +102,35 @@ struct tabClients {
 	int nbClients;
 	struct sockClient * clients;
 };
-struct tabFichiers {
-	int nbFichiers;
-	int * socks;
-	struct infosVideo * infosVideos;
+struct flux {
+	int sock;
+	int port;
+	struct infosVideo infosVideo;
+};
+struct tabFlux {
+	int nbFlux;
+	struct flux * flux;
 };
 
 void initReq(struct requete* req);
 
 void send_get_answer(int fd, char * catalogue);
 
-int createSockEvent(int epollfd, int port);
+int createSockEventTCP(int epollfd, int port);
+
+int createSockEventUDP(int epollfd, int port);
 
 int createSockClientEvent(int epollfd, int sock);
 
-void createFichier(int epollfd, struct tabFichiers * tabFichiers, int port, int * baseFichierCourante);
+void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFichierCourante, int type);
 
 void addImage(char * uneImage, struct infosVideo * infos);
 
-void connectClient(int epollfd, struct tabClients * tabClients, struct tabFichiers * tabFichiers, int sock , int * baseCourante, int isGet);
+void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux * tabFlux, int sock , int * baseCourante, int isGet);
 
-//int initDataUDP(int epollfd, int sock, int port, int type);
+void createEventPush(int epoll, int csock);
+
+void createEventPull(int epoll, int csock);
 
 int connectDataTCP(int epollfd, int sock, int port, int type);
 #endif // UTILS_H_

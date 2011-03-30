@@ -31,7 +31,7 @@ char * build_http_header(char * type, int size)
 	return header;
 }
 
-char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
+char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux * tabFluxUDP)
 {
 
 	char * buff = (char *)malloc(MAX_CATA*sizeof(char));
@@ -42,7 +42,8 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 	printf("fopen : %s\n", strerror(errno));
 
 	int i;
-	int baseFichierCourante = BASE_FICHIERS;
+	int baseFluxTCPCourante = BASE_FICHIERS;
+	int baseFluxUDPCourante = BASE_FICHIERS;
 	char * temp = (char *)malloc(512*sizeof(char));
 	char * temp2 = (char *)malloc(512*sizeof(char));
 
@@ -90,10 +91,13 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 
 		int j = 0;
 		char * tmp = (char *)malloc(512*sizeof(char));
+		memset(tmp, 0, 512);
 		char  * tmp2 = (char *)malloc(512*sizeof(char));
+		memset(tmp2, 0, 512);
 		fgets(tmp,512,g);
 		printf("fgets : %s\n", strerror(errno));
-
+		int port;
+		int typeCourant;
 		while (!feof(g))
 		{
 			strncpy(tmp2,tmp,strlen(tmp)-2);
@@ -104,14 +108,14 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 				if (j == 4)
 				{
 					int k;
-					int created = 0;
+					int parsed = 0;
 					for (k = 0; k < strlen(tmp2); k++)
 					{
-						if ((isdigit(tmp2[k]) != 0) && (created != 1) )
+						if ((isdigit(tmp2[k]) != 0) && (parsed != 1) )
 						{
 							printf("%s : %d\n",tmp2+k,atoi(tmp+k));
-							createFichier(epollfd, tabFichiers, atoi(tmp2+k), &baseFichierCourante);
-							created = 1;
+						    port = atoi(tmp2+k);
+							parsed = 1;	
 						}
 					}
 				}
@@ -121,26 +125,41 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 					sscanf(tmp2,"%*9s%s",protocole);
 					if(strcmp(protocole,"TCP_PULL") == 0)
 					{
-						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PULL;
+						typeCourant = 0;
+						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, TCP_PULL);
+						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.type = TCP_PULL;
 					}
 					else if(strcmp(protocole,"TCP_PUSH") == 0)
 					{
-						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = TCP_PUSH;
+						typeCourant = 0;
+						createFichier(epollfd, tabFluxTCP, port, &baseFluxTCPCourante, TCP_PUSH);
+						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.type = TCP_PUSH;
 					}
 					else if(strcmp(protocole,"UDP_PULL") == 0)
 					{
-						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PULL;
+						typeCourant = 1;
+						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PULL);
+						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.type = UDP_PULL;
 					}
 					else if(strcmp(protocole,"UDP_PUSH") == 0)
 					{
-						tabFichiers->infosVideos[tabFichiers->nbFichiers-1].type = UDP_PUSH;
+						typeCourant = 1;
+						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PUSH);
+						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.type = UDP_PUSH;
 					}
 				}	
 				else if (j == 6)
 				{
 					char fps[512];
 					sscanf(tmp2,"%*4s%s",fps);
-					tabFichiers->infosVideos[tabFichiers->nbFichiers-1].fps = atof(fps);
+					if(typeCourant == 0)
+					{
+						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.fps = atof(fps);
+					}
+					else
+					{
+						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.fps = atof(fps);
+					}
 				}
 				strcat(buff,tmp2);
 				strcat(buff," ");
@@ -150,7 +169,14 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 			{
 				char image[512];
 				sprintf(image, "%s%s", "./data/",tmp2);
-				addImage(image, &tabFichiers->infosVideos[tabFichiers->nbFichiers-1]);
+				if(typeCourant == 0)
+				{
+					addImage(image, &tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo);
+				}
+				else
+				{
+					addImage(image, &tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo);
+				}
 			}
 			int l2 = strlen(tmp2);
 			for(i=0;i<l2;i++)
@@ -172,6 +198,9 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 		fclose(g);
 		fgets(temp,512,f);
 		printf("fgets : %s\n", strerror(errno));
+		
+		free(tmp);
+        free(tmp2);
 
 	}while(!feof(f));
 	strcat(buff,"\r\n");
@@ -187,6 +216,8 @@ char * buildCatalogue (int epollfd, struct tabFichiers * tabFichiers)
 	strcpy(buff2, header);
 	strcat(buff2, buff);
 
+    free(temp);
+    free(temp2);
 	free(buff);
 	free(header);
 

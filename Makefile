@@ -14,7 +14,7 @@ RMFLAGS=-f
 EXE=ServerVideo
 LIBS=
 EFFACE=clean
-OBJ=$(BUILDDIR)utils.o $(BUILDDIR)requete.o $(BUILDDIR)cata.o $(BUILDDIR)envoi.o
+OBJ=$(BUILDDIR)utils.o $(BUILDDIR)requete.o $(BUILDDIR)cata.o $(BUILDDIR)envoi.o $(BUILDDIR)udp_pull.o $(BUILDDIR)udp_push.o
 
 $(EXE) : $(OBJ) $(BUILDDIR)main.o
 	$(EDL) $(LDFLAGS) -o $(EXE) $(OBJ) $(LIBS) $(BUILDDIR)main.o

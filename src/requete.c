@@ -56,6 +56,11 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				
 				//videoClient->clientSocket = initDataUDP(epollfd, sock, req->listenPort, UDP_PULL);
 				
+				memset(&videoClient->dest_addr,0,sizeof(&videoClient->dest_addr));
+				memcpy(&videoClient->dest_addr, &videoClient->orig_addr, sizeof(&videoClient->orig_addr));
+				
+				videoClient->dest_addr.sin_port = htons(req->listenPort);
+				
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
@@ -65,7 +70,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				fseek(videoClient->envoi->curFile, 0, SEEK_END);
 	            videoClient->envoi->fileSize = ftell(videoClient->envoi->curFile);
 	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
-				
+				printf("socket : %d\n",videoClient->clientSocket);	
 				videoClient->envoi->posDansImage = 0;
 				videoClient->envoi->tailleMaxFragment = req->fragmentSize;
 				
@@ -79,19 +84,28 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				printf("socket du client : %d\n", videoClient->clientSocket);
 
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				videoClient->etat = RUNNING;
+				if(videoClient->infosVideo->type == TCP_PUSH)
+				{
+					videoClient->etat = RUNNING;
+					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r");
+					if(videoClient->envoi->curFile == NULL)
+					{
+						puts("E: ouverture du fichier");
+					}
+				}
+				else
+				{
+					videoClient->etat = PAUSE;
+				}
 				videoClient->dernierEnvoi = getTime();
 				videoClient->envoi->state = NOTHING_SENT;
-				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r");
-				if(videoClient->envoi->curFile == NULL) {
-					puts("E: ouverture du fichier");
-				}
-				videoClient->id = 1;
+				videoClient->id = 0;
 				puts("VIDEO OKok !");
 
 
 			} else {
 				printf("GET id:%d\n", req->imgId);
+				videoClient->etat = RUNNING;
 
 				if (req->imgId == -1)
 				{	
@@ -137,6 +151,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 		case END:
 			printf("END\n");
 			struct epoll_event ev;
+			memset(&ev, 0, sizeof(struct epoll_event));
 			ev.events = 0;
 			ev.data.fd = videoClient->clientSocket;
 			FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
