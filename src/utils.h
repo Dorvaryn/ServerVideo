@@ -102,11 +102,14 @@ struct tabClients {
 	int nbClients;
 	struct sockClient * clients;
 };
+struct flux {
+	int sock;
+	int port;
+	struct infosVideo infosVideo;
+};
 struct tabFlux {
 	int nbFlux;
-	int * socks;
-	int * socksData;
-	struct infosVideo * infosVideos;
+	struct flux * flux;
 };
 
 void initReq(struct requete* req);
