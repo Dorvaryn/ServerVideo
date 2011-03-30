@@ -78,7 +78,8 @@ void sendImage(struct videoClient* videoClient) {
 		{
 			while(env->state != IMAGE_SENT)
 			{
-				if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
+				if((env->state == NOTHING_SENT || env->state == FRAGMENT_SENT)
+					&& timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
 				{
 					videoClient->dernierEnvoi = getTime();
 					createHeaderUDP(videoClient);
