@@ -1,8 +1,8 @@
 ServerAddress: 127.0.0.1
 ServerPort: 8081
 flux1.txt
+flux3.txt
 flux4.txt
 flux5.txt
 flux6.txt
 flux8.txt
-flux9.txt

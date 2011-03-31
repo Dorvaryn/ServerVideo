@@ -172,6 +172,13 @@ int main(int argc, char ** argv)
     pthread_detach(thread);
 
 	int i;
+	//Lancement des flux multicast
+	for(i = 0; i < tabFluxMCAST.nbFlux; i++) {
+        pthread_t thread;
+	    pthread_create(&thread, NULL, multiFlux, (void*)&tabFluxMCAST.flux[i]);
+        pthread_detach(thread);
+    }
+
 	for(i = 0; i < tabFluxUDP.nbFlux; i++)
 	{
 		if(tabFluxUDP.flux[i].infosVideo.type == UDP_PULL)
@@ -190,12 +197,6 @@ int main(int argc, char ** argv)
 		}
 	}
 	
-	//Lancement des flux multicast
-	/*for(i = 0; i < tabFluxMutlicast.nbFlux; i++) {
-        pthread_t thread;
-	    pthread_create(&thread, NULL, multiFlux, (void*)tabFluxMutlicast.flux[i]);
-        pthread_detach(thread);
-    }*/
 		
 	central(epollfd, &tabFluxTCP, &tabFluxUDP);
 

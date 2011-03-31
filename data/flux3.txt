@@ -4,7 +4,7 @@ Type=BMP
 Address=225.100.110.12
 Port=8082 
 Protocol=MCAST_PUSH
-IPS=0.5
+IPS=2
 Images/img1.bmp
 Images/img2.bmp
 Images/img3.bmp
