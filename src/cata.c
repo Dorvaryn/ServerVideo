@@ -99,6 +99,8 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 		fgets(tmp,512,g);
 		printf("fgets : %s\n", strerror(errno));
 		int port;
+		char * adresse = (char *)malloc(512*sizeof(char));
+		memset(adresse, '\0', 512*sizeof(char));
 		int typeCourant;
 		while (!feof(g))
 		{
@@ -107,18 +109,16 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 			
 			if (j < 7)
 			{
-				if (j == 4)
+				if (j == 3)
+				{
+						sscanf(tmp2,"%*8s%s",adresse);
+				}
+				else if (j == 4)
 				{
 					int k;
-					int parsed = 0;
 					for (k = 0; k < strlen(tmp2); k++)
 					{
-						if ((isdigit(tmp2[k]) != 0) && (parsed != 1) )
-						{
-							printf("%s : %d\n",tmp2+k,atoi(tmp+k));
-						    port = atoi(tmp2+k);
-							parsed = 1;	
-						}
+						sscanf(tmp2,"%*5s%d",&port);
 					}
 				}
 				else if (j == 5)
@@ -153,7 +153,10 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 					{
 						typeCourant = 2;
 						createFichier(epollfd, tabFluxMCAST, port, &baseFluxMCASTCourante, MCAST_PUSH);
-						tabFluxMCAST->flux[tabFluxUDP->nbFlux-1].infosVideo.type = MCAST_PUSH;
+						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].infosVideo.type = MCAST_PUSH;
+						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse = (char *)malloc(512*sizeof(char));
+						memset(tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse, '\0', 512*sizeof(char));
+						strcpy(tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse,adresse);
 					}
 				}	
 				else if (j == 6)

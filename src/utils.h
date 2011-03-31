@@ -106,6 +106,7 @@ struct tabClients {
 struct flux {
 	int sock;
 	int port;
+	char * adresse;
 	struct infosVideo infosVideo;
 };
 struct tabFlux {

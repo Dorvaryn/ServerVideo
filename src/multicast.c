@@ -1,7 +1,7 @@
 #include "multicast.h"
 #include "envoi.h"
 
-#define FRAGMENT_SIZE 728
+#define FRAGMENT_SIZE 512
 
 void* multiCatalogue(void* args) {
 	//Créer le socket multicast et envoyer le catalogue tous les x secondes
@@ -19,10 +19,11 @@ void* multiFlux(void* leflux) {
 	struct videoClient * video = (struct videoClient *)malloc(sizeof(struct videoClient));
 	memset(video, 0, sizeof(video));
    	video->clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	video->infosVideo = &flux->infosVideo;
 
 	memset(&video->dest_addr,0,sizeof(&video->dest_addr));
-	memcpy(&video->dest_addr, &video->orig_addr, sizeof(&video->orig_addr));
-
+	video->dest_addr.sin_family = AF_INET;
+	video->dest_addr.sin_addr.s_addr = inet_addr(flux->adresse);
 	video->dest_addr.sin_port = htons(flux->port);
 
 	video->envoi = (struct envoi *)malloc(sizeof(struct envoi));
