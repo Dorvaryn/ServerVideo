@@ -5,7 +5,9 @@
 
 void* multiCatalogue(void* args) {
 	//Créer le socket multicast et envoyer le catalogue tous les x secondes
-
+	while(1)
+	{
+	}
 
 	return NULL;
 }
