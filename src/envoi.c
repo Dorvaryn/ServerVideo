@@ -37,7 +37,7 @@ void sendImage(struct videoClient* videoClient) {
 				sendTCP(videoClient);
 			}
 		}
-		else if(videoClient->infosVideo->type == TCP_PUSH )
+		else if(videoClient->infosVideo->type == TCP_PUSH || videoClient->infosVideo->type == MCAST_PUSH )
 			{
 				if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) 
 				{

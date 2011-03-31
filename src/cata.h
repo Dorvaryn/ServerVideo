@@ -23,6 +23,6 @@ char * build_date();
 
 char * build_http_header(char * type, int size);
 
-char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux * tabFluxUDP);
+char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux * tabFluxUDP, struct tabFlux * tabFluxMCAST);
 
 #endif // CATA_H_

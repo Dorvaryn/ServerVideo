@@ -3,6 +3,6 @@
 
 void* multiCatalogue(void* args);
 
-void* multiFlux(void* args);
+void* multiFlux(void* leflux);
 
 #endif

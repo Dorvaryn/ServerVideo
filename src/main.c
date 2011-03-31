@@ -156,11 +156,15 @@ int main(int argc, char ** argv)
 	struct tabFlux tabFluxUDP;
 	tabFluxUDP.nbFlux = 0;
 	tabFluxUDP.flux = (struct flux *)malloc(BASE_FICHIERS*sizeof(struct flux));
+	
+	struct tabFlux tabFluxMCAST;
+	tabFluxMCAST.nbFlux = 0;
+	tabFluxMCAST.flux = (struct flux *)malloc(BASE_FICHIERS*sizeof(struct flux));
 
 	int baseFichiersCourante = BASE_FICHIERS;
 	createFichier(epollfd, &tabFluxTCP, 8081, &baseFichiersCourante, 0);
 
-	catalogue = buildCatalogue(epollfd, &tabFluxTCP, &tabFluxUDP);
+	catalogue = buildCatalogue(epollfd, &tabFluxTCP, &tabFluxUDP, &tabFluxMCAST);
 
     //Lancement du multicast catalogue
     pthread_t thread;

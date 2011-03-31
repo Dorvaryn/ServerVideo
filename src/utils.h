@@ -22,6 +22,7 @@
 #define TCP_PUSH 1
 #define UDP_PULL 2
 #define UDP_PUSH 3
+#define MCAST_PUSH 4
 
 //Type de requete
 #define BAD_REQUEST (-2)
