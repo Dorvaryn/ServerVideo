@@ -14,11 +14,11 @@ void* multiCatalogue(void* args) {
 
 void* multiFlux(void* leflux) {
 	//Créer le socket multicast et diffuser le flux
-	
+
 	struct flux * flux = (struct flux *) leflux;
 	struct videoClient * video = (struct videoClient *)malloc(sizeof(struct videoClient));
 	memset(video, 0, sizeof(video));
-   	video->clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	video->clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
 	video->infosVideo = &flux->infosVideo;
 
 	memset(&video->dest_addr,0,sizeof(&video->dest_addr));
@@ -40,11 +40,12 @@ void* multiFlux(void* leflux) {
 	video->envoi->tailleMaxFragment = FRAGMENT_SIZE - 128;
 
 	video->id = 1;
-	
+
+	printf("fps: %f\n",flux->infosVideo.fps);
 	while(1)
 	{
 		sendImage(video);
-		usleep(flux->infosVideo.fps*1000000);
+		usleep((1.0/flux->infosVideo.fps)*1000000);
 	}
 
 	return NULL;

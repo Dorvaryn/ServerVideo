@@ -52,6 +52,9 @@
 #define FAIL_FATAL(x) if(x == -1) {\
 	perror(#x);exit(EXIT_FAILURE);}
 
+#define FAIL_NULL(x) if(x != 0) {\
+	perror(#x);}
+
 struct infosVideo {
 	char type;
 	double fps;
