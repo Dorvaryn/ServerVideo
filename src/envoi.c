@@ -151,9 +151,12 @@ void sendTCP(struct videoClient* videoClient)
 
 		nbSent = send(videoClient->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
 		FAIL(nbSent);
-
-		env->buffer += nbSent;
-		env->bufLen -= nbSent;
+		
+		if( nbSent > 0 )
+		{
+			env->buffer += nbSent;
+			env->bufLen -= nbSent;
+		}
 
 		printf("car envoyes : %d/%d\n", nbSent, env->bufLen);
 
