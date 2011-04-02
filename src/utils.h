@@ -13,6 +13,7 @@
 #include <unistd.h> //Pour STDIN_FILENO
 #include <fcntl.h> // Pour déclarer non bloquant
 #include <sys/utsname.h> //Pour connaitre version noyau
+#include <sys/time.h>
 
 //Maximum d'un mot dans les requetes du client
 #define MAX_TOCKEN 256
@@ -116,6 +117,10 @@ struct tabFlux {
 	int nbFlux;
 	struct flux * flux;
 };
+
+//Gestion du temps
+double getTime();
+double timeInterval(double t1, double t2);
 
 void initReq(struct requete* req);
 
