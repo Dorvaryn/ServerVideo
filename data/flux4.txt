@@ -1,7 +1,7 @@
 ID=4
 Name=video4
 Type=BMP
-Address=127.0.0.1
+Address=192.164.1.44
 Port=8083
 Protocol=UDP_PUSH
 IPS=1

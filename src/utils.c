@@ -217,6 +217,7 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 #endif // OLD
+	FAIL(csock);
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
 	FAIL(connect(csock, (struct sockaddr *)&saddr, size_addr));

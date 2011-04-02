@@ -150,7 +150,7 @@ void sendTCP(struct videoClient* videoClient)
 		printf("socket du client : %d\n", videoClient->clientSocket);
 
 		nbSent = send(videoClient->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
-		FAIL(nbSent);
+		FAIL_FATAL(nbSent);
 		
 		if( nbSent > 0 )
 		{

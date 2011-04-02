@@ -1,7 +1,7 @@
 ID=8
 Name=video8
 Type=BMP
-Address=127.0.0.1
+Address=192.164.1.44
 Port=8089
 Protocol=TCP_PULL
 IPS=3
