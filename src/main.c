@@ -172,12 +172,12 @@ int main(int argc, char ** argv)
     pthread_detach(thread);
 
 	int i;
-	//Lancement des flux multicast
+	/*//Lancement des flux multicast
 	for(i = 0; i < tabFluxMCAST.nbFlux; i++) {
         pthread_t thread;
 	    pthread_create(&thread, NULL, multiFlux, (void*)&tabFluxMCAST.flux[i]);
         pthread_detach(thread);
-    }
+    }*/
 
 	for(i = 0; i < tabFluxUDP.nbFlux; i++)
 	{
