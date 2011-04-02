@@ -42,12 +42,13 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		FAIL(nfds);
-		//puts("working ...");
-		
+		puts("working ...");
+	  
 		int n;
 
 		for (n = 0; n < nfds; ++n)
 		{
+			printf("Event : %d\n", events[n].events);	
 			if (events[n].events != (EPOLLOUT))
 			{	
 				printf("event : %d : fd : %d\n",events[n].events,events[n].data.fd);

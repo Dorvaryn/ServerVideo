@@ -33,6 +33,8 @@ int createSockEventTCP(int epollfd, int port)
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
+	
+	puts("epolladd");
 
 	return sock;
 }
@@ -60,6 +62,8 @@ int createSockEventUDP(int epollfd, int port)
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
+	
+	puts("epolladd");
 
 	return sock;
 }
@@ -91,6 +95,7 @@ int createSockClientEvent(int epollfd, int sock)
 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
+	puts("epolladd");
 
 	return csock;
 }
