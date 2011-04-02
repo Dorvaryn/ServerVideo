@@ -37,7 +37,7 @@ void sendImage(struct videoClient* videoClient) {
 				sendTCP(videoClient);
 			}
 		}
-		else if(videoClient->infosVideo->type == TCP_PUSH )
+		else if(videoClient->infosVideo->type == TCP_PUSH)
 			{
 				if(env->state == NOTHING_SENT && timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps) 
 				{
@@ -74,7 +74,7 @@ void sendImage(struct videoClient* videoClient) {
 				}
 			}
 		}
-		else if(videoClient->infosVideo->type == UDP_PUSH) 
+		else if(videoClient->infosVideo->type == UDP_PUSH || videoClient->infosVideo->type == MCAST_PUSH)  
 		{
 		    if(timeInterval(videoClient->dernierEnvoi, getTime()) >= 1.0/videoClient->infosVideo->fps)
 		    {
@@ -151,9 +151,12 @@ void sendTCP(struct videoClient* videoClient)
 
 		nbSent = send(videoClient->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
 		FAIL(nbSent);
-
-		env->buffer += nbSent;
-		env->bufLen -= nbSent;
+		
+		if( nbSent > 0 )
+		{
+			env->buffer += nbSent;
+			env->bufLen -= nbSent;
+		}
 
 		printf("car envoyes : %d/%d\n", nbSent, env->bufLen);
 
@@ -201,9 +204,10 @@ void createHeaderUDP(struct videoClient* videoClient) {
 	env->originBuffer = env->buffer;
 
 	//Taille
-	fseek(env->curFile, 0, SEEK_END);
+	FAIL_NULL(fseek(env->curFile, 0, SEEK_END));
 	env->fileSize = ftell(env->curFile);
-	fseek(env->curFile, 0, SEEK_SET);
+	FAIL(env->fileSize);
+	FAIL_NULL(fseek(env->curFile, 0, SEEK_SET));
 
 
 	if(env->fileSize - env->posDansImage < env->tailleMaxFragment) {
@@ -249,8 +253,11 @@ void sendUDP(struct videoClient* videoClient) {
 				(struct sockaddr*)&videoClient->dest_addr, sizeof(struct sockaddr));
 		FAIL(nbSent);
 
-		env->buffer += nbSent;
-		env->bufLen -= nbSent;
+		if( nbSent > 0)
+		{
+			env->buffer += nbSent;
+			env->bufLen -= nbSent;
+		}
 
 	} while (env->bufLen > 0);
 
@@ -265,10 +272,9 @@ void sendUDP(struct videoClient* videoClient) {
 				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
-				if(videoClient->infosVideo->type == UDP_PUSH)
+				if(videoClient->infosVideo->type == UDP_PUSH || videoClient->infosVideo->type == MCAST_PUSH)
 				{
 					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
-					videoClient->envoi->state = IMAGE_SENT;
 					env->posDansImage = 0;
 					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
 					if(videoClient->envoi->curFile == NULL)

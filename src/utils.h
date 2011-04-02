@@ -22,6 +22,7 @@
 #define TCP_PUSH 1
 #define UDP_PULL 2
 #define UDP_PUSH 3
+#define MCAST_PUSH 4
 
 //Type de requete
 #define BAD_REQUEST (-2)
@@ -50,6 +51,9 @@
 
 #define FAIL_FATAL(x) if(x == -1) {\
 	perror(#x);exit(EXIT_FAILURE);}
+
+#define FAIL_NULL(x) if(x != 0) {\
+	perror(#x);}
 
 struct infosVideo {
 	char type;
@@ -105,6 +109,7 @@ struct tabClients {
 struct flux {
 	int sock;
 	int port;
+	char * adresse;
 	struct infosVideo infosVideo;
 };
 struct tabFlux {

@@ -31,7 +31,7 @@ char * build_http_header(char * type, int size)
 	return header;
 }
 
-char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux * tabFluxUDP)
+char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux * tabFluxUDP, struct tabFlux * tabFluxMCAST)
 {
 
 	char * buff = (char *)malloc(MAX_CATA*sizeof(char));
@@ -44,6 +44,8 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 	int i;
 	int baseFluxTCPCourante = BASE_FICHIERS;
 	int baseFluxUDPCourante = BASE_FICHIERS;
+	int baseFluxMCASTCourante = BASE_FICHIERS;
+
 	char * temp = (char *)malloc(512*sizeof(char));
 	char * temp2 = (char *)malloc(512*sizeof(char));
 
@@ -97,6 +99,8 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 		fgets(tmp,512,g);
 		printf("fgets : %s\n", strerror(errno));
 		int port;
+		char * adresse = (char *)malloc(512*sizeof(char));
+		memset(adresse, '\0', 512*sizeof(char));
 		int typeCourant;
 		while (!feof(g))
 		{
@@ -105,18 +109,16 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 			
 			if (j < 7)
 			{
-				if (j == 4)
+				if (j == 3)
+				{
+						sscanf(tmp2,"%*8s%s",adresse);
+				}
+				else if (j == 4)
 				{
 					int k;
-					int parsed = 0;
 					for (k = 0; k < strlen(tmp2); k++)
 					{
-						if ((isdigit(tmp2[k]) != 0) && (parsed != 1) )
-						{
-							printf("%s : %d\n",tmp2+k,atoi(tmp+k));
-						    port = atoi(tmp2+k);
-							parsed = 1;	
-						}
+						sscanf(tmp2,"%*5s%d",&port);
 					}
 				}
 				else if (j == 5)
@@ -147,6 +149,15 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 						createFichier(epollfd, tabFluxUDP, port, &baseFluxUDPCourante, UDP_PUSH);
 						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.type = UDP_PUSH;
 					}
+					else if(strcmp(protocole,"MCAST_PUSH") == 0)
+					{
+						typeCourant = 2;
+						createFichier(epollfd, tabFluxMCAST, port, &baseFluxMCASTCourante, MCAST_PUSH);
+						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].infosVideo.type = MCAST_PUSH;
+						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse = (char *)malloc(512*sizeof(char));
+						memset(tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse, '\0', 512*sizeof(char));
+						strcpy(tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse,adresse);
+					}
 				}	
 				else if (j == 6)
 				{
@@ -156,9 +167,13 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 					{
 						tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo.fps = atof(fps);
 					}
-					else
+					else if(typeCourant == 1)
 					{
 						tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo.fps = atof(fps);
+					}
+					else
+					{
+						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].infosVideo.fps = atof(fps);
 					}
 				}
 				strcat(buff,tmp2);
@@ -173,9 +188,13 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 				{
 					addImage(image, &tabFluxTCP->flux[tabFluxTCP->nbFlux-1].infosVideo);
 				}
-				else
+				else if(typeCourant == 1)
 				{
 					addImage(image, &tabFluxUDP->flux[tabFluxUDP->nbFlux-1].infosVideo);
+				}
+				else
+				{
+					addImage(image, &tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].infosVideo);
 				}
 			}
 			int l2 = strlen(tmp2);

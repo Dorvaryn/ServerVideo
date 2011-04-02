@@ -54,8 +54,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			{
 				printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
 				
-				//videoClient->clientSocket = initDataUDP(epollfd, sock, req->listenPort, UDP_PULL);
-				
 				memset(&videoClient->dest_addr,0,sizeof(&videoClient->dest_addr));
 				memcpy(&videoClient->dest_addr, &videoClient->orig_addr, sizeof(&videoClient->orig_addr));
 				

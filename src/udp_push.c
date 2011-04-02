@@ -11,11 +11,6 @@ void* udp_push(void * leflux)
 	epollfd = epoll_create(10);
 	FAIL(epollfd);
 
-	/*//Ajout à epoll de l'entrée standard
-	  ev.events = EPOLLIN;
-	  ev.data.fd = STDIN_FILENO;
-	  FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, STDIN_FILENO, &ev));*/
-
 	struct tabClients tabClientsUDP;
 	tabClientsUDP.clients =
 		(struct sockClient *)malloc(BASE_CLIENTS*sizeof(struct sockClient));
