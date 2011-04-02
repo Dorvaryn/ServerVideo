@@ -238,3 +238,14 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 
     return csock;	
 }
+
+void decoClient(struct videoClient * videoClient, int epollfd)
+{
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
+	ev.events = 0;
+	ev.data.fd = videoClient->clientSocket;
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
+	
+	close(videoClient->clientSocket);
+}
