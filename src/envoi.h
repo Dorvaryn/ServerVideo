@@ -4,7 +4,6 @@
 #include <string.h>
 #include <stdlib.h>
 #include <sys/socket.h>
-#include <sys/time.h>
 
 #include "requete.h"
 
@@ -32,10 +31,6 @@ struct envoi {
     FILE* curFile;
     int fileSize;
 };
-
-double getTime();
-
-double timeInterval(double t1, double t2);
 
 void sendImage(struct videoClient* videoClient);
 

@@ -2,6 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+double getTime() {
+	struct timeval timev;
+
+	gettimeofday(&timev, NULL);
+	double micro = (double)timev.tv_usec;
+	double sec = (double)timev.tv_sec;
+
+	return sec + micro/1000000;
+}
+
+double timeInterval(double t1, double t2) {
+    return (t1 < t2 ? t2-t1 : t2); //Evite le bug de minuit :)
+}
+
 void send_get_answer(int fd, char * catalogue)
 {
 	puts("Going to send");

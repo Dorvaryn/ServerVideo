@@ -45,6 +45,9 @@ void initReq(struct requete* req) {
 }
 
 void traiteRequete(struct requete* req, struct videoClient* videoClient, int epollfd, int sock) {
+    
+    videoClient->lastAlive = getTime();
+    
 	switch(req->type) {
 		case BAD_REQUEST:
 			puts("E: Mauvaise requete");
@@ -221,7 +224,7 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
 					req->imgId = numero;
 				}
 			} else if(req->reqPosition == 2 && strcmp(req->mot, "LISTEN_PORT") != 0) {
-				req->type = BAD_REQUEST;
+				//req->type = BAD_REQUEST;
 			} else if(req->reqPosition == 3) {
 				int numero = parseInt(req->mot);
 				if(numero == PARSE_ERROR) {
@@ -231,7 +234,7 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
 				}
 			} else if(req->reqPosition == 4) {
 				if(req->type == ALIVE || strcmp(req->mot, "FRAGMENT_SIZE") != 0) {
-					req->type = BAD_REQUEST;
+					//req->type = BAD_REQUEST;
 				}
 			} else if(req->reqPosition == 5) {
 				int numero = parseInt(req->mot);
@@ -241,7 +244,7 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
 					req->fragmentSize = numero;
 				}
 			} else if(req->reqPosition == 6) {
-				req->type = BAD_REQUEST;
+				//req->type = BAD_REQUEST;
 			}
 
 			req->reqPosition++;
