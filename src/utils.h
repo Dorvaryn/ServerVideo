@@ -144,5 +144,5 @@ void createEventPull(int epoll, int csock);
 
 int connectDataTCP(int epollfd, int sock, int port, int type);
 
-void decoClient(struct videoClient * videoClient, int epollfd);
+void decoClient(struct videoClient * videoClient, int sock, int epollfd);
 #endif // UTILS_H_
