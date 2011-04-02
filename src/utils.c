@@ -5,18 +5,17 @@
 void send_get_answer(int fd, char * catalogue)
 {
 	puts("Going to send");
-	send(fd, catalogue, strlen(catalogue), 0);
-	printf("send : %s\n", strerror(errno));
+	FAIL(send(fd, catalogue, strlen(catalogue), 0));
 }
 
 int createSockEventTCP(int epollfd, int port)
 {
 	int sock = socket(AF_INET, SOCK_STREAM, 0); //Version portable des sockets non bloquants
+	FAIL(sock);
+	
 	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
 	FAIL(flags);
 	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
-
-	printf("socket : %s\n", strerror(errno));
 
 	struct sockaddr_in saddr;
 
@@ -24,11 +23,9 @@ int createSockEventTCP(int epollfd, int port)
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
 
-	bind(sock, (struct sockaddr *)&saddr, sizeof(saddr));
-	printf("bind : %s\n", strerror(errno));
+	FAIL(bind(sock, (struct sockaddr *)&saddr, sizeof(saddr)));
 
-	listen(sock, 10);
-	printf("listen : %s\n", strerror(errno));
+	FAIL(listen(sock, 10));
 
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
@@ -44,11 +41,10 @@ int createSockEventUDP(int epollfd, int port)
 {
 	int sock = socket(AF_INET, SOCK_DGRAM, 0); //Version portable des sockets non bloquants
 	FAIL(sock);
+
 	int flags = fcntl(sock,F_GETFL,O_NONBLOCK); // Version portable des sockets non bloquants
 	FAIL(flags);
 	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
-
-	printf("socket : %s\n", strerror(errno));
 
 	struct sockaddr_in saddr;
 
@@ -56,13 +52,11 @@ int createSockEventUDP(int epollfd, int port)
 	saddr.sin_family = AF_INET;
 	saddr.sin_port = htons(port);
 
-	bind(sock, (struct sockaddr *)&saddr, sizeof(saddr));
-	printf("bind : %s\n", strerror(errno));
+	FAIL(bind(sock, (struct sockaddr *)&saddr, sizeof(saddr)));
 
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
 
-	printf("socket : %d\n",sock);
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
@@ -84,16 +78,15 @@ int createSockClientEvent(int epollfd, int sock)
 
 	#if defined ( OLD )
 	csock = accept(sock, (struct sockaddr *)&saddr_client, &size_addr);
+	FAIL(csock)
+
 	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 	#endif // OLD
 
-	printf("accept : %s\n", strerror(errno));
-
 	printf("Connection de %s :: %d\n", inet_ntoa(saddr_client.sin_addr), 
 			htons(saddr_client.sin_port));
-	FAIL(csock);
 
 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
