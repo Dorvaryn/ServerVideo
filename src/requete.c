@@ -112,6 +112,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 					videoClient->id = req->imgId;
 				}
 				free(videoClient->envoi);
+				videoClient->envoi = NULL;
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
@@ -260,6 +261,7 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
 
 	if(req->isOver) {
 		free(req->mot);
+		req->mot = NULL;
 
 		if(req->type == GET && req->imgId == -2) {
 			req->type = BAD_REQUEST;

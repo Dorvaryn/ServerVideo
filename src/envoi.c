@@ -11,7 +11,6 @@ void sendImage(struct videoClient* videoClient, int epollfd, int sockControl) {
             && timeInterval(videoClient->lastAlive, getTime()) >= 60)
 	{
 	    puts("Client mort !");
-	    //TODO: "déconnection" (& nettoyage de epoll)
 		decoClient(videoClient, sockControl, epollfd, videoClient->infosVideo->type);
 	}
 
@@ -158,6 +157,7 @@ void sendTCP(struct videoClient* videoClient)
 		{
 			env->state = HEADER_SENT;
 			free(env->originBuffer);
+			env->originBuffer = NULL;
 		}
 		else if(env->state == SENDING_IMAGE)
 		{
@@ -165,6 +165,7 @@ void sendTCP(struct videoClient* videoClient)
 			{
 				fclose(env->curFile);
 				free(env->originBuffer);
+				env->originBuffer = NULL;
 				videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
@@ -178,6 +179,7 @@ void sendTCP(struct videoClient* videoClient)
 				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
+				env->originBuffer = NULL;
 			}
 		}
 	}
@@ -215,6 +217,8 @@ void createHeaderUDP(struct videoClient* videoClient) {
 void createFragment(struct videoClient* videoClient) {
 	struct envoi* env = videoClient->envoi;
 
+    free(env->originBuffer);
+    env->originBuffer = NULL;
 	env->buffer = malloc(env->tailleFragment*sizeof(char));
 	env->originBuffer = env->buffer;
 	memset(env->buffer,'\0',env->tailleFragment*sizeof(char));
@@ -257,6 +261,7 @@ void sendUDP(struct videoClient* videoClient) {
 				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
+				env->originBuffer = NULL;
 				if(videoClient->infosVideo->type == UDP_PUSH || videoClient->infosVideo->type == MCAST_PUSH)
 				{
 					videoClient->id = (videoClient->id < videoClient->infosVideo->nbImages ? videoClient->id+1 : 1);
@@ -273,6 +278,7 @@ void sendUDP(struct videoClient* videoClient) {
 		{
 			env->state = HEADER_SENT;
 			free(env->originBuffer);
+			env->originBuffer = NULL;
 		}
 
 	}

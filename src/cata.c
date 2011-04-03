@@ -190,6 +190,7 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 		
 		free(tmp);
         free(tmp2);
+        free(adresse);
 
 	}while(!feof(f));
 	strcat(buff,"\r\n");

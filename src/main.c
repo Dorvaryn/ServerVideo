@@ -126,7 +126,20 @@ int central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP
 		}
 	} //Fin de la boucle principale
 
-	//TODO: fermer les ressources proprement ici
+    int i;
+	for(i=0; i<tabClientsTCP.nbClients; i++) {
+	    free(tabClientsTCP.clients[i].requete.mot);
+	    
+	    free(tabClientsTCP.clients[i].videoClient.envoi->originBuffer);
+	    free(tabClientsTCP.clients[i].videoClient.envoi->buffer);
+	    fclose(tabClientsTCP.clients[i].videoClient.envoi->curFile);
+	    
+	    free(tabClientsTCP.clients[i].videoClient.envoi);
+	    
+	    close(tabClientsTCP.clients[i].sock);
+	}
+	free(tabClientsTCP.clients);
+	
 	return restart;
 }  
 
@@ -197,6 +210,7 @@ int main(int argc, char ** argv)
 
 		int j;
 		for(i = 0; i < tabFluxTCP.nbFlux; i++) {
+		    close(tabFluxTCP.flux[i].sock);
 			for(j = 0; j < BASE_IMAGES; j++) {
 				free(tabFluxTCP.flux[i].infosVideo.images[j]);
 			}
@@ -205,14 +219,27 @@ int main(int argc, char ** argv)
 		free(tabFluxTCP.flux);
 
 		for(i = 0; i < tabFluxUDP.nbFlux; i++) {
+		    close(tabFluxUDP.flux[i].sock);
 			for(j = 0; j < BASE_IMAGES; j++) {
 				free(tabFluxUDP.flux[i].infosVideo.images[j]);
 			}
 			free(tabFluxUDP.flux[i].infosVideo.images);
 		}
-		free(tabFluxUDP.flux);    
-
+		free(tabFluxUDP.flux);
+		
+		for(i = 0; i < tabFluxMCAST.nbFlux; i++) {
+		    close(tabFluxMCAST.flux[i].sock);
+			for(j = 0; j < BASE_IMAGES; j++) {
+				free(tabFluxMCAST.flux[i].infosVideo.images[j]);
+			}
+			free(tabFluxMCAST.flux[i].infosVideo.images);
+		}
+		free(tabFluxMCAST.flux);
+		
 		free(catalogue);
+		
+		close(epollfd);
+		
 	} while (restart != 0);
 
 	return 0;
