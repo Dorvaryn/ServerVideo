@@ -1,7 +1,7 @@
 ID=9
 Name=SintelHD
 Type=JPEG
-Address=127.0.0.1
+Address=192.168.1.44
 Port=8093
 Protocol=TCP_PUSH
 IPS=60

@@ -2,6 +2,20 @@
 #include <stdlib.h>
 #include <string.h>
 
+double getTime() {
+	struct timeval timev;
+
+	gettimeofday(&timev, NULL);
+	double micro = (double)timev.tv_usec;
+	double sec = (double)timev.tv_sec;
+
+	return sec + micro/1000000;
+}
+
+double timeInterval(double t1, double t2) {
+    return (t1 < t2 ? t2-t1 : t2); //Evite le bug de minuit :)
+}
+
 void send_get_answer(int fd, char * catalogue)
 {
 	puts("Going to send");
@@ -33,6 +47,8 @@ int createSockEventTCP(int epollfd, int port)
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
+	
+	puts("epolladd");
 
 	return sock;
 }
@@ -60,6 +76,8 @@ int createSockEventUDP(int epollfd, int port)
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
+	
+	puts("epolladd");
 
 	return sock;
 }
@@ -79,18 +97,25 @@ int createSockClientEvent(int epollfd, int sock)
 	#if defined ( OLD )
 	csock = accept(sock, (struct sockaddr *)&saddr_client, &size_addr);
 	FAIL(csock)
-
+	
 	int flags = fcntl(csock,F_GETFL,O_NONBLOCK); //Version portalble des sockets non bloquants
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 	#endif // OLD
 
-	printf("Connection de %s :: %d\n", inet_ntoa(saddr_client.sin_addr), 
-			htons(saddr_client.sin_port));
+	printf("Connection de %s :: %d socket : %d\n", inet_ntoa(saddr_client.sin_addr), 
+			htons(saddr_client.sin_port), csock);
+	
+	struct sockaddr_in addr;
+	memset(&addr, 0, sizeof(struct sockaddr_in));
+	socklen_t len = sizeof(struct sockaddr_in);
 
+	FAIL(getpeername(csock, (struct sockaddr*)&addr, &len));
+	printf("getsockname %s\n", inet_ntoa(addr.sin_addr));
 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
+	puts("epolladd");
 
 	return csock;
 }
@@ -197,15 +222,15 @@ void createEventPush(int epollfd, int csock)
 
 int connectDataTCP(int epollfd, int sock, int port, int type)
 {
-	struct sockaddr_in addr, saddr;
+	struct sockaddr_in addr;
 	memset(&addr, 0, sizeof(struct sockaddr_in));
 	int csock;
-	socklen_t len;
-	memset(&len, 0, sizeof(socklen_t));
-	getsockname(sock, (struct sockaddr*)&addr, &len);
-	saddr.sin_addr.s_addr = addr.sin_addr.s_addr;
-	saddr.sin_family = AF_INET;
-	saddr.sin_port = htons(port);
+	socklen_t len = sizeof(struct sockaddr_in);
+
+	FAIL(getpeername(sock, (struct sockaddr*)&addr, &len));
+	addr.sin_port = htons(port);
+
+	printf("addr : %s sock : %d\n", inet_ntoa(addr.sin_addr), sock);
 	
 #if defined ( NEW )
 	csock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK,0); //socket NONBLOCK plus performant 
@@ -217,9 +242,9 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 	FAIL(flags);
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 #endif // OLD
+	FAIL(csock);
 
-	socklen_t size_addr = sizeof(struct sockaddr_in);
-	FAIL(connect(csock, (struct sockaddr *)&saddr, size_addr));
+	FAIL(connect(csock, (struct sockaddr *)&addr, len));
 	
 	if(type == TCP_PULL)
 	{
@@ -231,4 +256,18 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 	}
 
     return csock;	
+}
+
+void decoClient(struct videoClient * videoClient, int sock, int epollfd)
+{
+	struct epoll_event ev;
+	memset(&ev, 0, sizeof(struct epoll_event));
+	ev.events = 0;
+	ev.data.fd = videoClient->clientSocket;
+	
+	ev.data.fd = sock;
+	FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, sock, &ev));
+
+	close(videoClient->clientSocket);
+	close(sock);
 }

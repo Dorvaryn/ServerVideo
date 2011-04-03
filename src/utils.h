@@ -13,6 +13,7 @@
 #include <unistd.h> //Pour STDIN_FILENO
 #include <fcntl.h> // Pour déclarer non bloquant
 #include <sys/utsname.h> //Pour connaitre version noyau
+#include <sys/time.h>
 
 //Maximum d'un mot dans les requetes du client
 #define MAX_TOCKEN 256
@@ -117,6 +118,10 @@ struct tabFlux {
 	struct flux * flux;
 };
 
+//Gestion du temps
+double getTime();
+double timeInterval(double t1, double t2);
+
 void initReq(struct requete* req);
 
 void send_get_answer(int fd, char * catalogue);
@@ -138,4 +143,6 @@ void createEventPush(int epoll, int csock);
 void createEventPull(int epoll, int csock);
 
 int connectDataTCP(int epollfd, int sock, int port, int type);
+
+void decoClient(struct videoClient * videoClient, int sock, int epollfd);
 #endif // UTILS_H_

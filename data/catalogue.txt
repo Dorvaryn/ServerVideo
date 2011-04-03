@@ -1,4 +1,4 @@
-ServerAddress: 127.0.0.1
+ServerAddress: 192.168.1.44
 ServerPort: 8081
 flux1.txt
 flux3.txt
@@ -6,3 +6,6 @@ flux4.txt
 flux5.txt
 flux6.txt
 flux8.txt
+flux9.txt
+flux10.txt
+flux11.txt
