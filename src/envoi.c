@@ -10,8 +10,11 @@ void sendImage(struct videoClient* videoClient, int epollfd, int sockControl) {
             || videoClient->infosVideo->type == UDP_PUSH)
             && timeInterval(videoClient->lastAlive, getTime()) >= 60)
 	{
-	    puts("Client mort !");
-		decoClient(videoClient, sockControl, epollfd, videoClient->infosVideo->type);
+		if(videoClient->clientSocket != -1)
+		{
+			puts("Client mort !");
+			decoClient(videoClient, sockControl, epollfd, videoClient->infosVideo->type);
+		}
 	}
 
 	if(videoClient->etat == RUNNING)

@@ -1,9 +1,9 @@
 ID=10
 Name=DoctorWho
 Type=JPEG
-Address=225.100.110.12
+Address=192.168.1.44
 Port=8090
-Protocol=MCAST_PUSH
+Protocol=UDP_PULL
 IPS=25
 Images/DW/DW0000.jpg
 Images/DW/DW0001.jpg
