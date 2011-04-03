@@ -45,7 +45,7 @@
 #define MAX_EVENTS 10
 #define BASE_CLIENTS 32
 #define BASE_FICHIERS 32 
-#define BASE_IMAGES 2048 
+#define BASE_IMAGES 1024 
 
 #define FAIL(x) if(x == -1) {\
 	perror(#x);}
