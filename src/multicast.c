@@ -53,7 +53,9 @@ void* multiFlux(void* leflux) {
 	video->dest_addr.sin_port = htons(flux->port);
 
 	video->envoi = (struct envoi *)malloc(sizeof(struct envoi));
+	memset(video->envoi, 0, sizeof(video->envoi));
 	video->envoi->state = NOTHING_SENT;
+	video->envoi->originBuffer = NULL;
 	video->envoi->curFile = fopen(video->infosVideo->images[0], "r");
 	if(video->envoi->curFile == NULL) {
 		puts("E: ouverture du fichier");

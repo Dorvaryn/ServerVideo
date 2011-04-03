@@ -102,6 +102,7 @@ int central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP
 								traiteChaine(buffer, &tabClientsTCP.clients[i].requete, &tabClientsTCP.clients[i].videoClient, 
 										epollfd, tabClientsTCP.clients[i].sock);
 								free(buffer);
+								buffer = NULL;
 							}
 							else
 							{
@@ -129,16 +130,21 @@ int central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP
     int i;
 	for(i=0; i<tabClientsTCP.nbClients; i++) {
 	    free(tabClientsTCP.clients[i].requete.mot);
+	    tabClientsTCP.clients[i].requete.mot = NULL;
 	    
 	    free(tabClientsTCP.clients[i].videoClient.envoi->originBuffer);
+	    tabClientsTCP.clients[i].videoClient.envoi->originBuffer = NULL;
 	    free(tabClientsTCP.clients[i].videoClient.envoi->buffer);
+	    tabClientsTCP.clients[i].videoClient.envoi->buffer = NULL;
 	    fclose(tabClientsTCP.clients[i].videoClient.envoi->curFile);
 	    
 	    free(tabClientsTCP.clients[i].videoClient.envoi);
+	    tabClientsTCP.clients[i].videoClient.envoi = NULL;
 	    
 	    close(tabClientsTCP.clients[i].sock);
 	}
 	free(tabClientsTCP.clients);
+	tabClientsTCP.clients = NULL;
 	
 	return restart;
 }  
@@ -213,30 +219,40 @@ int main(int argc, char ** argv)
 		    close(tabFluxTCP.flux[i].sock);
 			for(j = 0; j < BASE_IMAGES; j++) {
 				free(tabFluxTCP.flux[i].infosVideo.images[j]);
+				tabFluxTCP.flux[i].infosVideo.images[j] = NULL;
 			}
 			free(tabFluxTCP.flux[i].infosVideo.images);
+			tabFluxTCP.flux[i].infosVideo.images = NULL;
 		}
 		free(tabFluxTCP.flux);
+		tabFluxTCP.flux = NULL;
 
 		for(i = 0; i < tabFluxUDP.nbFlux; i++) {
 		    close(tabFluxUDP.flux[i].sock);
 			for(j = 0; j < BASE_IMAGES; j++) {
 				free(tabFluxUDP.flux[i].infosVideo.images[j]);
+				tabFluxUDP.flux[i].infosVideo.images[j] = NULL;
 			}
 			free(tabFluxUDP.flux[i].infosVideo.images);
+			tabFluxUDP.flux[i].infosVideo.images = NULL;
 		}
 		free(tabFluxUDP.flux);
+		tabFluxUDP.flux = NULL;
 		
 		for(i = 0; i < tabFluxMCAST.nbFlux; i++) {
 		    close(tabFluxMCAST.flux[i].sock);
 			for(j = 0; j < BASE_IMAGES; j++) {
 				free(tabFluxMCAST.flux[i].infosVideo.images[j]);
+				tabFluxMCAST.flux[i].infosVideo.images[j] = NULL;
 			}
 			free(tabFluxMCAST.flux[i].infosVideo.images);
+			tabFluxMCAST.flux[i].infosVideo.images = NULL;
 		}
 		free(tabFluxMCAST.flux);
+		tabFluxMCAST.flux = NULL;
 		
 		free(catalogue);
+		catalogue = NULL;
 		
 		close(epollfd);
 		
