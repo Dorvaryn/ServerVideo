@@ -50,12 +50,10 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
     
 	switch(req->type) {
 		case BAD_REQUEST:
-			puts("E: Mauvaise requete");
 			break;
 		case GET:
 			if(req->fragmentSize != -1) 
 			{
-				printf("GET id:%d port:%d frag_size:%d\n", req->imgId, req->listenPort, req->fragmentSize);
 				
 				memset(&videoClient->dest_addr,0,sizeof(&videoClient->dest_addr));
 				memcpy(&videoClient->dest_addr, &videoClient->orig_addr, sizeof(&videoClient->orig_addr));
@@ -68,10 +66,11 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				if(videoClient->envoi->curFile == NULL) {
 					puts("E: ouverture du fichier");
 				}
+				
 				fseek(videoClient->envoi->curFile, 0, SEEK_END);
 	            videoClient->envoi->fileSize = ftell(videoClient->envoi->curFile);
 	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
-				printf("socket : %d\n",videoClient->clientSocket);	
+				
 				videoClient->envoi->posDansImage = 0;
 				videoClient->envoi->tailleMaxFragment = req->fragmentSize - 128;
 				
@@ -79,10 +78,8 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 
 
 			} else if(req->listenPort != -1) {
-				printf("GET id:%d port:%d\n", req->imgId, req->listenPort);
 
 				videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, videoClient->infosVideo->type);
-				printf("socket du client : %d\n", videoClient->clientSocket);
 
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				if(videoClient->infosVideo->type == TCP_PUSH)
@@ -101,11 +98,9 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->dernierEnvoi = getTime();
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->id = 0;
-				puts("VIDEO OKok !");
 
 
 			} else {
-				printf("GET id:%d\n", req->imgId);
 				videoClient->etat = RUNNING;
 
 				if (req->imgId == -1)
@@ -125,11 +120,10 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				{
 					puts("E: ouverture du fichier");
 				}
-				sendImage(videoClient); 
+				sendImage(videoClient, epollfd, sock); 
 			}
 			break;
 		case START:
-			printf("START\n");
 			if(videoClient->etat == PAUSED) 
 			{
 				if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
@@ -141,10 +135,9 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				}
 				videoClient->etat = RUNNING;
 			}
-			sendImage(videoClient);
+			sendImage(videoClient, epollfd, sock);
 			break;
 		case PAUSE:
-			printf("PAUSE\n");
 			if(videoClient->etat == RUNNING) 
 			{
 				if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
@@ -158,7 +151,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			}
 			break;
 		case END:
-			printf("END\n");
 			if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
 			{
 				struct epoll_event ev;
@@ -170,7 +162,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			videoClient->etat = OVER;
 			break;
 		case ALIVE:
-			printf("ALIVE id:%d port:%d\n", req->imgId, req->listenPort);
 			videoClient->lastAlive = time(NULL);
 			break;
 		default:
@@ -183,10 +174,6 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
 	if(req->mot == 0) {
 		req->mot = malloc(MAX_TOCKEN*sizeof(char));
 	}
-
-	puts("==>");
-	puts(chaine);
-	puts("<==");
 
 	int i;
 	for(i=0; chaine[i] != '\0' && !req->isOver; i++) {

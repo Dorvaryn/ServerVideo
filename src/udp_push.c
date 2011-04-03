@@ -33,7 +33,6 @@ void* udp_push(void * leflux)
 
 		nfds = epoll_wait(epollfd, events, MAX_EVENTS, -1);
 		FAIL(nfds);
-		//puts("working ...");
 
 		int n;
 
@@ -41,7 +40,6 @@ void* udp_push(void * leflux)
 		{
 			if (events[n].events == EPOLLIN )
 			{					
-				printf("%s\n", "buffer");
 				char * buffer = (char *)malloc(512*sizeof(char));
 				memset(buffer, '\0', 512);
 
@@ -49,8 +47,6 @@ void* udp_push(void * leflux)
 				memset(&faddr, 0, sizeof(struct sockaddr_in));
 				socklen_t len = sizeof(faddr);
 
-				printf("socket : %d\n",flux->sock);
-				printf("%s\n", "recvfrom");
 				FAIL(recvfrom(flux->sock, buffer, 512*sizeof(char),0, (struct sockaddr*)&faddr, &len));
 
 				int j = 0;
@@ -89,21 +85,19 @@ void* udp_push(void * leflux)
 					memset(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr,0,sizeof(struct sockaddr_in));
 					memcpy(&tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.orig_addr, &faddr, sizeof(struct sockaddr_in));
 					tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.clientSocket = sockData;
-					printf(" sockData: %d\n",sockData);
+					
 					tabClientsUDP.clients[tabClientsUDP.nbClients].videoClient.infosVideo = &flux->infosVideo;
 					trouve = tabClientsUDP.nbClients++;
 				}
 				traiteChaine(buffer, &tabClientsUDP.clients[trouve].requete, &tabClientsUDP.clients[trouve].videoClient, 
 						epollfd, 0);
-				printf("%s\n", "done");
 			}
 			else if(events[n].events == EPOLLOUT)
 			{
 				int i;
 				for(i = 0; i < tabClientsUDP.nbClients; i++)
 				{
-					//sendImage avec les bons paramètres
-					sendImage(&tabClientsUDP.clients[i].videoClient);
+					sendImage(&tabClientsUDP.clients[i].videoClient, epollfd, -1);
 				}
 			}
 

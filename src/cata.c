@@ -39,76 +39,58 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 
 	/*Ouverture du fichier*/
 	FILE * f = fopen("data/catalogue.txt", "r");
-	printf("fopen : %s\n", strerror(errno));
 
-	int i;
 	int baseFluxTCPCourante = BASE_FICHIERS;
 	int baseFluxUDPCourante = BASE_FICHIERS;
 	int baseFluxMCASTCourante = BASE_FICHIERS;
 
 	char * temp = (char *)malloc(512*sizeof(char));
 	char * temp2 = (char *)malloc(512*sizeof(char));
-
-	int l3 = strlen(buff);
-	for(i=0;i<l3;i++)
-	{
-		buff[i] = '\0';
-	}
-	int l = strlen(temp);
-	for(i=0;i<l;i++)
-	{
-		temp[i] = '\0';
-	}
+	memset(temp, '\0', 512);
+	memset(temp2, '\0', 512);
 	
 	fgets(temp,512,f);
 	strcat(buff,temp);
 
 	fgets(temp,512,f);
 	strcat(buff,temp);
+						
+	int serverPort;
+	sscanf(temp,"%*12s%d",&serverPort);
+	createFichier(epollfd, tabFluxTCP, serverPort, &baseFluxTCPCourante, 0);
 
 	//strcat(buff,"ServerAddress: 10.0.2.2\r\n");
 	//strcat(buff,"ServerAddress: 127.0.0.1\r\n");
 	//strcat(buff,"ServerPort: 8081\r\n");
 
 	fgets(temp,512,f);
-	printf("fgets : %s\n", strerror(errno));
 	do
 	{
 		strcpy(temp2,DATA_DIRECTORY);
 		strncat(temp2,temp,strlen(temp)-2);
 
-		printf("%s\n", temp2);
-
 		FILE * g = fopen(temp2,"r");
-		printf("fopen : %s\n", strerror(errno));
 		strcat(buff,"Object ");
-
-		int l = strlen(temp2);
-		for(i=0;i<l;i++)
-		{
-			temp2[i] = '\0';
-		}
-		int l2 = strlen(temp);
-		for(i=0;i<l2;i++)
-		{
-			temp[i] = '\0';
-		}
+		
+		memset(temp, '\0', 512);
+		memset(temp2, '\0', 512);
 
 		int j = 0;
 		char * tmp = (char *)malloc(512*sizeof(char));
 		memset(tmp, 0, 512);
 		char  * tmp2 = (char *)malloc(512*sizeof(char));
 		memset(tmp2, 0, 512);
+
 		fgets(tmp,512,g);
-		printf("fgets : %s\n", strerror(errno));
+		
 		int port;
 		char * adresse = (char *)malloc(512*sizeof(char));
 		memset(adresse, '\0', 512*sizeof(char));
+
 		int typeCourant;
 		while (!feof(g))
 		{
 			strncpy(tmp2,tmp,strlen(tmp)-2);
-			printf("%s : %d\n",tmp2,j);
 			
 			if (j < 7)
 			{
@@ -118,11 +100,7 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 				}
 				else if (j == 4)
 				{
-					int k;
-					for (k = 0; k < strlen(tmp2); k++)
-					{
 						sscanf(tmp2,"%*5s%d",&port);
-					}
 				}
 				else if (j == 5)
 				{	
@@ -200,33 +178,21 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 					addImage(image, &tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].infosVideo);
 				}
 			}
-			int l2 = strlen(tmp2);
-			for(i=0;i<l2;i++)
-			{
-				tmp2[i] = '\0';
-			}
-			int l = strlen(tmp);
-			for(i=0;i<l;i++)
-			{
-				tmp[i] = '\0';
-			}
+
+			memset(tmp, '\0', 512);
+			memset(tmp2, '\0', 512);
 			fgets(tmp,512,g);
-			printf("fgets : %s\n", strerror(errno));
 			j++;
 		}
-		printf("%s\n", "fin");
 		strcat(buff,"\r\n");
-		printf("%s\n", "strcat");
 		fclose(g);
 		fgets(temp,512,f);
-		printf("fgets : %s\n", strerror(errno));
 		
 		free(tmp);
         free(tmp2);
 
 	}while(!feof(f));
 	strcat(buff,"\r\n");
-	printf("%s\n", "done");
 	fclose(f);
 
 	char * header;

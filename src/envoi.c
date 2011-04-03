@@ -2,7 +2,7 @@
 #include "utils.h"
 #include <errno.h>
 
-void sendImage(struct videoClient* videoClient) {
+void sendImage(struct videoClient* videoClient, int epollfd, int sockControl) {
 
 	struct envoi* env = videoClient->envoi;
 	
@@ -12,6 +12,7 @@ void sendImage(struct videoClient* videoClient) {
 	{
 	    puts("Client mort !");
 	    //TODO: "déconnection" (& nettoyage de epoll)
+		decoClient(videoClient, sockControl, epollfd, videoClient->infosVideo->type);
 	}
 
 	if(videoClient->etat == RUNNING)
@@ -117,7 +118,6 @@ void createHeaderTCP(struct videoClient* videoClient)
 	env->state = SENDING_HEADER;
 	env->bufLen = strlen(env->buffer);
 
-	puts("header cree");
 }
 
 void createImageTCP(struct videoClient* videoClient) 
@@ -131,7 +131,6 @@ void createImageTCP(struct videoClient* videoClient)
 
 	FAIL(fread(env->buffer, sizeof(char), env->fileSize, env->curFile));
 	env->state = SENDING_IMAGE;
-	puts("image cree");
 }
 
 void sendTCP(struct videoClient* videoClient) 
@@ -142,8 +141,6 @@ void sendTCP(struct videoClient* videoClient)
 	int nbSent;
 	do
 	{	
-		printf("socket du client : %d\n", videoClient->clientSocket);
-
 		nbSent = send(videoClient->clientSocket, env->buffer, env->bufLen, MSG_NOSIGNAL);
 		FAIL(nbSent);
 		
@@ -152,9 +149,6 @@ void sendTCP(struct videoClient* videoClient)
 			env->buffer += nbSent;
 			env->bufLen -= nbSent;
 		}
-
-		printf("car envoyes : %d/%d\n", nbSent, env->bufLen);
-
 
 	} while (errno != EAGAIN && env->bufLen > 0);
 
@@ -184,7 +178,6 @@ void sendTCP(struct videoClient* videoClient)
 				env->state = IMAGE_SENT;
 				fclose(env->curFile);
 				free(env->originBuffer);
-				puts("Envoyé");
 			}
 		}
 	}
@@ -216,9 +209,6 @@ void createHeaderUDP(struct videoClient* videoClient) {
 	env->state = SENDING_HEADER;
 	env->bufLen = strlen(env->buffer);
 	env->more = 1;
-	printf(" buffer %s\n",env->buffer);
-	printf(" socket %d\n",videoClient->clientSocket);
-	puts("header cree");
 }
 
 //Charge la bonne partie de l'image dans le buffer (memcpy)

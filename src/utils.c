@@ -18,7 +18,6 @@ double timeInterval(double t1, double t2) {
 
 void send_get_answer(int fd, char * catalogue)
 {
-	puts("Going to send");
 	FAIL(send(fd, catalogue, strlen(catalogue), 0));
 }
 
@@ -47,8 +46,6 @@ int createSockEventTCP(int epollfd, int port)
 	ev.events = EPOLLIN | EPOLLET;
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
-	
-	puts("epolladd");
 
 	return sock;
 }
@@ -77,8 +74,6 @@ int createSockEventUDP(int epollfd, int port)
 	ev.data.fd = sock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, sock, &ev));
 	
-	puts("epolladd");
-
 	return sock;
 }
 
@@ -103,19 +98,9 @@ int createSockClientEvent(int epollfd, int sock)
 	FAIL(fcntl(csock,F_SETFL,flags|O_NONBLOCK)); //Version portalble des sockets non bloquants
 	#endif // OLD
 
-	printf("Connection de %s :: %d socket : %d\n", inet_ntoa(saddr_client.sin_addr), 
-			htons(saddr_client.sin_port), csock);
-	
-	struct sockaddr_in addr;
-	memset(&addr, 0, sizeof(struct sockaddr_in));
-	socklen_t len = sizeof(struct sockaddr_in);
-
-	FAIL(getpeername(csock, (struct sockaddr*)&addr, &len));
-	printf("getsockname %s\n", inet_ntoa(addr.sin_addr));
 	ev.events = EPOLLIN | EPOLLOUT | EPOLLET;
 	ev.data.fd = csock;
 	FAIL(epoll_ctl(epollfd, EPOLL_CTL_ADD, csock, &ev));
-	puts("epolladd");
 
 	return csock;
 }
@@ -157,9 +142,7 @@ void createFichier(int epollfd, struct tabFlux * tabFlux, int port, int * baseFi
 
 void addImage(char * uneImage, struct infosVideo * infos)
 {
-	printf("Debug precopy\n");
 	strcpy(infos->images[infos->nbImages], uneImage);
-	printf("Debug postcopy\n");
 	infos->nbImages++;
 }
 
@@ -229,8 +212,6 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 
 	FAIL(getpeername(sock, (struct sockaddr*)&addr, &len));
 	addr.sin_port = htons(port);
-
-	printf("addr : %s sock : %d\n", inet_ntoa(addr.sin_addr), sock);
 	
 #if defined ( NEW )
 	csock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK,0); //socket NONBLOCK plus performant 
@@ -258,16 +239,21 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
     return csock;	
 }
 
-void decoClient(struct videoClient * videoClient, int sock, int epollfd)
+void decoClient(struct videoClient * videoClient, int sock, int epollfd, int type)
 {
-	struct epoll_event ev;
-	memset(&ev, 0, sizeof(struct epoll_event));
-	ev.events = 0;
-	ev.data.fd = videoClient->clientSocket;
-	
-	ev.data.fd = sock;
-	FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, sock, &ev));
+	if( type == TCP_PUSH)
+	{
+		struct epoll_event ev;
+		memset(&ev, 0, sizeof(struct epoll_event));
+		ev.events = 0;
+		ev.data.fd = videoClient->clientSocket;
+		FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
 
-	close(videoClient->clientSocket);
-	close(sock);
+		ev.data.fd = sock;
+		FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, sock, &ev));
+
+		close(videoClient->clientSocket);
+		close(sock);
+	}
+	videoClient->clientSocket = -1;
 }

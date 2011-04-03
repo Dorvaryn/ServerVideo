@@ -138,11 +138,11 @@ void addImage(char * uneImage, struct infosVideo * infos);
 
 void connectClient(int epollfd, struct tabClients * tabClients, struct tabFlux * tabFlux, int sock , int * baseCourante, int isGet);
 
-void createEventPush(int epoll, int csock);
+void createEventPush(int epollfd, int csock);
 
-void createEventPull(int epoll, int csock);
+void createEventPull(int epollfd, int csock);
 
 int connectDataTCP(int epollfd, int sock, int port, int type);
 
-void decoClient(struct videoClient * videoClient, int sock, int epollfd);
+void decoClient(struct videoClient * videoClient, int sock, int epollfd, int type);
 #endif // UTILS_H_

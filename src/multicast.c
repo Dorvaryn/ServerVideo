@@ -5,8 +5,33 @@
 
 void* multiCatalogue(void* args) {
 	//Créer le socket multicast et envoyer le catalogue tous les x secondes
+	char * origineBuffer = (char *)args;
+	int clientSocket = socket(AF_INET, SOCK_DGRAM, 0);
+	
+	struct sockaddr_in dest_addr;
+	memset(&dest_addr,0,sizeof(dest_addr));
+	dest_addr.sin_family = AF_INET;
+	dest_addr.sin_addr.s_addr = inet_addr("225.6.7.8");
+	dest_addr.sin_port = htons(4567);
 	while(1)
 	{
+		char * buffer = origineBuffer;
+		int bufLen = strlen(origineBuffer);
+		int nbSent = 0;
+		do
+		{
+			nbSent = sendto(clientSocket, buffer, bufLen, 0,
+					(struct sockaddr*)&dest_addr, sizeof(struct sockaddr));
+			FAIL(nbSent);
+
+			if( nbSent > 0)
+			{
+				buffer += nbSent;
+				bufLen -= nbSent;
+			}
+
+		} while (bufLen > 0);
+		sleep(1);
 	}
 
 	return NULL;
@@ -35,16 +60,15 @@ void* multiFlux(void* leflux) {
 	fseek(video->envoi->curFile, 0, SEEK_END);
 	video->envoi->fileSize = ftell(video->envoi->curFile);
 	fseek(video->envoi->curFile, 0, SEEK_SET);
-	printf("socket : %d\n",video->clientSocket);	
+	
 	video->envoi->posDansImage = 0;
 	video->envoi->tailleMaxFragment = FRAGMENT_SIZE - 128;
 
 	video->id = 1;
 
-	printf("fps: %f\n",flux->infosVideo.fps);
 	while(1)
 	{
-		sendImage(video);
+		sendImage(video, -1, -1);
 		usleep((1.0/flux->infosVideo.fps)*1000000);
 	}
 
