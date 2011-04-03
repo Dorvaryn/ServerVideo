@@ -32,7 +32,7 @@ struct envoi {
     int fileSize;
 };
 
-void sendImage(struct videoClient* videoClient);
+void sendImage(struct videoClient* videoClient, int epollfd, int sockControl);
 
 void createHeaderTCP(struct videoClient* videoClient);
 
