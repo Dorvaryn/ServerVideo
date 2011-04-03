@@ -7,4 +7,3 @@ flux5.txt
 flux6.txt
 flux8.txt
 flux9.txt
-flux10.txt
