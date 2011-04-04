@@ -33,8 +33,7 @@ Pour ajouter un flux il suffit de créer son fichier flux dans le répertoire da
 10. ...
 
 ### Lancement du serveur et commandes ###
-Le serveur comprend quelques commandes de base: 
-* exit
-* quit
-* q
+* exit :quitter
+* quit :quitter
+* q	   :quitter
 
