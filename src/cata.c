@@ -135,6 +135,7 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 						typeCourant = 2;
 						createFichier(epollfd, tabFluxMCAST, port, &baseFluxMCASTCourante, MCAST_PUSH);
 						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].infosVideo.type = MCAST_PUSH;
+						
 						tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse = (char *)malloc(512*sizeof(char));
 						memset(tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse, '\0', 512*sizeof(char));
 						strcpy(tabFluxMCAST->flux[tabFluxMCAST->nbFlux-1].adresse,adresse);
@@ -189,7 +190,11 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 		fgets(temp,512,f);
 		
 		free(tmp);
+		tmp = NULL;
         free(tmp2);
+        tmp2 = NULL;
+        free(adresse);
+        adresse = NULL;
 
 	}while(!feof(f));
 	strcat(buff,"\r\n");
@@ -205,9 +210,13 @@ char * buildCatalogue (int epollfd, struct tabFlux * tabFluxTCP, struct tabFlux 
 	strcat(buff2, buff);
 
     free(temp);
+    temp = NULL;
     free(temp2);
+    temp2 = NULL;
 	free(buff);
+	buff = NULL;
 	free(header);
+	header = NULL;
 
 	return buff2;
 }

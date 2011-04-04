@@ -112,6 +112,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 					videoClient->id = req->imgId;
 				}
 				free(videoClient->envoi);
+				videoClient->envoi = NULL;
 				videoClient->envoi = malloc(sizeof(struct envoi));
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
@@ -151,15 +152,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			}
 			break;
 		case END:
-			if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
-			{
-				struct epoll_event ev;
-				memset(&ev, 0, sizeof(struct epoll_event));
-				ev.events = 0;
-				ev.data.fd = videoClient->clientSocket;
-				FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
-			}
-			videoClient->etat = OVER;
+			decoClient(videoClient, sock, epollfd, videoClient->infosVideo->type);
 			break;
 		case ALIVE:
 			videoClient->lastAlive = time(NULL);
@@ -260,6 +253,7 @@ void traiteChaine(char* chaine, struct requete* req, struct videoClient* videoCl
 
 	if(req->isOver) {
 		free(req->mot);
+		req->mot = NULL;
 
 		if(req->type == GET && req->imgId == -2) {
 			req->type = BAD_REQUEST;

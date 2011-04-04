@@ -103,7 +103,6 @@ void* udp_push(void * leflux)
 
 		}
 
-		//TODO : GESTION des signaux de fin free(tabClientsUDP.clients);
 
 	}
 	

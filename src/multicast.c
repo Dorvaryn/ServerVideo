@@ -1,5 +1,6 @@
 #include "multicast.h"
 #include "envoi.h"
+#include "utils.h"
 
 #define FRAGMENT_SIZE 512
 
@@ -52,8 +53,10 @@ void* multiFlux(void* leflux) {
 	video->dest_addr.sin_port = htons(flux->port);
 
 	video->envoi = (struct envoi *)malloc(sizeof(struct envoi));
+	memset(video->envoi, 0, sizeof(video->envoi));
 	video->envoi->state = NOTHING_SENT;
-	video->envoi->curFile = fopen(video->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
+	video->envoi->originBuffer = NULL;
+	video->envoi->curFile = fopen(video->infosVideo->images[0], "r");
 	if(video->envoi->curFile == NULL) {
 		puts("E: ouverture du fichier");
 	}
@@ -65,6 +68,8 @@ void* multiFlux(void* leflux) {
 	video->envoi->tailleMaxFragment = FRAGMENT_SIZE - 128;
 
 	video->id = 1;
+	video->etat = RUNNING;
+	video->dernierEnvoi = -1000; //Il y a très longtemps
 
 	while(1)
 	{
