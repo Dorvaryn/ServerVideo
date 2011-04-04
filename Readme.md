@@ -18,5 +18,5 @@ make clean : permet de purger les .o et l'exécutable
 dummy
 
 ### Lancement du serveur et commandes ###
-Le serveur comprend quelques commandes de base\n
+Le serveur comprend quelques commandes de base
 exit / quit / q : quitter
