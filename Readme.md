@@ -16,6 +16,9 @@ toutefois pour de meilleures performance un système avec un noyau supérieur a 
 * make : permet de compiler le programme, la compatibilité noyaux < 2.6.28 se fait automatiquement si un tel système est détecté
 * make clean : permet de purger les .o et l'exécutable
 
+### Installation ###
+Pour utiliser le serveur sur le réseau, ne pas oublier de changer les adresses 127.0.0.1 par l'adresse de la machine serveur.
+
 ### Format du catalogue ###
 Le catalogue est un fichier texte utilisant les marques de fin de ligne CRLF,
 les deux premières ligne indiquent l'adresse du serveur et le port sur lequel on peut demander le catalogue. Ensuite chacune des lignes est le nom d'un fichier flux situé dans le répertoire data.
