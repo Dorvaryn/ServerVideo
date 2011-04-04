@@ -152,15 +152,7 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 			}
 			break;
 		case END:
-			if(videoClient->infosVideo->type != UDP_PULL && videoClient->infosVideo->type != UDP_PUSH)
-			{
-				struct epoll_event ev;
-				memset(&ev, 0, sizeof(struct epoll_event));
-				ev.events = 0;
-				ev.data.fd = videoClient->clientSocket;
-				FAIL(epoll_ctl(epollfd, EPOLL_CTL_DEL, videoClient->clientSocket, &ev));
-			}
-			videoClient->etat = OVER;
+			decoClient(videoClient, sock, epollfd, videoClient->infosVideo->type);
 			break;
 		case ALIVE:
 			videoClient->lastAlive = time(NULL);

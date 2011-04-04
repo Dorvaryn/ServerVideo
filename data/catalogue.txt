@@ -1,6 +1,7 @@
 ServerAddress: 192.168.1.44
 ServerPort: 8080
 flux1.txt
+flux2.txt
 flux3.txt
 flux4.txt
 flux5.txt

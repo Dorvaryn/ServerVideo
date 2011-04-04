@@ -192,8 +192,6 @@ void sendTCP(struct videoClient* videoClient)
 void createHeaderUDP(struct videoClient* videoClient) {
 	struct envoi* env = videoClient->envoi;
 
-    free(env->originBuffer);
-    env->originBuffer = NULL;
 	env->buffer = malloc(128*sizeof(char));
 	memset(env->buffer,'\0',128*sizeof(char));
 	env->originBuffer = env->buffer;

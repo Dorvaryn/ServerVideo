@@ -22,9 +22,8 @@
 
 char * catalogue;
 
-int central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP)
+void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP)
 {
-	int restart;
 	struct epoll_event events[MAX_EVENTS];
 
 	struct tabClients tabClientsTCP;
@@ -72,14 +71,11 @@ int central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP
 						if(strcmp(chaine, "exit\n") == 0 || strcmp(chaine, "quit\n") == 0  || strcmp(chaine, "q\n") == 0)
 						{
 							done = 1;
-							restart = 0;
 							puts("Fin du serveur");
 						}
-						else if(strcmp(chaine, "restart\n") == 0)
+						else
 						{
-							done = 1;
-							restart = 1;
-							puts("Restarting");
+							puts("Commande invalide\nUsage: exit, quit, q");
 						}
 						done2 = 1;
 					}
@@ -145,15 +141,11 @@ int central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUDP
 	}
 	free(tabClientsTCP.clients);
 	tabClientsTCP.clients = NULL;
-	
-	return restart;
+
 }  
 
 int main(int argc, char ** argv)
 {
-	int restart = 0;
-	do
-	{
 		struct epoll_event ev;
 		memset(&ev, 0, sizeof(struct epoll_event));
 		int epollfd;
@@ -212,7 +204,7 @@ int main(int argc, char ** argv)
 			}
 		}
 
-		restart = central(epollfd, &tabFluxTCP, &tabFluxUDP);
+		central(epollfd, &tabFluxTCP, &tabFluxUDP);
 
 		int j;
 		for(i = 0; i < tabFluxTCP.nbFlux; i++) {
@@ -255,8 +247,6 @@ int main(int argc, char ** argv)
 		catalogue = NULL;
 		
 		close(epollfd);
-		
-	} while (restart != 0);
 
 	return 0;
 }

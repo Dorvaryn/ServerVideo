@@ -241,7 +241,7 @@ int connectDataTCP(int epollfd, int sock, int port, int type)
 
 void decoClient(struct videoClient * videoClient, int sock, int epollfd, int type)
 {
-	if( type == TCP_PUSH)
+	if(type == TCP_PUSH || type == TCP_PULL)
 	{
 		struct epoll_event ev;
 		memset(&ev, 0, sizeof(struct epoll_event));
@@ -255,5 +255,6 @@ void decoClient(struct videoClient * videoClient, int sock, int epollfd, int typ
 		close(videoClient->clientSocket);
 		close(sock);
 	}
+	videoClient->etat = OVER;
 	videoClient->clientSocket = -1;
 }
