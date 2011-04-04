@@ -13,8 +13,8 @@ Ce server est spécifique au systèmes GNU/Linux, il est compatible avec les ver
 toutefois pour de meilleures performance un système avec un noyau supérieur a 2.6.28 est recommandé
 
 ### Compilation ###
-* make : permet de compiler le programme, la compatibilité noyaux < 2.6.28 se fait automatiquement si un tel système est détecté
-* make clean : permet de purger les .o et l'exécutable
+* `make` : permet de compiler le programme, la compatibilité noyaux < 2.6.28 se fait automatiquement si un tel système est détecté
+* `make clean` : permet de purger les .o et l'exécutable
 
 ### Format du catalogue ###
 Le catalogue est un fichier texte utilisant les marques de fin de ligne CRLF,
@@ -34,4 +34,6 @@ Pour ajouter un flux il suffit de créer son fichier flux dans le répertoire da
 
 ### Lancement du serveur et commandes ###
 Le serveur comprend quelques commandes de base: 
-`exit / quit / q : quitter`
+
+exit / quit / q : quitter
+
