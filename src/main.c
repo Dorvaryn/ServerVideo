@@ -124,7 +124,8 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 	} //Fin de la boucle principale
 
     int i;
-	for(i=0; i<tabClientsTCP.nbClients; i++) {
+	for(i=1; i<tabClientsTCP.nbClients; i++)  // i = 0 correspond au catalogue
+	{ 
 	    free(tabClientsTCP.clients[i].requete.mot);
 	    tabClientsTCP.clients[i].requete.mot = NULL;
 	    
