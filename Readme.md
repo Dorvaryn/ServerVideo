@@ -1,29 +1,26 @@
-ServerVideo
-=============
-
+# ServerVideo #
 Un serveur video streaming en C utilisant epoll
 
-Auteurs
--------
+## Auteurs ##
+
 * Benjamin Augustin <benjamin@odai.homelinux.net>
 * Thibaut Patel <thibaut.patel@gmail.com>
 
-Manuel utilisateur
-------------------
+## Manuel utilisateur ##
 
-### Systèmes d'exploitation compatibles
+### Systèmes d'exploitation compatibles ###
 Ce server est spécifique au systèmes GNU/Linux, il est compatible avec les version noyau antérieures a la 2.6.28,
 toutefois pour de meilleures performance un système avec un noyau supérieur a 2.6.28 est recommandé
 
-### Compilation
+### Compilation ###
 * make : permet de compiler le programme, la compatibilité noyaux < 2.6.28 se fait automatiquement si un tel système est détecté
 * make clean : permet de purger les .o et l'exécutable
 
-### Format du catalogue
+### Format du catalogue ###
 Le catalogue est un fichier texte utilisant les marques de fin de ligne CRLF,
 les deux premières ligne indiquent l'adresse du serveur et le port sur lequel on peut demander le catalogue. Ensuite chacune des lignes est le nom d'un fichier flux situé dans le répertoire data.
 Pour ajouter un flux il suffit de créer son fichier flux dans le répertoire data et d'ajouter le nom du fichier dans le catalogue.
-####Un fichier flux se décompose ainsi
+####Un fichier flux se décompose ainsi ####
 1. ID=0 //Id du flux
 2. Name=NomDuFlux //Le nom du flux qui aparaitra dans le catalogue
 3. Type=JPEG //Le type d'image (JPEG ou BMP)
@@ -35,6 +32,6 @@ Pour ajouter un flux il suffit de créer son fichier flux dans le répertoire da
 9. Images/Numbers/img2.jpeg // ...
 10. ...
 
-### Lancement du serveur et commandes
+### Lancement du serveur et commandes ###
 Le serveur comprend quelques commandes de base: 
-* exit / quit / q : quitter
+`exit / quit / q : quitter`
