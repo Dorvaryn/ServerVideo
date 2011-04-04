@@ -132,8 +132,10 @@ void central(int epollfd, struct tabFlux * tabFluxTCP,struct tabFlux * tabFluxUD
 	    tabClientsTCP.clients[i].videoClient.envoi->originBuffer = NULL;
 	    free(tabClientsTCP.clients[i].videoClient.envoi->buffer);
 	    tabClientsTCP.clients[i].videoClient.envoi->buffer = NULL;
-	    fclose(tabClientsTCP.clients[i].videoClient.envoi->curFile);
-	    
+	    if(tabClientsTCP.clients[i].videoClient.envoi->curFile != NULL)
+		{
+			fclose(tabClientsTCP.clients[i].videoClient.envoi->curFile);
+		}
 	    free(tabClientsTCP.clients[i].videoClient.envoi);
 	    tabClientsTCP.clients[i].videoClient.envoi = NULL;
 	    
