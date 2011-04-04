@@ -1,7 +1,7 @@
 ID=1
 Name=NumTCP_PULL
 Type=BMP
-Address=192.168.1.44
+Address=127.0.0.1
 Port=8081
 Protocol=TCP_PULL
 IPS=3

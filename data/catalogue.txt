@@ -1,4 +1,4 @@
-ServerAddress: 192.168.1.44
+ServerAddress: 127.0.0.1
 ServerPort: 8080
 flux1.txt
 flux2.txt

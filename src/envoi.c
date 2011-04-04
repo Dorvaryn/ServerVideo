@@ -152,7 +152,7 @@ void sendTCP(struct videoClient* videoClient)
 			env->bufLen -= nbSent;
 		}
 
-	} while (errno != EAGAIN && env->bufLen > 0);
+	} while (nbSent != -1 && env->bufLen > 0);
 
 	if(env->bufLen <= 0) 
 	{
@@ -247,7 +247,7 @@ void sendUDP(struct videoClient* videoClient) {
 			env->bufLen -= nbSent;
 		}
 
-	} while (env->bufLen > 0);
+	} while (nbSent != -1 && env->bufLen > 0);
 
 	if(env->bufLen <= 0) //Quand tout est envoyé
 	{
