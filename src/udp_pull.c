@@ -56,7 +56,6 @@ void* udp_pull(void* leflux)
 							&& faddr.sin_family == comp->sin_family
 							&& faddr.sin_port == comp->sin_port)
 					{
-						puts("trouvé");
 						trouve = j;
 					}
 					j++;

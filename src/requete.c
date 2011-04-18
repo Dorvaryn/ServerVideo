@@ -124,10 +124,6 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				{
 					puts("E: ouverture du fichier");
 				}
-				if(videoClient->infosVideo->type == UDP_PULL)
-				{
-					puts("plop");
-				}
 				sendImage(videoClient, epollfd, sock); 
 			}
 			break;
