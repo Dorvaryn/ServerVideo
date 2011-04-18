@@ -67,7 +67,7 @@ void* multiFlux(void* leflux) {
 	video->envoi->posDansImage = 0;
 	video->envoi->tailleMaxFragment = FRAGMENT_SIZE - 128;
 
-	video->id = 1;
+	video->id = 0;
 	video->etat = RUNNING;
 	video->dernierEnvoi = -1000; //Il y a très longtemps
 
