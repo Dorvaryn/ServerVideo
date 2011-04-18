@@ -31,6 +31,7 @@ int createSockEventTCP(int epollfd, int port)
 	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
 
 	struct sockaddr_in saddr;
+	memset(&saddr, 0, sizeof(struct sockaddr_in));
 
 	saddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	saddr.sin_family = AF_INET;
@@ -60,6 +61,7 @@ int createSockEventUDP(int epollfd, int port)
 	FAIL(fcntl(sock,F_SETFL,flags|O_NONBLOCK)); // Version portalble des sockets non bloquants
 
 	struct sockaddr_in saddr;
+	memset(&saddr, 0, sizeof(struct sockaddr_in));
 
 	saddr.sin_addr.s_addr = htonl(INADDR_ANY);
 	saddr.sin_family = AF_INET;
@@ -83,6 +85,7 @@ int createSockClientEvent(int epollfd, int sock)
 	struct epoll_event ev;
 	memset(&ev, 0, sizeof(struct epoll_event));
 	struct sockaddr_in saddr_client;
+	memset(&saddr_client, 0, sizeof(struct sockaddr_in));
 
 	socklen_t size_addr = sizeof(struct sockaddr_in);
 	#if defined ( NEW )

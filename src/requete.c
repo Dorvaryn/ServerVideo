@@ -61,23 +61,27 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->dest_addr.sin_port = htons(req->listenPort);
 				
 				videoClient->envoi = malloc(sizeof(struct envoi));
-				videoClient->envoi->state = NOTHING_SENT;
-				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r"); //TODO: initialiser curFile avec le bon fichier
-				if(videoClient->envoi->curFile == NULL) {
-					puts("E: ouverture du fichier");
+				if(videoClient->infosVideo->type == UDP_PUSH)
+				{
+					videoClient->etat = RUNNING;
+					videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[0], "r");
+					if(videoClient->envoi->curFile == NULL)
+					{
+						puts("E: ouverture du fichier");
+					}
 				}
-				
-				fseek(videoClient->envoi->curFile, 0, SEEK_END);
-	            videoClient->envoi->fileSize = ftell(videoClient->envoi->curFile);
-	            fseek(videoClient->envoi->curFile, 0, SEEK_SET);
-				
+				else
+				{
+					videoClient->etat = PAUSE;
+				}
 				videoClient->envoi->posDansImage = 0;
 				videoClient->envoi->tailleMaxFragment = req->fragmentSize - 128;
-				
-				videoClient->id = 1;
+				videoClient->id = 0;
+				videoClient->dernierEnvoi = getTime();
+				videoClient->envoi->state = NOTHING_SENT;
 
-
-			} else if(req->listenPort != -1) {
+			} else if(req->listenPort != -1) 
+			{
 
 				videoClient->clientSocket = connectDataTCP(epollfd, sock, req->listenPort, videoClient->infosVideo->type);
 
@@ -100,7 +104,8 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				videoClient->id = 0;
 
 
-			} else {
+			} else 
+			{
 				videoClient->etat = RUNNING;
 
 				if (req->imgId == -1)
@@ -111,15 +116,17 @@ void traiteRequete(struct requete* req, struct videoClient* videoClient, int epo
 				{
 					videoClient->id = req->imgId;
 				}
-				free(videoClient->envoi);
-				videoClient->envoi = NULL;
-				videoClient->envoi = malloc(sizeof(struct envoi));
+				videoClient->envoi->more = 0;
+				videoClient->envoi->posDansImage = 0;
 				videoClient->envoi->state = NOTHING_SENT;
 				videoClient->envoi->curFile = fopen(videoClient->infosVideo->images[videoClient->id-1], "r");
-				videoClient->envoi->posDansImage = 0;
 				if(videoClient->envoi->curFile == NULL)
 				{
 					puts("E: ouverture du fichier");
+				}
+				if(videoClient->infosVideo->type == UDP_PULL)
+				{
+					puts("plop");
 				}
 				sendImage(videoClient, epollfd, sock); 
 			}
